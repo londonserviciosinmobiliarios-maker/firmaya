@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FirmaYa — Firma Electrónica Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#0D6278;
+  --primary-dark:#0A4E62;
+  --primary-light:#1A7A92;
+  --primary-pale:#EBF4F7;
+  --white:#FFFFFF;
+  --text-dark:#1A2B35;
+  --text-medium:#4A6070;
+  --text-light:#8A9BAB;
+  --bg-light:#F5F8FA;
+  --success:#27AE60;
+  --border:#D0DDE5;
+}
+body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--white)}
+
+/* ---- NAVBAR ---- */
+.navbar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:0 6%;height:72px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06)
+}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-wordmark{display:flex;flex-direction:column}
+.logo-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--primary);line-height:1}
+.logo-tagline{font-size:9px;letter-spacing:2.5px;color:var(--text-light);text-transform:uppercase;margin-top:3px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{text-decoration:none;color:var(--text-medium);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;border:none;transition:all .2s}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.btn-outline:hover{background:var(--primary);color:white}
+.btn-white{background:white;color:var(--primary);box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.2)}
+.btn-ghost{background:transparent;color:white;border:2px solid rgba(255,255,255,0.45)}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);border-color:white}
+.btn-lg{padding:15px 32px;font-size:16px}
+
+/* ---- HERO ---- */
+.hero{
+  background:linear-gradient(140deg,var(--primary-dark) 0%,var(--primary) 55%,#1A8EA8 100%);
+  color:white;padding:100px 6% 80px;text-align:center;position:relative;overflow:hidden
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);
+  padding:7px 18px;border-radius:30px;font-size:12px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;margin-bottom:28px
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:54px;font-weight:700;
+  line-height:1.15;margin-bottom:20px;max-width:680px;margin-left:auto;margin-right:auto
+}
+.hero p{
+  font-size:18px;opacity:.85;max-width:540px;
+  margin:0 auto 40px;line-height:1.65
+}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:70px}
+.stats-bar{
+  display:flex;justify-content:center;gap:64px;
+  padding-top:20px;border-top:1px solid rgba(255,255,255,0.15)
+}
+.stat-item{text-align:center}
+.stat-number{font-family:'Playfair Display',serif;font-size:30px;font-weight:700}
+.stat-label{font-size:12px;opacity:.7;margin-top:4px}
+
+/* ---- SECTIONS ---- */
+.section{padding:88px 6%}
+.section-alt{background:var(--bg-light)}
+.section-title{text-align:center;margin-bottom:64px}
+.section-title h2{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;margin-bottom:12px}
+.section-title p{font-size:17px;color:var(--text-medium);max-width:500px;margin:0 auto;line-height:1.65}
+.tag{display:inline-block;background:var(--primary-pale);color:var(--primary);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:12px}
+
+/* ---- HOW IT WORKS ---- */
+.steps{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:48px;
+  max-width:860px;margin:0 auto;position:relative
+}
+.steps::before{
+  content:'';position:absolute;top:32px;left:17%;right:17%;
+  height:2px;background:linear-gradient(to right,var(--primary),var(--primary-light))
+}
+.step{text-align:center;position:relative}
+.step-num{
+  width:64px;height:64px;background:var(--primary);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 22px;
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:white;
+  position:relative;z-index:1;box-shadow:0 4px 18px rgba(13,98,120,.35)
+}
+.step h3{font-size:17px;font-weight:600;margin-bottom:10px}
+.step p{font-size:14px;color:var(--text-medium);line-height:1.65}
+
+/* ---- FEATURES ---- */
+.features-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+  max-width:980px;margin:0 auto
+}
+.feat-card{
+  background:white;border:1px solid var(--border);border-radius:14px;
+  padding:30px;transition:all .3s
+}
+.feat-card:hover{border-color:var(--primary);box-shadow:0 8px 28px rgba(13,98,120,.1);transform:translateY(-4px)}
+.feat-icon{font-size:34px;margin-bottom:16px;display:block}
+.feat-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.feat-card p{font-size:13px;color:var(--text-medium);line-height:1.65}
+
+/* ---- VALIDATIONS ---- */
+.val-section{background:var(--primary-pale);padding:88px 6%}
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:800px;margin:0 auto}
+.val-group{background:white;border-radius:14px;padding:30px;border:1px solid var(--border)}
+.val-group-title{
+  font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--primary);margin-bottom:18px;padding-bottom:14px;
+  border-bottom:2px solid var(--primary-pale)
+}
+.val-item{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:14px;color:var(--text-medium)}
+.val-check{
+  width:22px;height:22px;background:var(--primary);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:white
+}
+
+/* ---- PRICING ---- */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:980px;margin:0 auto}
+.price-card{
+  background:white;border:1px solid var(--border);border-radius:18px;
+  padding:38px 30px;text-align:center;position:relative;transition:all .3s
+}
+.price-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.price-card.featured{border:2px solid var(--primary);box-shadow:0 12px 40px rgba(13,98,120,.18)}
+.popular-tag{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--primary);color:white;padding:4px 18px;
+  border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase
+}
+.plan-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--primary);margin-bottom:8px}
+.plan-price{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--text-dark)}
+.plan-price span{font-size:16px;color:var(--text-medium);font-family:'Inter',sans-serif;font-weight:400}
+.plan-period{font-size:12px;color:var(--text-light);margin-bottom:26px}
+.plan-divider{height:1px;background:var(--border);margin-bottom:22px}
+.plan-feats{list-style:none;text-align:left;margin-bottom:30px}
+.plan-feats li{padding:7px 0;font-size:13px;color:var(--text-medium);display:flex;align-items:center;gap:9px}
+.check{color:var(--success);font-weight:700;font-size:15px}
+
+/* ---- LEGAL ---- */
+.legal-sec{background:var(--primary);color:white;padding:76px 6%;text-align:center}
+.legal-sec h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;margin-bottom:14px}
+.legal-sec p{opacity:.82;max-width:520px;margin:0 auto;font-size:16px;line-height:1.65}
+.badges{display:flex;justify-content:center;gap:20px;margin-top:48px;flex-wrap:wrap}
+.badge{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.1);padding:18px 24px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.2);min-width:200px
+}
+.badge-icon{font-size:30px}
+.badge-text strong{display:block;font-size:14px;font-weight:600}
+.badge-text small{font-size:11px;opacity:.72}
+
+/* ---- FOOTER ---- */
+footer{background:#111E26;color:white;padding:48px 6%;text-align:center}
+footer .f-logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:8px}
+footer p{color:rgba(255,255,255,.45);font-size:13px}
+footer .f-links{display:flex;justify-content:center;gap:24px;margin:16px 0}
+footer .f-links a{color:rgba(255,255,255,.5);font-size:13px;text-decoration:none}
+footer .f-links a:hover{color:white}
+
+/* ---- DEMO OVERLAY ---- */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.72);z-index:300;
+  align-items:center;justify-content:center;backdrop-filter:blur(4px)
+}
+.overlay.open{display:flex}
+.phone{
+  width:390px;background:white;border-radius:28px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.4);position:relative;max-height:92vh;
+  display:flex;flex-direction:column
+}
+.phone-bar{
+  background:var(--primary);padding:18px 22px;
+  display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0
+}
+.phone-bar-logo{font-family:'Playfair Display',serif;font-size:19px;font-weight:700}
+.phone-bar-sub{font-size:10px;opacity:.7;margin-top:2px}
+.close-btn{
+  background:rgba(255,255,255,.18);border:none;color:white;
+  width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center
+}
+.phone-body{padding:26px;overflow-y:auto;flex:1}
+
+/* Progress dots */
+.dots{display:flex;justify-content:center;gap:6px;margin-bottom:22px}
+.dot{width:8px;height:8px;border-radius:4px;background:var(--border);transition:all .3s}
+.dot.active{width:24px;background:var(--primary)}
+.dot.done{background:var(--success)}
+
+/* Screens */
+.screen{display:none}
+.screen.on{display:block}
+
+/* Canvas */
+#sigCanvas{
+  border:2px dashed var(--border);border-radius:10px;
+  background:#FAFAFA;cursor:crosshair;width:100%;touch-action:none
+}
+
+/* Selfie sim */
+.selfie-frame{
+  width:220px;height:220px;border-radius:50%;background:#1A2B35;
+  margin:0 auto;position:relative;overflow:hidden;
+  border:3px solid var(--primary)
+}
+.selfie-frame::after{
+  content:'';position:absolute;inset:0;
+  border-radius:50%;box-shadow:inset 0 0 30px rgba(13,98,120,.5)
+}
+.selfie-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:rgba(255,255,255,.7)
+}
+.selfie-icon{font-size:60px;margin-bottom:8px}
+.selfie-label{font-size:13px;text-align:center}
+
+/* PIN inputs */
+.pin-row{display:flex;gap:10px;justify-content:center}
+.pin-input{
+  width:52px;height:60px;text-align:center;font-size:26px;font-weight:700;
+  border:2px solid var(--border);border-radius:10px;outline:none;
+  transition:border-color .2s;font-family:'Inter',sans-serif
+}
+.pin-input:focus{border-color:var(--primary)}
+
+/* Success */
+.success-circle{
+  width:90px;height:90px;background:var(--success);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:42px;color:white;
+  box-shadow:0 6px 24px rgba(39,174,96,.35)
+}
+
+/* Nav buttons */
+.d-nav{display:flex;gap:10px;margin-top:20px}
+.d-btn{
+  flex:1;padding:13px;border-radius:10px;font-size:14px;
+  font-weight:600;cursor:pointer;border:none;transition:all .2s
+}
+.d-btn-p{background:var(--primary);color:white}
+.d-btn-p:hover{background:var(--primary-dark)}
+.d-btn-s{background:var(--bg-light);color:var(--text-medium)}
+.d-btn-s:hover{background:var(--border)}
+.d-btn-g{background:var(--success);color:white}
+
+/* Info box */
+.info-box{background:var(--bg-light);border-radius:10px;padding:14px;font-size:12px;color:var(--text-medium);line-height:1.8}
+.info-box p{margin-bottom:4px}
+.info-box p:last-child{margin-bottom:0}
+
+/* ---- TOGGLE BILLING ---- */
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:48px}
+.toggle-label{font-size:14px;font-weight:600;color:var(--text-medium)}
+.toggle-label.active-label{color:var(--text-dark)}
+.toggle-switch{width:52px;height:28px;background:var(--primary);border-radius:20px;position:relative;cursor:pointer;transition:background .3s}
+.toggle-switch::after{content:'';position:absolute;width:22px;height:22px;background:white;border-radius:50%;top:3px;left:3px;transition:left .3s}
+.toggle-switch.annual::after{left:27px}
+.annual-badge{display:inline-block;background:#D5F5E3;color:var(--success);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:6px}
+
+/* ---- COMPARISON TABLE ---- */
+.comp-wrap{overflow-x:auto;max-width:900px;margin:48px auto 0}
+.comp-table{width:100%;border-collapse:collapse}
+.comp-table th{padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);background:var(--bg-light);border-bottom:2px solid var(--border)}
+.comp-table th.th-plan{text-align:center;width:130px}
+.comp-table th.th-feat{text-align:left}
+.comp-table td{padding:13px 16px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text-medium)}
+.comp-table td.td-feat{font-weight:500;color:var(--text-dark)}
+.comp-table td.td-val{text-align:center}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tbody tr:hover td{background:var(--primary-pale)}
+.comp-section td{background:var(--bg-light)!important;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);padding:10px 16px!important}
+.check-yes{color:var(--success);font-size:17px}
+.check-no{color:var(--border);font-size:17px}
+
+/* ---- FAQ ---- */
+.faq-list{max-width:760px;margin:0 auto}
+.faq-item{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;background:white}
+.faq-q{padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:var(--text-dark);transition:background .2s;gap:16px}
+.faq-q:hover{background:var(--primary-pale)}
+.faq-q.open{background:var(--primary-pale);color:var(--primary)}
+.faq-icon{font-size:22px;transition:transform .3s;color:var(--primary);flex-shrink:0}
+.faq-icon.open{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 22px 18px;font-size:14px;color:var(--text-medium);line-height:1.8}
+.faq-a.open{display:block}
+
+/* ---- ENTERPRISE BANNER ---- */
+.enterprise-banner{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:white;border-radius:16px;padding:40px 48px;max-width:900px;margin:40px auto 0;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.enterprise-banner h3{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:8px}
+.enterprise-banner p{opacity:.85;font-size:15px;line-height:1.6}
+.btn-white-outline{background:transparent;color:white;border:2px solid rgba(255,255,255,.6);padding:13px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;display:inline-block;transition:all .2s}
+.btn-white-outline:hover{background:white;color:var(--primary)}
+
+/* Responsive */
+@media(max-width:768px){
+  .nav-links a,.btn-outline{display:none}
+  .hero h1{font-size:36px}
+  .steps{grid-template-columns:1fr}
+  .steps::before{display:none}
+  .features-grid,.val-grid,.price-grid{grid-template-columns:1fr}
+  .stats-bar{gap:32px}
+  .phone{width:340px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="#" class="logo">
+    <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+      <rect width="44" height="44" rx="11" fill="#0D6278"/>
+      <rect x="4" y="4" width="36" height="36" rx="8" fill="none" stroke="white" stroke-width="1" stroke-opacity=".3"/>
+      <!-- Pen -->
+      <line x1="29" y1="9" x2="18" y2="24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <polygon points="16,27 18,24 21,26" fill="white"/>
+      <!-- Signature -->
+      <path d="M11,33 Q15,29 19,32 Q22,35 26,31 Q30,27 34,30" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="logo-wordmark">
+      <span class="logo-name">FirmaYa</span>
+      <span class="logo-tagline">Firma Electrónica Digital</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#como">Cómo funciona</a>
+    <a href="#validaciones">Validaciones</a>
+    <a href="#precios">Precios</a>
+    <a href="#legal">Legal</a>
+    <a href="#" class="btn btn-outline">Ingresar</a>
+    <a href="#" class="btn btn-primary">Empezar gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ Válido bajo Ley 25.506 · República Argentina</div>
+  <h1>Firmá documentos desde cualquier celular</h1>
+  <p>La plataforma de firma electrónica más simple para inmobiliarias, estudios jurídicos y empresas. Tus clientes firman en menos de 2 minutos.</p>
+  <div class="hero-ctas">
+    <a href="#" class="btn btn-white btn-lg">Empezar gratis →</a>
+    <button class="btn btn-ghost btn-lg" onclick="openDemo()">▶ Ver demo en vivo</button>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Validez legal</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">&lt; 2 min</div>
+      <div class="stat-label">Para firmar</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">0 papel</div>
+      <div class="stat-label">100% digital</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">SHA-256</div>
+      <div class="stat-label">Integridad garantizada</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="como">
+  <div class="section-title">
+    <div class="tag">Proceso</div>
+    <h2>Así de simple</h2>
+    <p>En 3 pasos, tu documento está firmado con plena validez jurídica</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Subí el documento</h3>
+      <p>PDF o Word. Arrastrá el archivo o seleccionalo desde tu computadora. Posicionás dónde va la firma.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Invitás a firmar</h3>
+      <p>Ingresás el nombre y email del firmante. El sistema envía el link por email o te lo da para WhatsApp.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Recibís el firmado</h3>
+      <p>El cliente firma desde su celular. El documento firmado y el informe de evidencia te llegan solos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section section-alt">
+  <div class="section-title">
+    <div class="tag">Herramientas</div>
+    <h2>Todo lo que necesitás</h2>
+    <p>Diseñado para que firmar sea simple, seguro y legalmente defendible</p>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <span class="feat-icon">✍️</span>
+      <h3>Firma en pantalla</h3>
+      <p>El cliente firma con el dedo en su celular. Sin apps, sin descargas, sin cuentas.</p>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📧</span>
+      <h3>Verificación múltiple</h3>
+      <p>Código por email, SMS o WhatsApp para confirmar la identidad antes de firmar.</p>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🤳</span>
+      <h3>Selfie con timestamp</h3>
+      <p>Foto del firmante en el momento exacto de la firma, con fecha, hora y marca de agua.</p>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🪪</span>
+      <h3>Foto del DNI</h3>
+      <p>El firmante sube foto de su documento de identidad para autenticación avanzada.</p>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🔐</span>
+      <h3>Hash SHA-256</h3>
+      <p>Huella digital única del documento. Prueba que no fue alterado después de la firma.</p>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📋</span>
+      <h3>Informe de firmas</h3>
+      <p>PDF con todo el rastro de evidencia: IP, GPS, dispositivo, selfie, email y timestamp.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALIDATIONS -->
+<section class="val-section" id="validaciones">
+  <div class="section-title">
+    <div class="tag">Autenticación</div>
+    <h2>Elegís el nivel de validación</h2>
+    <p>Adaptado al tipo de documento — más simple para reservas, más robusto para contratos grandes</p>
+  </div>
+  <div class="val-grid">
+    <div class="val-group">
+      <div class="val-group-title">🔵 Autenticación Estándar</div>
+      <div class="val-item"><div class="val-check">✓</div> Firma manuscrita en pantalla</div>
+      <div class="val-item"><div class="val-check">✓</div> Código de verificación por e-mail</div>
+      <div class="val-item"><div class="val-check">✓</div> Código de verificación por SMS</div>
+      <div class="val-item"><div class="val-check">✓</div> Código de verificación por WhatsApp</div>
+    </div>
+    <div class="val-group">
+      <div class="val-group-title">🟣 Autenticación Avanzada</div>
+      <div class="val-item"><div class="val-check">✓</div> Selfie — foto del rostro con timestamp</div>
+      <div class="val-item"><div class="val-check">✓</div> Foto del documento de identidad</div>
+      <div class="val-item"><div class="val-check">✓</div> Reconocimiento facial</div>
+      <div class="val-item"><div class="val-check">✓</div> Biometría facial — prueba de vida</div>
+      <div class="val-item"><div class="val-check">✓</div> Validación de identidad completa</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="precios">
+  <div class="section-title">
+    <div class="tag">Precios</div>
+    <h2>Planes sin sorpresas</h2>
+    <p>Sin costos ocultos. Cancelás cuando querés.</p>
+  </div>
+
+  <!-- Billing toggle -->
+  <div class="billing-toggle">
+    <span class="toggle-label active-label" id="lblMensual">Mensual</span>
+    <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
+    <span class="toggle-label" id="lblAnual">Anual <span class="annual-badge">20% OFF</span></span>
+  </div>
+
+  <div class="price-grid">
+    <div class="price-card">
+      <div class="plan-name">Básico</div>
+      <div class="plan-price">$15.000 <span>ARS</span></div>
+      <div class="plan-period">por mes · cobro mensual</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li><span class="check">✓</span> 1 usuario</li>
+        <li><span class="check">✓</span> 20 documentos por mes</li>
+        <li><span class="check">✓</span> Firma en pantalla</li>
+        <li><span class="check">✓</span> Código por email</li>
+        <li><span class="check">✓</span> Informe de firmas PDF</li>
+        <li><span class="check">✓</span> Soporte por email</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;display:flex">Empezar</a>
+    </div>
+    <div class="price-card featured">
+      <div class="popular-tag">MÁS POPULAR</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$35.000 <span>ARS</span></div>
+      <div class="plan-period">por mes · cobro mensual</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li><span class="check">✓</span> 3 usuarios</li>
+        <li><span class="check">✓</span> 50 documentos por mes</li>
+        <li><span class="check">✓</span> Todo lo del Básico</li>
+        <li><span class="check">✓</span> Selfie + Foto del DNI</li>
+        <li><span class="check">✓</span> Código por SMS y WhatsApp</li>
+        <li><span class="check">✓</span> Personalización de marca</li>
+        <li><span class="check">✓</span> Plantillas de documentos</li>
+        <li><span class="check">✓</span> Soporte prioritario</li>
+      </ul>
+      <a href="#" class="btn btn-primary" style="width:100%;display:flex">Empezar</a>
+    </div>
+    <div class="price-card">
+      <div class="plan-name">Agencia</div>
+      <div class="plan-price">$70.000 <span>ARS</span></div>
+      <div class="plan-period">por mes · cobro mensual</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-feats">
+        <li><span class="check">✓</span> Usuarios ilimitados</li>
+        <li><span class="check">✓</span> Documentos ilimitados</li>
+        <li><span class="check">✓</span> Todo lo del Pro</li>
+        <li><span class="check">✓</span> Reconocimiento facial</li>
+        <li><span class="check">✓</span> Biometría + prueba de vida</li>
+        <li><span class="check">✓</span> API para integrar a tus sistemas</li>
+        <li><span class="check">✓</span> Soporte WhatsApp directo</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;display:flex">Empezar</a>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="section section-alt">
+  <div class="section-title">
+    <div class="tag">Comparación</div>
+    <h2>Compará los planes</h2>
+    <p>Todo lo que incluye cada plan, sin letra chica</p>
+  </div>
+  <div class="comp-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th class="th-feat">Funcionalidad</th>
+          <th class="th-plan">Básico</th>
+          <th class="th-plan">Pro</th>
+          <th class="th-plan">Agencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="comp-section"><td colspan="4">📊 Uso</td></tr>
+        <tr><td class="td-feat">Documentos por mes</td><td class="td-val">20</td><td class="td-val">50</td><td class="td-val">Ilimitados</td></tr>
+        <tr><td class="td-feat">Usuarios incluidos</td><td class="td-val">1</td><td class="td-val">3</td><td class="td-val">Ilimitados</td></tr>
+        <tr><td class="td-feat">El firmante necesita cuenta</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td></tr>
+        <tr class="comp-section"><td colspan="4">🔵 Autenticación Estándar</td></tr>
+        <tr><td class="td-feat">Firma en pantalla</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Código por email</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Código por SMS</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Código por WhatsApp</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr class="comp-section"><td colspan="4">🟣 Autenticación Avanzada</td></tr>
+        <tr><td class="td-feat">Selfie con timestamp</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Foto del DNI</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Reconocimiento facial</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Biometría — prueba de vida</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr class="comp-section"><td colspan="4">⚙️ Funcionalidades</td></tr>
+        <tr><td class="td-feat">Informe de firmas PDF</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Recordatorios automáticos</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Personalización de marca</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Plantillas de documentos</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Almacenamiento 5 años</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">API para integración</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
+        <tr><td class="td-feat">Soporte</td><td class="td-val">Email</td><td class="td-val">Prioritario</td><td class="td-val">WhatsApp directo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Enterprise banner -->
+  <div class="enterprise-banner">
+    <div>
+      <h3>¿Necesitás algo a medida?</h3>
+      <p>Para grandes agencias, estudios jurídicos o empresas con alto volumen de documentos. Usuarios ilimitados, integración total y soporte dedicado.</p>
+    </div>
+    <a href="#" class="btn-white-outline">Hablar con ventas →</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="section-title">
+    <div class="tag">FAQ</div>
+    <h2>Preguntas frecuentes</h2>
+    <p>Todo lo que necesitás saber antes de empezar</p>
+  </div>
+  <div class="faq-list">
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿El firmante necesita crear una cuenta en FirmaYa?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">No. El firmante solo recibe un link por email o WhatsApp, lo abre desde su celular y firma. No necesita registrarse ni instalar ninguna app. Solo vos, como agente o empresa, tenés una cuenta en FirmaYa.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Las firmas tienen validez legal en Argentina?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Sí. Todas las firmas generadas en FirmaYa son firma electrónica válida bajo la <strong>Ley 25.506</strong> de Firma Electrónica de la República Argentina. Cada documento incluye un informe de evidencia con IP, GPS, dispositivo, timestamp, selfie y hash SHA-256 del documento, lo que lo hace legalmente defendible ante cualquier disputa.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cuál es la diferencia entre firmante y usuario?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a"><strong>Usuario</strong> es quien tiene cuenta en FirmaYa, sube documentos y gestiona los envíos (vos, tu equipo). <strong>Firmante</strong> es la persona que recibe el link y firma el documento (tu cliente, el propietario, el inquilino). Los firmantes no necesitan cuenta ni pagan nada.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Puedo cancelar en cualquier momento?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Sí, podés cancelar sin penalización. Todos los planes son prepagos con renovación automática. Si cancelás, seguís teniendo acceso hasta que termine el período ya pagado. No te vamos a cobrar nada más.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cómo se almacenan los documentos firmados?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Guardamos todos tus documentos firmados durante <strong>mínimo 5 años</strong> en servidores seguros. Además, al completarse la firma te enviamos una copia automáticamente por email. También podés descargar todos tus documentos en cualquier momento y guardarlos en tu propio Google Drive, OneDrive o donde quieras.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Qué pasa si el firmante no tiene internet o celular?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">FirmaYa funciona desde cualquier dispositivo con navegador web: celular, tablet o computadora. No requiere app ni conexión especial. Si el firmante no tiene acceso a internet, la firma debe hacerse en forma presencial por medios tradicionales.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Cómo contrato FirmaYa?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Creás una cuenta gratis, elegís el plan que necesitás y pagás con tarjeta de crédito o débito. La activación es inmediata. Te enviamos la factura por email dentro de las 48 horas.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        ¿Puedo integrar FirmaYa con mis otros sistemas?
+        <span class="faq-icon">+</span>
+      </div>
+      <div class="faq-a">Sí. El Plan Agencia incluye acceso completo a la API de FirmaYa para integrar el proceso de firma en tus propios sistemas (CRM, software de gestión inmobiliaria, etc.). Para integraciones más simples también podés usar Zapier o Make sin escribir código.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- LEGAL -->
+<section class="legal-sec" id="legal">
+  <h2>Cumplimiento legal garantizado</h2>
+  <p>Cada firma generada en FirmaYa cumple con la legislación vigente de firma electrónica de la República Argentina, con evidencia forense completa ante cualquier disputa</p>
+  <div class="badges">
+    <div class="badge">
+      <div class="badge-icon">⚖️</div>
+      <div class="badge-text">
+        <strong>Ley 25.506</strong>
+        <small>Firma Electrónica Argentina</small>
+      </div>
+    </div>
+    <div class="badge">
+      <div class="badge-icon">🔒</div>
+      <div class="badge-text">
+        <strong>Ley 25.326</strong>
+        <small>Protección de datos personales</small>
+      </div>
+    </div>
+    <div class="badge">
+      <div class="badge-icon">🛡️</div>
+      <div class="badge-text">
+        <strong>SHA-256</strong>
+        <small>Integridad del documento</small>
+      </div>
+    </div>
+    <div class="badge">
+      <div class="badge-icon">📍</div>
+      <div class="badge-text">
+        <strong>IP · GPS · Dispositivo</strong>
+        <small>Evidencia geolocalizada</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">FirmaYa</div>
+  <p>Firma Electrónica Digital · firmaya.com.ar</p>
+  <div class="f-links">
+    <a href="#">Términos y condiciones</a>
+    <a href="#">Privacidad</a>
+    <a href="#">Legal</a>
+    <a href="#">Contacto</a>
+  </div>
+  <p style="font-size:12px;margin-top:8px;">© 2026 FirmaYa. Todos los derechos reservados. Desarrollado en Argentina.</p>
+</footer>
+
+<!-- ===== DEMO OVERLAY ===== -->
+<div class="overlay" id="overlay" onclick="closeOutside(event)">
+  <div class="phone" id="phone">
+    <div class="phone-bar">
+      <div>
+        <div class="phone-bar-logo">FirmaYa</div>
+        <div class="phone-bar-sub">Demo interactivo · firma desde tu celular</div>
+      </div>
+      <button class="close-btn" onclick="closeDemo()">✕</button>
+    </div>
+    <div class="phone-body">
+
+      <!-- SCREEN 1: Bienvenida -->
+      <div class="screen on" id="s1">
+        <div class="dots">
+          <div class="dot active"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div style="text-align:center;padding:12px 0">
+          <div style="width:72px;height:72px;background:var(--primary-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">📄</div>
+          <p style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Inmobiliaria Ejemplo S.A.</p>
+          <h3 style="font-family:'Playfair Display',serif;font-size:19px;margin-bottom:10px">Te invitaron a firmar</h3>
+          <p style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:20px">RESERVA DPTO 9 DE JULIO 1157 PH 33</p>
+          <p style="font-size:13px;color:var(--text-medium);line-height:1.7;margin-bottom:20px">Este documento tiene validez legal bajo la Ley 25.506 de Firma Electrónica de la República Argentina.</p>
+          <div class="info-box">
+            <p>📎 <strong>1 documento adjunto</strong></p>
+            <p>✍️ <strong>1 firma requerida</strong></p>
+            <p>⏰ <strong>Vence en 7 días</strong></p>
+            <p>🔒 <strong>Autenticación: Firma + Email + Selfie</strong></p>
+          </div>
+        </div>
+        <div class="d-nav"><button class="d-btn d-btn-p" onclick="go(2)">Ver documento →</button></div>
+      </div>
+
+      <!-- SCREEN 2: Vista documento -->
+      <div class="screen" id="s2">
+        <div class="dots">
+          <div class="dot done"></div><div class="dot active"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <p style="font-size:13px;font-weight:600;margin-bottom:10px">📄 Revisá el documento</p>
+        <div style="border:1px solid var(--border);border-radius:10px;padding:16px;background:#FAFAFA;font-size:11px;color:var(--text-medium);line-height:1.8;max-height:210px;overflow-y:auto;margin-bottom:12px">
+          <strong style="display:block;text-align:center;font-size:12px;color:var(--text-dark);margin-bottom:10px">RESERVA DE COMPRA · N° 2026-061</strong>
+          <p>En la ciudad de Córdoba, a los 13 días del mes de junio de 2026, la Sra. <strong>MARIA SILVIA LOPEZ</strong>, DNI 12.345.678, en adelante "EL RESERVANTE", entrega en concepto de reserva la suma de <strong>PESOS OCHOCIENTOS MIL ($800.000)</strong> por la propiedad ubicada en <strong>9 de Julio 1157, Piso 2 PH 33</strong>, Ciudad de Córdoba, Provincia de Córdoba...</p>
+          <br/><p>La presente reserva tiene validez por el término de 10 (diez) días hábiles a partir de la fecha de suscripción. La suma entregada será imputada al precio de venta acordado...</p>
+          <br/>
+          <div style="background:#FFF9E6;border:1px dashed #F0C040;border-radius:6px;padding:10px;text-align:center;margin-top:8px">
+            <p style="color:#856404;font-size:12px;font-weight:600">✍️ Tu firma va aquí</p>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:12px">Scrolleá para leer el documento completo</p>
+        <div class="d-nav">
+          <button class="d-btn d-btn-s" onclick="go(1)">← Atrás</button>
+          <button class="d-btn d-btn-p" onclick="go(3)">Ir a firmar →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: Firma -->
+      <div class="screen" id="s3">
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <p style="font-size:13px;font-weight:600;margin-bottom:4px">✍️ Dibujá tu firma</p>
+        <p style="font-size:12px;color:var(--text-light);margin-bottom:12px">Usá el dedo para firmar en el recuadro de abajo</p>
+        <canvas id="sigCanvas" width="310" height="130"></canvas>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;margin-bottom:14px">
+          <button onclick="clearSig()" style="padding:6px 14px;background:var(--bg-light);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-medium)">🗑 Limpiar</button>
+        </div>
+        <div class="d-nav">
+          <button class="d-btn d-btn-s" onclick="go(2)">← Atrás</button>
+          <button class="d-btn d-btn-p" onclick="go(4)">Confirmar firma →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: Selfie -->
+      <div class="screen" id="s4">
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
+        <p style="font-size:13px;font-weight:600;margin-bottom:4px;text-align:center">🤳 Confirmá tu identidad</p>
+        <p style="font-size:12px;color:var(--text-medium);margin-bottom:16px;text-align:center">Necesitamos una selfie para validar quién firma</p>
+        <div class="selfie-frame" id="selfieFrame">
+          <div class="selfie-overlay" id="selfieOverlay">
+            <div class="selfie-icon">👤</div>
+            <div class="selfie-label">Posicioná tu cara<br>en el círculo</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-light);text-align:center;margin:12px 0">La foto se marca con timestamp y se adjunta al informe de firmas</p>
+        <div class="d-nav">
+          <button class="d-btn d-btn-s" onclick="go(3)">← Atrás</button>
+          <button class="d-btn d-btn-p" onclick="takeSelfie()">📸 Sacar selfie →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: Código email -->
+      <div class="screen" id="s5">
+        <div class="dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot active"></div>
+        </div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="font-size:44px;margin-bottom:14px">📧</div>
+          <h4 style="font-size:16px;font-weight:600;margin-bottom:8px">Verificá tu email</h4>
+          <p style="font-size:13px;color:var(--text-medium);margin-bottom:22px;line-height:1.6">Enviamos un código de 4 dígitos a<br><strong>mar***@gmail.com</strong></p>
+          <div class="pin-row" style="margin-bottom:16px">
+            <input class="pin-input" id="p1" maxlength="1" oninput="pinNext(this,'p2')">
+            <input class="pin-input" id="p2" maxlength="1" oninput="pinNext(this,'p3')">
+            <input class="pin-input" id="p3" maxlength="1" oninput="pinNext(this,'p4')">
+            <input class="pin-input" id="p4" maxlength="1" oninput="pinLast(this)">
+          </div>
+          <p style="font-size:12px;color:var(--text-light)">¿No llegó? <a href="#" style="color:var(--primary)" onclick="return false">Reenviar código</a></p>
+        </div>
+        <div class="d-nav">
+          <button class="d-btn d-btn-s" onclick="go(4)">← Atrás</button>
+          <button class="d-btn d-btn-p" onclick="go(6)">Verificar →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 6: Éxito -->
+      <div class="screen" id="s6">
+        <div style="text-align:center;padding:16px 0">
+          <div class="success-circle">✓</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:var(--success)">¡Firmado!</h3>
+          <p style="font-size:14px;color:var(--text-medium);margin-bottom:24px;line-height:1.7">Tu firma fue registrada con plena validez legal. El documento firmado fue enviado automáticamente a la inmobiliaria.</p>
+          <div class="info-box">
+            <p>✅ Firma manuscrita registrada</p>
+            <p>✅ Selfie con timestamp adjuntada</p>
+            <p>✅ Email verificado</p>
+            <p>✅ IP · GPS · Dispositivo registrados</p>
+            <p>✅ Hash SHA-256 del documento</p>
+            <p>✅ Informe de firmas generado</p>
+          </div>
+          <p style="font-size:11px;color:var(--text-light);margin-top:12px">Token de firma: e0a6cb32-39ab-45a9-ab93</p>
+        </div>
+        <div class="d-nav">
+          <button class="d-btn" style="background:var(--success);color:white" onclick="closeDemo()">Cerrar demo</button>
+        </div>
+      </div>
+
+    </div><!-- /phone-body -->
+  </div><!-- /phone -->
+</div><!-- /overlay -->
+
+<script>
+// ---- BILLING TOGGLE ----
+const prices = {
+  mensual: ['$15.000','$35.000','$70.000'],
+  anual:   ['$12.000','$28.000','$56.000']
+};
+let billing = 'mensual';
+function toggleBilling(){
+  billing = billing === 'mensual' ? 'anual' : 'mensual';
+  const toggle = document.getElementById('billingToggle');
+  const lblM = document.getElementById('lblMensual');
+  const lblA = document.getElementById('lblAnual');
+  toggle.classList.toggle('annual', billing === 'anual');
+  lblM.classList.toggle('active-label', billing === 'mensual');
+  lblA.classList.toggle('active-label', billing === 'anual');
+  document.querySelectorAll('.plan-price').forEach((el, i) => {
+    el.innerHTML = prices[billing][i] + ' <span>ARS</span>';
+  });
+  document.querySelectorAll('.plan-period').forEach(el => {
+    el.textContent = billing === 'anual' ? 'por mes · cobro anual' : 'por mes · cobro mensual';
+  });
+}
+
+// ---- FAQ ----
+function toggleFaq(el){
+  const icon = el.querySelector('.faq-icon');
+  const ans = el.nextElementSibling;
+  const isOpen = el.classList.contains('open');
+  // close all
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.classList.remove('open');
+    q.querySelector('.faq-icon').classList.remove('open');
+    q.nextElementSibling.classList.remove('open');
+  });
+  if(!isOpen){
+    el.classList.add('open');
+    icon.classList.add('open');
+    ans.classList.add('open');
+  }
+}
+
+// ---- Canvas signature ----
+const cv = document.getElementById('sigCanvas');
+const ctx = cv ? cv.getContext('2d') : null;
+let drawing = false;
+
+function getPos(e, canvas){
+  const r = canvas.getBoundingClientRect();
+  const scale = canvas.width / r.width;
+  const src = e.touches ? e.touches[0] : e;
+  return {x:(src.clientX-r.left)*scale, y:(src.clientY-r.top)*scale};
+}
+
+if(cv){
+  cv.addEventListener('mousedown', e=>{drawing=true; const p=getPos(e,cv); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
+  cv.addEventListener('mousemove', e=>{ if(!drawing)return; const p=getPos(e,cv); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#1A2B35'; ctx.lineTo(p.x,p.y); ctx.stroke(); });
+  cv.addEventListener('mouseup',()=>drawing=false);
+  cv.addEventListener('touchstart', e=>{e.preventDefault(); drawing=true; const p=getPos(e,cv); ctx.beginPath(); ctx.moveTo(p.x,p.y);},{passive:false});
+  cv.addEventListener('touchmove', e=>{e.preventDefault(); if(!drawing)return; const p=getPos(e,cv); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#1A2B35'; ctx.lineTo(p.x,p.y); ctx.stroke();},{passive:false});
+  cv.addEventListener('touchend',()=>drawing=false);
+}
+
+function clearSig(){ if(ctx) ctx.clearRect(0,0,cv.width,cv.height); }
+
+// ---- Demo navigation ----
+function openDemo(){ document.getElementById('overlay').classList.add('open'); go(1); }
+function closeDemo(){ document.getElementById('overlay').classList.remove('open'); }
+function closeOutside(e){ if(e.target===document.getElementById('overlay')) closeDemo(); }
+
+function go(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s'+n).classList.add('on');
+  document.querySelector('.phone-body').scrollTop=0;
+}
+
+// ---- Selfie simulation ----
+function takeSelfie(){
+  const frame = document.getElementById('selfieFrame');
+  const overlay = document.getElementById('selfieOverlay');
+  overlay.innerHTML = '<div style="font-size:60px">📸</div><div class="selfie-label">Capturando...</div>';
+  frame.style.border = '3px solid var(--success)';
+  setTimeout(()=>{
+    overlay.innerHTML = '<div style="font-size:60px">✅</div><div class="selfie-label" style="color:#27AE60"><strong>¡Selfie capturada!</strong><br>06/13/2026 20:46:27</div>';
+    setTimeout(()=> go(5), 1200);
+  }, 1500);
+}
+
+// ---- PIN auto-advance ----
+function pinNext(el, nextId){
+  if(el.value) document.getElementById(nextId).focus();
+}
+function pinLast(el){
+  // auto-submit after all filled
+  const all = document.querySelectorAll('.pin-input');
+  let ok = true;
+  all.forEach(i=>{ if(!i.value) ok=false; });
+  if(ok) setTimeout(()=>go(6), 600);
+}
+</script>
+</body>
+</html>
