@@ -1,6 +1,9 @@
-meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FirmaYa Ã¢ÂÂ Panel</title>
+<title>FirmaYa — Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -365,21 +368,21 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           <path d="M13,39 Q18,34 23,38 Q27,41 31,37 Q36,32 41,35" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
         </svg>
         <div class="login-logo-name">FirmaYa</div>
-        <div class="login-logo-sub">Firma ElectrÃÂ³nica Digital</div>
+        <div class="login-logo-sub">Firma Electrónica Digital</div>
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
         <input class="form-input" type="text" id="loginEmail" value="london@firmaya.com.ar" placeholder="tu@email.com" autocomplete="off" readonly style="background:#f5f8fa;cursor:default">
       </div>
       <div class="form-group">
-        <label class="form-label">ContraseÃÂ±a</label>
-        <input class="form-input" id="loginPass" type="tel" inputmode="text" placeholder="ContraseÃÂ±a" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="-webkit-text-security:disc">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" id="loginPass" type="tel" inputmode="text" placeholder="Contraseña" autocomplete="off" style="-webkit-text-security:disc">
       </div>
-      <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseÃÂ±a incorrectos.</div>
+      <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseña incorrectos.</div>
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="doLogin()">
-        Ingresar al panel Ã¢ÂÂ
+        Ingresar al panel →
       </button>
-      <div class="login-footer">ÃÂ¿Olvidaste tu contraseÃÂ±a? <a href="#" style="color:var(--primary)">Recuperar</a></div>
+      <div class="login-footer">¿Olvidaste tu contraseña? <a href="#" style="color:var(--primary)">Recuperar</a></div>
     </div>
   </div>
 </div>
@@ -393,29 +396,29 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         FirmaYa
-        <span>Panel de gestiÃÂ³n</span>
+        <span>Panel de gestión</span>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-item active" onclick="showView('dashboard')">
-          <span class="nav-item-icon">Ã°ÂÂÂ</span> Dashboard
+          <span class="nav-item-icon">📊</span> Dashboard
         </div>
         <div class="nav-item" onclick="showView('documentos')">
-          <span class="nav-item-icon">Ã°ÂÂÂ</span> Documentos
+          <span class="nav-item-icon">📄</span> Documentos
         </div>
         <div class="nav-item" onclick="showView('nuevo')">
-          <span class="nav-item-icon">Ã¢ÂÂ</span> Nuevo documento
+          <span class="nav-item-icon">➕</span> Nuevo documento
         </div>
         <div class="nav-item" onclick="showView('contactos')">
-          <span class="nav-item-icon">Ã°ÂÂÂ¥</span> Contactos
+          <span class="nav-item-icon">👥</span> Contactos
         </div>
         <div class="nav-item" onclick="showView('plantillas')">
-          <span class="nav-item-icon">Ã°ÂÂÂ</span> Plantillas
+          <span class="nav-item-icon">📋</span> Plantillas
         </div>
         <div class="nav-item" onclick="showView('informes')">
-          <span class="nav-item-icon">Ã°ÂÂÂ</span> Informes
+          <span class="nav-item-icon">📈</span> Informes
         </div>
         <div class="nav-item" onclick="showView('ajustes')">
-          <span class="nav-item-icon">Ã¢ÂÂÃ¯Â¸Â</span> Ajustes
+          <span class="nav-item-icon">⚙️</span> Ajustes
         </div>
       </nav>
       <div class="sidebar-bottom">
@@ -423,7 +426,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           <div class="user-avatar">LF</div>
           <div>
             <div class="user-name">Luciano F.</div>
-            <div class="user-plan" id="planCounter">Plan Pro ÃÂ· 0/50 docs</div>
+            <div class="user-plan" id="planCounter">Plan Pro · 0/50 docs</div>
           </div>
         </div>
       </div>
@@ -434,11 +437,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
       <!-- TOP BAR -->
       <div class="topbar">
-        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="MenÃÂº">Ã¢ÂÂ°</button>
+        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
         <div class="topbar-title" id="topbarTitle">Dashboard</div>
         <div class="topbar-right">
           <div class="search-bar">
-            <span>Ã°ÂÂÂ</span>
+            <span>🔍</span>
             <input placeholder="Buscar documentos o firmantes...">
           </div>
           <button class="btn btn-primary" onclick="showView('nuevo')">+ Nuevo documento</button>
@@ -451,35 +454,35 @@ td.td-name{font-weight:600;color:var(--text-dark)}
         <!-- ===== DASHBOARD ===== -->
         <div id="view-dashboard" class="view on">
           <div class="page-header">
-            <div class="page-title">Bienvenido Ã°ÂÂÂ</div>
-            <div class="page-sub">Resumen de tu actividad ÃÂ· Julio 2026</div>
+            <div class="page-title">Bienvenido 👋</div>
+            <div class="page-sub">Resumen de tu actividad · Julio 2026</div>
           </div>
 
           <div class="stats-row">
             <div class="stat-card">
               <div class="stat-num" id="statTotal">0</div>
               <div class="stat-lbl">Total enviados</div>
-              <div class="stat-icon">Ã°ÂÂÂ¤</div>
+              <div class="stat-icon">📤</div>
             </div>
             <div class="stat-card green">
               <div class="stat-num" id="statFirmados">0</div>
               <div class="stat-lbl">Firmados</div>
-              <div class="stat-icon">Ã¢ÂÂ</div>
+              <div class="stat-icon">✅</div>
             </div>
             <div class="stat-card orange">
               <div class="stat-num" id="statPendientes">0</div>
               <div class="stat-lbl">Pendientes</div>
-              <div class="stat-icon">Ã¢ÂÂ³</div>
+              <div class="stat-icon">⏳</div>
             </div>
             <div class="stat-card red">
               <div class="stat-num" id="statRechazados">0</div>
               <div class="stat-lbl">Rechazados</div>
-              <div class="stat-icon">Ã¢ÂÂ</div>
+              <div class="stat-icon">❌</div>
             </div>
           </div>
 
           <div class="alert-info">
-            Ã¢ÂÂ¡ TenÃÂ©s 50 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan Ã¢ÂÂ</a>
+            ⚡ Tenés 50 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>
           </div>
 
           <div class="table-card">
@@ -489,14 +492,14 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <span class="tag-filter active" onclick="filterDocs(this,null)">Todos</span>
                 <span class="tag-filter" onclick="filterDocs(this,'Firmado')">Firmados</span>
                 <span class="tag-filter" onclick="filterDocs(this,'Pendiente')">Pendientes</span>
-                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody')" style="color:var(--danger);border-color:var(--danger)">Ã°ÂÂÂ Borrar seleccionados</button>
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
               </div>
             </div>
             <table id="docsTable">
               <thead>
                 <tr>
                   <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody')" title="Seleccionar todos"></th>
-                  <th>NÃÂ°</th>
+                  <th>N°</th>
                   <th>Documento</th>
                   <th>Firmante</th>
                   <th>Enviado</th>
@@ -519,7 +522,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
             <div class="table-header">
               <div class="table-title" id="docsCount">0 documentos</div>
               <div style="display:flex;gap:8px">
-                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody2')" style="color:var(--danger);border-color:var(--danger)">Ã°ÂÂÂ Borrar seleccionados</button>
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody2')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
                 <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo</button>
               </div>
             </div>
@@ -527,7 +530,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <thead>
                 <tr>
                   <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody2')" title="Seleccionar todos"></th>
-                  <th>NÃÂ°</th><th>Documento</th><th>Firmante</th><th>Enviado</th><th>Estado</th><th></th>
+                  <th>N°</th><th>Documento</th><th>Firmante</th><th>Enviado</th><th>Estado</th><th></th>
                 </tr>
               </thead>
               <tbody id="docsBody2"></tbody>
@@ -539,7 +542,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
         <div id="view-nuevo" class="view" style="display:none">
           <div class="page-header">
             <div class="page-title">Nuevo documento</div>
-            <div class="page-sub">EnviÃÂ¡ un documento para firma electrÃÂ³nica</div>
+            <div class="page-sub">Enviá un documento para firma electrónica</div>
           </div>
           <div class="flow-card">
 
@@ -567,35 +570,35 @@ td.td-name{font-weight:600;color:var(--text-dark)}
             <div class="flow-body" id="flowStep1">
               <input type="file" id="realFileInput" accept=".pdf,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
               <div class="upload-zone" id="uploadZone" onclick="document.getElementById('realFileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
-                <div class="upload-icon">Ã°ÂÂÂ</div>
-                <div class="upload-title">ArrastrÃÂ¡ el documento aquÃÂ­</div>
-                <div class="upload-sub">o <span class="upload-link">buscÃÂ¡ el archivo</span> en tu computadora</div>
-                <div class="upload-sub" style="margin-top:8px">PDF o DOCX ÃÂ· MÃÂ¡ximo 10MB</div>
+                <div class="upload-icon">📂</div>
+                <div class="upload-title">Arrastrá el documento aquí</div>
+                <div class="upload-sub">o <span class="upload-link">buscá el archivo</span> en tu computadora</div>
+                <div class="upload-sub" style="margin-top:8px">PDF o DOCX · Máximo 10MB</div>
               </div>
               <div id="uploadedFile" style="display:none">
                 <div class="uploaded-file">
-                  <div class="uploaded-file-icon">Ã°ÂÂÂ</div>
+                  <div class="uploaded-file-icon">📄</div>
                   <div>
-                    <div class="uploaded-file-name" id="uploadedFileName">Ã¢ÂÂ</div>
-                    <div class="uploaded-file-size" id="uploadedFileSize">Subido correctamente Ã¢ÂÂ</div>
+                    <div class="uploaded-file-name" id="uploadedFileName">—</div>
+                    <div class="uploaded-file-size" id="uploadedFileSize">Subido correctamente ✓</div>
                   </div>
-                  <button onclick="resetUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light)">Ã¢ÂÂ</button>
+                  <button onclick="resetUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light)">✕</button>
                 </div>
               </div>
             </div>
             <div class="flow-footer" id="flowFooter1">
               <div style="font-size:13px;color:var(--text-light)">Paso 1 de 4</div>
-              <button class="btn btn-primary" id="btnNext1" onclick="flowGo(2)" disabled>Siguiente Ã¢ÂÂ</button>
+              <button class="btn btn-primary" id="btnNext1" onclick="flowGo(2)" disabled>Siguiente →</button>
             </div>
 
             <!-- Step 2: Signer -->
             <div class="flow-body" id="flowStep2" style="display:none">
               <div class="signer-card">
-                <div class="signer-card-title">Ã¢ÂÂÃ¯Â¸Â Firmante 1</div>
+                <div class="signer-card-title">✍️ Firmante 1</div>
                 <div class="form-row">
                   <div class="form-group" style="margin:0">
                     <label class="form-label">Nombre completo *</label>
-                    <input class="form-input" type="text" id="firmanteName" placeholder="Ej: Juan GarcÃÂ­a">
+                    <input class="form-input" type="text" id="firmanteName" placeholder="Ej: Juan García">
                   </div>
                   <div class="form-group" style="margin:0">
                     <label class="form-label">Email *</label>
@@ -617,26 +620,26 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   </div>
                 </div>
 
-                <div class="section-label">Ã°ÂÂÂµ AutenticaciÃÂ³n EstÃÂ¡ndar</div>
+                <div class="section-label">🔵 Autenticación Estándar</div>
                 <div class="check-grid">
                   <div class="check-item checked" onclick="toggleCheck(this)">
                     <input type="checkbox" checked> Firma en pantalla
                   </div>
                   <div class="check-item checked" onclick="toggleCheck(this)">
-                    <input type="checkbox" checked> CÃÂ³digo por e-mail
+                    <input type="checkbox" checked> Código por e-mail
                   </div>
                   <div class="check-item" onclick="toggleCheck(this)">
-                    <input type="checkbox"> CÃÂ³digo por SMS
+                    <input type="checkbox"> Código por SMS
                   </div>
                   <div class="check-item" onclick="toggleCheck(this)">
-                    <input type="checkbox"> CÃÂ³digo por WhatsApp
+                    <input type="checkbox"> Código por WhatsApp
                   </div>
                 </div>
 
-                <div class="section-label">Ã°ÂÂÂ£ AutenticaciÃÂ³n Avanzada</div>
+                <div class="section-label">🟣 Autenticación Avanzada</div>
                 <div class="check-grid">
                   <div class="check-item checked" onclick="toggleCheck(this)">
-                    <input type="checkbox" checked> Selfie Ã¢ÂÂ foto del rostro
+                    <input type="checkbox" checked> Selfie — foto del rostro
                   </div>
                   <div class="check-item" onclick="toggleCheck(this)">
                     <input type="checkbox"> Foto del DNI
@@ -645,65 +648,65 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                     <input type="checkbox"> Reconocimiento facial
                   </div>
                   <div class="check-item" onclick="toggleCheck(this)">
-                    <input type="checkbox"> BiometrÃÂ­a Ã¢ÂÂ prueba de vida
+                    <input type="checkbox"> Biometría — prueba de vida
                   </div>
                 </div>
               </div>
               <button class="btn btn-ghost btn-sm" style="margin-top:4px">+ Agregar otro firmante</button>
             </div>
             <div class="flow-footer" id="flowFooter2" style="display:none">
-              <button class="btn btn-ghost" onclick="flowGo(1)">Ã¢ÂÂ AtrÃÂ¡s</button>
+              <button class="btn btn-ghost" onclick="flowGo(1)">← Atrás</button>
               <div style="font-size:13px;color:var(--text-light)">Paso 2 de 4</div>
-              <button class="btn btn-primary" onclick="flowGo(3)">Siguiente Ã¢ÂÂ</button>
+              <button class="btn btn-primary" onclick="flowGo(3)">Siguiente →</button>
             </div>
 
             <!-- Step 3: Position signature -->
             <div class="flow-body" id="flowStep3" style="display:none">
-              <p style="font-size:13px;color:var(--text-medium);margin-bottom:12px">ArrastrÃÂ¡ el recuadro amarillo hasta donde debe ir la firma del cliente.</p>
+              <p style="font-size:13px;color:var(--text-medium);margin-bottom:12px">Arrastrá el recuadro amarillo hasta donde debe ir la firma del cliente.</p>
               <div class="doc-preview" id="pdfViewerBox"
                    ondragover="handlePdfDragOver(event)" ondrop="handlePdfDrop(event)">
                 <div id="pdfCanvasContainer" style="display:flex;flex-direction:column;gap:10px;align-items:center">
                   <div id="pdfLoadingMsg" style="text-align:center;padding:48px 20px;color:#eee">
-                    <div style="font-size:48px;margin-bottom:10px">Ã°ÂÂÂ</div>
-                    <p id="previewDocName" style="font-size:13px">Cargando documentoÃ¢ÂÂ¦</p>
+                    <div style="font-size:48px;margin-bottom:10px">📄</div>
+                    <p id="previewDocName" style="font-size:13px">Cargando documento…</p>
                   </div>
                 </div>
                 <div class="sig-placeholder" id="sigPlaceholder" draggable="true"
                      ondragstart="handleSigDragStart(event)">
-                  <span id="sigPlaceholderName">Ã¢ÂÂÃ¯Â¸Â Firma del firmante</span>
-                  <span class="sig-placeholder-move">Ã¢Â Â¿ ArrastrÃÂ¡ para mover</span>
+                  <span id="sigPlaceholderName">✍️ Firma del firmante</span>
+                  <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
                 </div>
               </div>
-              <p style="font-size:11px;color:var(--text-light);margin-top:8px;text-align:center">Ã°ÂÂÂ¡ ArrastrÃÂ¡ el bloque amarillo hasta donde debe firmar el cliente</p>
+              <p style="font-size:11px;color:var(--text-light);margin-top:8px;text-align:center">💡 Arrastrá el bloque amarillo hasta donde debe firmar el cliente</p>
             </div>
             <div class="flow-footer" id="flowFooter3" style="display:none">
-              <button class="btn btn-ghost" onclick="flowGo(2)">Ã¢ÂÂ AtrÃÂ¡s</button>
+              <button class="btn btn-ghost" onclick="flowGo(2)">← Atrás</button>
               <div style="font-size:13px;color:var(--text-light)">Paso 3 de 4</div>
-              <button class="btn btn-primary" onclick="flowGo(4)">Siguiente Ã¢ÂÂ</button>
+              <button class="btn btn-primary" onclick="flowGo(4)">Siguiente →</button>
             </div>
 
             <!-- Step 4: Send -->
             <div class="flow-body" id="flowStep4" style="display:none">
               <div id="sendForm">
                 <div class="send-summary">
-                  <h4>Ã°ÂÂÂ Resumen</h4>
-                  <div class="send-row"><span class="send-row-label">Documento</span><span class="send-row-val" id="resumeDoc">Ã¢ÂÂ</span></div>
-                  <div class="send-row"><span class="send-row-label">Firmante</span><span class="send-row-val" id="resumeFirmante">Ã¢ÂÂ</span></div>
-                  <div class="send-row"><span class="send-row-label">Email</span><span class="send-row-val" id="resumeEmail">Ã¢ÂÂ</span></div>
+                  <h4>📋 Resumen</h4>
+                  <div class="send-row"><span class="send-row-label">Documento</span><span class="send-row-val" id="resumeDoc">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Firmante</span><span class="send-row-val" id="resumeFirmante">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Email</span><span class="send-row-val" id="resumeEmail">—</span></div>
                   <div class="send-row"><span class="send-row-label">Validaciones</span><span class="send-row-val">Firma + Email + Selfie</span></div>
-                  <div class="send-row"><span class="send-row-label">Vencimiento</span><span class="send-row-val">7 dÃÂ­as</span></div>
+                  <div class="send-row"><span class="send-row-label">Vencimiento</span><span class="send-row-val">7 días</span></div>
                 </div>
-                <p style="font-size:13px;font-weight:600;margin-bottom:14px">ÃÂ¿CÃÂ³mo querÃÂ©s enviar el link de firma?</p>
+                <p style="font-size:13px;font-weight:600;margin-bottom:14px">¿Cómo querés enviar el link de firma?</p>
                 <div class="send-options">
                   <div class="send-option" onclick="sendDoc('email')">
-                    <div class="send-option-icon">Ã°ÂÂÂ§</div>
+                    <div class="send-option-icon">📧</div>
                     <div class="send-option-title">Por email</div>
-                    <div class="send-option-sub">El sistema envÃÂ­a el link automÃÂ¡ticamente al email del firmante</div>
+                    <div class="send-option-sub">El sistema envía el link automáticamente al email del firmante</div>
                   </div>
                   <div class="send-option" onclick="sendDoc('wa')">
-                    <div class="send-option-icon">Ã°ÂÂÂ¬</div>
+                    <div class="send-option-icon">💬</div>
                     <div class="send-option-title">Link para WhatsApp</div>
-                    <div class="send-option-sub">CopiÃÂ¡s el link y lo mandÃÂ¡s vos por WhatsApp</div>
+                    <div class="send-option-sub">Copiás el link y lo mandás vos por WhatsApp</div>
                   </div>
                 </div>
               </div>
@@ -711,20 +714,20 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <!-- Sent success -->
               <div id="sentSuccess" style="display:none">
                 <div class="sent-success">
-                  <div class="sent-circle">Ã¢ÂÂ</div>
-                  <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:var(--success)">ÃÂ¡Enviado!</h3>
+                  <div class="sent-circle">✓</div>
+                  <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:var(--success)">¡Enviado!</h3>
                   <p id="sentMsg" style="font-size:14px;color:var(--text-medium);margin-bottom:24px;line-height:1.7"></p>
                   <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:20px">
                     <div style="font-size:11px;color:var(--text-light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link de firma (para compartir)</div>
-                    <div id="sentLink" style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all;margin-bottom:8px">Ã¢ÂÂ</div>
-                    <button onclick="copiarLink()" class="btn btn-ghost btn-sm" style="width:100%;margin-top:4px">Ã°ÂÂÂ Copiar link</button>
+                    <div id="sentLink" style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all;margin-bottom:8px">—</div>
+                    <button onclick="copiarLink()" class="btn btn-ghost btn-sm" style="width:100%;margin-top:4px">📋 Copiar link</button>
                   </div>
-                  <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Ir al dashboard Ã¢ÂÂ</button>
+                  <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Ir al dashboard →</button>
                 </div>
               </div>
             </div>
             <div class="flow-footer" id="flowFooter4" style="display:none">
-              <button class="btn btn-ghost" id="btnBack4" onclick="flowGo(3)">Ã¢ÂÂ AtrÃÂ¡s</button>
+              <button class="btn btn-ghost" id="btnBack4" onclick="flowGo(3)">← Atrás</button>
               <div style="font-size:13px;color:var(--text-light)">Paso 4 de 4</div>
               <div></div>
             </div>
@@ -735,101 +738,101 @@ td.td-name{font-weight:600;color:var(--text-dark)}
         <!-- ===== DETAIL VIEW ===== -->
         <div id="view-detalle" class="view" style="display:none">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-            <button class="btn btn-ghost btn-sm" onclick="showView('dashboard')">Ã¢ÂÂ Volver</button>
+            <button class="btn btn-ghost btn-sm" onclick="showView('dashboard')">← Volver</button>
             <div class="page-title" style="font-size:20px">Detalle del documento</div>
           </div>
 
           <div class="detail-header">
             <div class="detail-status">
-              <div class="status-big" id="detailDocName">Ã°ÂÂÂ Ã¢ÂÂ</div>
-              <span class="badge badge-success" id="detailBadge">Ã¢ÂÂ</span>
+              <div class="status-big" id="detailDocName">📄 —</div>
+              <span class="badge badge-success" id="detailBadge">—</span>
             </div>
             <div style="display:flex;gap:24px;font-size:13px;color:var(--text-medium)">
-              <span id="detailDocId">Ã°ÂÂÂ Doc ID: Ã¢ÂÂ</span>
-              <span id="detailCreado">Ã°ÂÂÂ Creado: Ã¢ÂÂ</span>
-              <span id="detailFirmadoSpan">Ã¢ÂÂ Firmado: Ã¢ÂÂ</span>
+              <span id="detailDocId">🆔 Doc ID: —</span>
+              <span id="detailCreado">📅 Creado: —</span>
+              <span id="detailFirmadoSpan">✅ Firmado: —</span>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">
-              <button class="btn btn-primary btn-sm">Ã¢Â¬Â Descargar firmado</button>
-              <button class="btn btn-ghost btn-sm">Ã°ÂÂÂ Ver informe de firmas</button>
-              <button class="btn btn-ghost btn-sm">Ã°ÂÂÂ Duplicar documento</button>
+              <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
+              <button class="btn btn-ghost btn-sm">📋 Ver informe de firmas</button>
+              <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
             <div class="timeline">
-              <div style="font-size:15px;font-weight:700;margin-bottom:20px">Ã¢ÂÂ± Historial de eventos</div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:20px">⏱ Historial de eventos</div>
               <div class="timeline-item">
-                <div class="timeline-dot">Ã¢ÂÂ</div>
+                <div class="timeline-dot">✓</div>
                 <div class="timeline-content">
                   <div class="timeline-title">Documento creado y enviado</div>
-                  <div class="timeline-time">13/06/2026 ÃÂ· 20:41:40</div>
+                  <div class="timeline-time">13/06/2026 · 20:41:40</div>
                 </div>
               </div>
               <div class="timeline-item">
-                <div class="timeline-dot">Ã¢ÂÂ</div>
+                <div class="timeline-dot">✓</div>
                 <div class="timeline-content">
                   <div class="timeline-title">Firmante notificado por email</div>
-                  <div class="timeline-time">13/06/2026 ÃÂ· 20:41:42</div>
-                  <div class="timeline-detail" id="detailEmail">Ã°ÂÂÂ§ Ã¢ÂÂ</div>
+                  <div class="timeline-time">13/06/2026 · 20:41:42</div>
+                  <div class="timeline-detail" id="detailEmail">📧 —</div>
                 </div>
               </div>
               <div class="timeline-item">
-                <div class="timeline-dot">Ã¢ÂÂ</div>
+                <div class="timeline-dot">✓</div>
                 <div class="timeline-content">
                   <div class="timeline-title">Documento abierto por el firmante</div>
-                  <div class="timeline-time">13/06/2026 ÃÂ· 20:44:18</div>
+                  <div class="timeline-time">13/06/2026 · 20:44:18</div>
                 </div>
               </div>
               <div class="timeline-item">
-                <div class="timeline-dot">Ã¢ÂÂ</div>
+                <div class="timeline-dot">✓</div>
                 <div class="timeline-content">
                   <div class="timeline-title">Selfie capturada</div>
-                  <div class="timeline-time">13/06/2026 ÃÂ· 20:45:55</div>
+                  <div class="timeline-time">13/06/2026 · 20:45:55</div>
                 </div>
               </div>
               <div class="timeline-item">
-                <div class="timeline-dot" style="background:var(--success)">Ã¢ÂÂ</div>
+                <div class="timeline-dot" style="background:var(--success)">✓</div>
                 <div class="timeline-content">
                   <div class="timeline-title">Documento firmado</div>
-                  <div class="timeline-time">13/06/2026 ÃÂ· 20:46:27</div>
-                  <div class="timeline-detail" style="color:var(--success)" id="detailTimelineName">Ã¢ÂÂ Ã¢ÂÂ firmÃÂ³ el documento</div>
+                  <div class="timeline-time">13/06/2026 · 20:46:27</div>
+                  <div class="timeline-detail" style="color:var(--success)" id="detailTimelineName">✅ — firmó el documento</div>
                 </div>
               </div>
             </div>
 
             <div class="timeline">
-              <div style="font-size:15px;font-weight:700;margin-bottom:16px">Ã°ÂÂÂ Evidencia de autenticaciÃÂ³n</div>
-              <div style="font-size:13px;color:var(--text-medium);margin-bottom:4px"><strong id="detailFirmante">Ã¢ÂÂ</strong></div>
-              <div style="font-size:12px;color:var(--text-light);margin-bottom:16px" id="detailToken">Token: Ã¢ÂÂ</div>
+              <div style="font-size:15px;font-weight:700;margin-bottom:16px">🔒 Evidencia de autenticación</div>
+              <div style="font-size:13px;color:var(--text-medium);margin-bottom:4px"><strong id="detailFirmante">—</strong></div>
+              <div style="font-size:12px;color:var(--text-light);margin-bottom:16px" id="detailToken">Token: —</div>
               <div class="evidence-grid">
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂÂ§</div>
+                  <div class="evidence-icon">📧</div>
                   <div class="evidence-label">Email</div>
-                  <div class="evidence-value" id="detailEmailEvid">Ã¢ÂÂ Ã¢ÂÂ</div>
+                  <div class="evidence-value" id="detailEmailEvid">— ✓</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂ¤Â³</div>
+                  <div class="evidence-icon">🤳</div>
                   <div class="evidence-label">Selfie</div>
-                  <div class="evidence-value">Capturada 20:46:27 Ã¢ÂÂ</div>
+                  <div class="evidence-value">Capturada 20:46:27 ✓</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂÂ</div>
-                  <div class="evidence-label">UbicaciÃÂ³n GPS</div>
+                  <div class="evidence-icon">🌍</div>
+                  <div class="evidence-label">Ubicación GPS</div>
                   <div class="evidence-value">-35.666012, -63.747082</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂÂ¥</div>
+                  <div class="evidence-icon">🖥</div>
                   <div class="evidence-label">IP</div>
                   <div class="evidence-value">190.105.160.18</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂÂ±</div>
+                  <div class="evidence-icon">📱</div>
                   <div class="evidence-label">Dispositivo</div>
-                  <div class="evidence-value">Android ÃÂ· Chrome 149</div>
+                  <div class="evidence-value">Android · Chrome 149</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">Ã°ÂÂÂ</div>
+                  <div class="evidence-icon">🔐</div>
                   <div class="evidence-label">Hash SHA-256</div>
                   <div class="evidence-value">2105b99a9e...</div>
                 </div>
@@ -841,19 +844,19 @@ td.td-name{font-weight:600;color:var(--text-dark)}
         <!-- ===== OTHER VIEWS (placeholder) ===== -->
         <div id="view-contactos" class="view" style="display:none">
           <div class="page-header"><div class="page-title">Contactos</div><div class="page-sub">Tus firmantes frecuentes</div></div>
-          <div class="empty-state"><div class="empty-icon">Ã°ÂÂÂ¥</div><p>PrÃÂ³ximamente disponible</p></div>
+          <div class="empty-state"><div class="empty-icon">👥</div><p>Próximamente disponible</p></div>
         </div>
         <div id="view-plantillas" class="view" style="display:none">
           <div class="page-header"><div class="page-title">Plantillas</div><div class="page-sub">Documentos preconfigurados</div></div>
-          <div class="empty-state"><div class="empty-icon">Ã°ÂÂÂ</div><p>PrÃÂ³ximamente disponible</p></div>
+          <div class="empty-state"><div class="empty-icon">📋</div><p>Próximamente disponible</p></div>
         </div>
         <div id="view-informes" class="view" style="display:none">
-          <div class="page-header"><div class="page-title">Informes</div><div class="page-sub">EstadÃÂ­sticas de firma</div></div>
-          <div class="empty-state"><div class="empty-icon">Ã°ÂÂÂ</div><p>PrÃÂ³ximamente disponible</p></div>
+          <div class="page-header"><div class="page-title">Informes</div><div class="page-sub">Estadísticas de firma</div></div>
+          <div class="empty-state"><div class="empty-icon">📈</div><p>Próximamente disponible</p></div>
         </div>
         <div id="view-ajustes" class="view" style="display:none">
-          <div class="page-header"><div class="page-title">Ajustes</div><div class="page-sub">ConfiguraciÃÂ³n de tu cuenta</div></div>
-          <div class="empty-state"><div class="empty-icon">Ã¢ÂÂÃ¯Â¸Â</div><p>PrÃÂ³ximamente disponible</p></div>
+          <div class="page-header"><div class="page-title">Ajustes</div><div class="page-sub">Configuración de tu cuenta</div></div>
+          <div class="empty-state"><div class="empty-icon">⚙️</div><p>Próximamente disponible</p></div>
         </div>
 
       </div><!-- /content -->
@@ -866,13 +869,22 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 const docs = [];
 
 function renderStats(){
-  const total=docs.length,firmados=docs.filter(d=>d.estado==='Firmado').length,pendientes=docs.filter(d=>d.estado==='Pendiente').length,rechazados=docs.filter(d=>d.estado==='Rechazado').length;
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('statTotal',total);set('statFirmados',firmados);set('statPendientes',pendientes);set('statRechazados',rechazados);
-  set('docsCount',total+' documentos');
-  const pc=document.getElementById('planCounter');if(pc)pc.textContent='Plan Pro ÃÂ· '+total+'/50 docs';
-  const a=document.querySelector('.alert-info');if(a)a.innerHTML='Ã¢ÂÂ¡ TenÃÂ©s '+(50-total)+' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan Ã¢ÂÂ</a>';
+  const total = docs.length;
+  const firmados = docs.filter(d=>d.estado==='Firmado').length;
+  const pendientes = docs.filter(d=>d.estado==='Pendiente').length;
+  const rechazados = docs.filter(d=>d.estado==='Rechazado').length;
+  const set = (id,v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('statTotal', total);
+  set('statFirmados', firmados);
+  set('statPendientes', pendientes);
+  set('statRechazados', rechazados);
+  set('docsCount', total + ' documentos');
+  const pc = document.getElementById('planCounter');
+  if(pc) pc.textContent = 'Plan Pro · ' + total + '/50 docs';
+  const alert = document.querySelector('.alert-info');
+  if(alert) alert.innerHTML = '⚡ Tenés ' + (50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
 }
+
 function statusBadge(s){
   if(s==='Firmado') return '<span class="badge badge-success">FIRMADO</span>';
   if(s==='Pendiente') return '<span class="badge badge-warning">PENDIENTE</span>';
@@ -890,14 +902,14 @@ function renderDocs(data, bodyId){
     <tr>
       <td><input type="checkbox" class="doc-check" data-id="${d.id}"></td>
       <td style="font-weight:600;color:var(--text-light)">#${d.id}</td>
-      <td class="td-name"><span class="doc-icon">Ã°ÂÂÂ</span>${d.nombre}</td>
+      <td class="td-name"><span class="doc-icon">📄</span>${d.nombre}</td>
       <td>${d.firmante}</td>
       <td>${d.enviado}</td>
       <td>${statusBadge(d.estado)}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.id===${d.id}))">Ver</button>
-          <button class="btn btn-ghost btn-sm">Ã¢Â¬Â</button>
+          <button class="btn btn-ghost btn-sm">⬇</button>
         </div>
       </td>
     </tr>
@@ -910,8 +922,8 @@ function toggleAllDocs(cb, bodyId){
 
 function deleteSelected(bodyId){
   const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
-  if(!checked.length){ alert('SeleccionÃÂ¡ al menos un documento para borrar.'); return; }
-  if(!confirm('ÃÂ¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
+  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
   checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
@@ -943,19 +955,19 @@ function showDetail(doc){
   if(doc){
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
-    if(g('detailDocName')) g('detailDocName').textContent = 'Ã°ÂÂÂ ' + doc.nombre;
+    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
     if(g('detailBadge')){
       g('detailBadge').textContent = doc.estado.toUpperCase();
       g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
     }
-    if(g('detailDocId')) g('detailDocId').textContent = 'Ã°ÂÂÂ Doc ID: ' + doc.id;
-    if(g('detailCreado')) g('detailCreado').textContent = 'Ã°ÂÂÂ Creado: ' + doc.enviado;
+    if(g('detailDocId')) g('detailDocId').textContent = '🆔 Doc ID: ' + doc.id;
+    if(g('detailCreado')) g('detailCreado').textContent = '📅 Creado: ' + doc.enviado;
     if(g('detailFirmadoSpan')) g('detailFirmadoSpan').style.display = firmado ? '' : 'none';
-    if(g('detailEmail')) g('detailEmail').textContent = 'Ã°ÂÂÂ§ ' + (doc.email || 'Ã¢ÂÂ');
-    if(g('detailTimelineName')) g('detailTimelineName').textContent = 'Ã¢ÂÂ ' + doc.firmante + ' firmÃÂ³ el documento';
+    if(g('detailEmail')) g('detailEmail').textContent = '📧 ' + (doc.email || '—');
+    if(g('detailTimelineName')) g('detailTimelineName').textContent = '✅ ' + doc.firmante + ' firmó el documento';
     if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
-    if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || 'Ã¢ÂÂ');
-    if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || 'Ã¢ÂÂ') + (firmado ? ' Ã¢ÂÂ' : '');
+    if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
+    if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
   }
   showView('detalle');
 }
@@ -1021,7 +1033,7 @@ function showUploadedFile(file){
   document.getElementById('uploadZone').style.display='none';
   document.getElementById('uploadedFile').style.display='block';
   document.getElementById('uploadedFileName').textContent = file.name;
-  document.getElementById('uploadedFileSize').textContent = size+' ÃÂ· '+ext.toUpperCase()+' ÃÂ· Subido correctamente Ã¢ÂÂ';
+  document.getElementById('uploadedFileSize').textContent = size+' · '+ext.toUpperCase()+' · Subido correctamente ✓';
   document.getElementById('btnNext1').removeAttribute('disabled');
   window._uploadedFileName = file.name;
   window._uploadedFile = file;
@@ -1059,7 +1071,7 @@ function flowGo(n){
   }
   if(n===3){
     const name = (document.getElementById('firmanteName')||{}).value||'';
-    document.getElementById('sigPlaceholderName').textContent = 'Ã¢ÂÂÃ¯Â¸Â Firma de '+(name.trim()||'el firmante');
+    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
     // Reset sig placeholder position
     const sig = document.getElementById('sigPlaceholder');
     if(sig){ sig.style.left=''; sig.style.top=''; sig.style.right='24px'; sig.style.bottom='40px'; }
@@ -1067,15 +1079,15 @@ function flowGo(n){
     if(window._uploadedFile) renderPdfPreview(window._uploadedFile);
     else {
       const pn = document.getElementById('previewDocName');
-      if(pn) pn.textContent = 'Ã°ÂÂÂ ' + (window._uploadedFileName || 'Documento cargado');
+      if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
     }
   }
   if(n===4){
     const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
     const email = ((document.getElementById('firmanteEmail')||{}).value||'').trim();
-    window._signerName = name || 'Ã¢ÂÂ';
-    window._signerEmail = email || 'Ã¢ÂÂ';
-    document.getElementById('resumeDoc').textContent = window._uploadedFileName || 'Ã¢ÂÂ';
+    window._signerName = name || '—';
+    window._signerEmail = email || '—';
+    document.getElementById('resumeDoc').textContent = window._uploadedFileName || '—';
     document.getElementById('resumeFirmante').textContent = window._signerName;
     document.getElementById('resumeEmail').textContent = window._signerEmail;
   }
@@ -1093,25 +1105,20 @@ async function renderPdfPreview(file){
   const lm  = document.getElementById('pdfLoadingMsg');
   if(!cc) return;
   cc.querySelectorAll('canvas').forEach(c=>c.remove());
-  const _ext=(file.name||'').split('.').pop().toLowerCase();
-  if(_ext==='docx'||_ext==='doc'){if(lm){lm.style.display='block';lm.innerHTML='<div style="font-size:52px;margin-bottom:12px">Ã°ÂÂÂ</div><p style="font-size:15px;color:#fff;font-weight:600;margin-bottom:6px">'+file.name+'</p><p style="font-size:12px;color:#ccc">Documento Word cargado Ã¢ÂÂ<br>PosicionÃÂ¡ el recuadro amarillo donde debe ir la firma.</p>';}return;}
-  if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='';
-  // Handle DOCX/DOC Ã¢ÂÂ PDF.js cannot render Word files
-  var _ext = (file.name||'').split('.').pop().toLowerCase();
-  if(_ext==='docx'||_ext==='doc'){
-    if(lm){lm.style.display='block';lm.innerHTML='<div style="font-size:52px;margin-bottom:12px">\u{1F4DD}</div><p style="font-size:15px;color:#fff;font-weight:600;margin-bottom:6px">'+file.name+'</p><p style="font-size:12px;color:#ccc">Documento Word cargado \u2713<br>Posicion\u00e1 el recuadro amarillo donde debe ir la firma.</p>';}
+  if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⏳</div><p style="font-size:13px;color:#eee">Cargando PDF…</p>'; }
+  const _ext = (file.name||'').split('.').pop().toLowerCase();
+  if(_ext === 'docx' || _ext === 'doc'){
+    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">📝</div><p style="font-size:13px;color:#eee">'+file.name+'</p><p style="font-size:11px;color:#aaa;margin-top:6px">El documento Word se enviará para firma correctamente</p>'; }
     return;
   }
-  // Always set worker inline (avoids CORS issues)
-  if(typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-  if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">Ã¢ÂÂ³</div><p style="font-size:13px;color:#eee">Cargando PDFÃ¢ÂÂ¦</p>'; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '';
   if(typeof pdfjsLib === 'undefined'){
-    if(lm) lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">Ã¢ÂÂ Ã¯Â¸Â</div><p style="font-size:13px;color:#eee">PDF.js no disponible. VerificÃÂ¡ tu conexiÃÂ³n a internet.</p>';
+    if(lm) lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">PDF.js no disponible. Verificá tu conexión a internet.</p>';
     return;
   }
   try{
     const buf  = await file.arrayBuffer();
-    const pdf  = await pdfjsLib.getDocument({data: new Uint8Array(buf)}).promise;
+    const pdf  = await pdfjsLib.getDocument({data: buf}).promise;
     if(lm) lm.style.display='none';
     const availW = (box ? box.offsetWidth : 600) - 32;
     for(let p=1; p<=Math.min(pdf.numPages, 20); p++){
@@ -1127,7 +1134,7 @@ async function renderPdfPreview(file){
       await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
     }
   } catch(e){
-    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:36px;margin-bottom:10px">Ã¢ÂÂ Ã¯Â¸Â</div><p style="font-size:13px;color:#eee">No se pudo mostrar el PDF. El archivo puede estar protegido con contraseÃÂ±a o no es un PDF vÃÂ¡lido.</p>'; }
+    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:36px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">No se pudo mostrar el PDF. El archivo puede estar protegido con contraseña o no es un PDF válido.</p>'; }
   }
 }
 
@@ -1162,8 +1169,8 @@ function sendDoc(method){
   const name  = window._signerName  || 'el firmante';
   const email = window._signerEmail || '';
   const msgs = {
-    email:'El link de firma fue enviado automÃÂ¡ticamente al email de '+name+'. Te avisaremos cuando firme.',
-    wa:'CopiÃÂ¡ el link y enviÃÂ¡selo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
+    email:'El link de firma fue enviado automáticamente al email de '+name+'. Te avisaremos cuando firme.',
+    wa:'Copiá el link y enviáselo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
   };
   // Agregar documento al array
   const newId = docs.length > 0 ? Math.max(...docs.map(d=>d.id)) + 1 : 1;
@@ -1174,7 +1181,7 @@ function sendDoc(method){
   docs.unshift({
     id: newId,
     nombre: docNombre.toUpperCase(),
-    firmante: window._signerName || 'Ã¢ÂÂ',
+    firmante: window._signerName || '—',
     email: email,
     token: token,
     enviado: fecha,
@@ -1194,9 +1201,9 @@ function sendDoc(method){
   // Mostrar link en pantalla
   const sentLinkEl = document.getElementById('sentLink');
   if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
-  // Copiar al portapapeles automÃÂ¡ticamente
+  // Copiar al portapapeles automáticamente
   try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
-  // Llamar al Worker si el mÃÂ©todo es email
+  // Llamar al Worker si el método es email
   if(method === 'email' && email){
     fetch(FIRMAYA_WORKER + '/api/send', {
       method: 'POST',
@@ -1209,11 +1216,11 @@ function sendDoc(method){
 // ---- COPY LINK ----
 function copiarLink(){
   const link = document.getElementById('sentLink')?.textContent || '';
-  if(!link || link === 'Ã¢ÂÂ') return;
+  if(!link || link === '—') return;
   try{ navigator.clipboard.writeText(link); } catch(e){}
   const btn = event.target;
   const orig = btn.textContent;
-  btn.textContent = 'Ã¢ÂÂ Copiado!';
+  btn.textContent = '✅ Copiado!';
   setTimeout(()=>{ btn.textContent = orig; }, 2000);
 }
 
