@@ -6,6 +6,7 @@
 <title>FirmaYa — Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -56,12 +57,12 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 /* Sidebar */
 .sidebar{
   width:240px;background:var(--primary-dark);color:white;
-  display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;bottom:0;left:0;z-index:50
+  display:flex;flex-direction:column;lex-shrink:0;position:fixed;top:0;bottom:0;left:0;z-index:50
 }
 .sidebar-logo{
   padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);
   font-family:'Playfair Display',serif;font-size:22px;font-weight:700
-}
+	}
 .sidebar-logo span{display:block;font-family:'Inter',sans-serif;font-size:10px;opacity:.6;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
 .sidebar-nav{flex:1;padding:16px 12px}
 .nav-item{
@@ -701,7 +702,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <div class="send-option" onclick="sendDoc('email')">
                     <div class="send-option-icon">📧</div>
                     <div class="send-option-title">Por email</div>
-                    <div class="send-option-sub">El sistema envía el link automáticamente al email del firmante</div>
+                    <div class="send-option-sub">El sistema envia el link automaticamente al email del firmante</div>
                   </div>
                   <div class="send-option" onclick="sendDoc('wa')">
                     <div class="send-option-icon">💬</div>
@@ -748,12 +749,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <span class="badge badge-success" id="detailBadge">—</span>
             </div>
             <div style="display:flex;gap:24px;font-size:13px;color:var(--text-medium)">
-              <span id="detailDocId">🆔 Doc ID: —</span>
-              <span id="detailCreado">📅 Creado: —</span>
-              <span id="detailFirmadoSpan">✅ Firmado: —</span>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:16px">
-              <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
+              <span id="detailDocId">🆔 Doc ID: �mary btn-sm">⬇ Descargar firmado</button>
               <button class="btn btn-ghost btn-sm">📋 Ver informe de firmas</button>
               <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
@@ -863,7 +859,6 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     </main>
   </div>
 </div>
-
 <script>
 // ---- DOCS DATA ----
 // Load persisted docs from localStorage
@@ -891,7 +886,7 @@ function renderStats(){
   const pc = document.getElementById('planCounter');
   if(pc) pc.textContent = 'Plan Pro · ' + total + '/50 docs';
   const alert = document.querySelector('.alert-info');
-  if(alert) alert.innerHTML = '⚡ Tenés ' + (50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
+  if(alert) alert.innerHTML = '⚩ Tenés ' + (50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
 }
 
 function statusBadge(s){
@@ -932,7 +927,7 @@ function toggleAllDocs(cb, bodyId){
 function deleteSelected(bodyId){
   const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
   if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
-  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  if(!confirm('«Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
   checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
   saveDocs();
   renderDocs(docs.slice(0,5), 'docsBody');
@@ -952,7 +947,7 @@ function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   document.getElementById('view-'+name).style.display='block';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {dashboard:'Dashboard',documentos:'Documentos',nuevo:'Nuevo documento',contactos:'Contactos',plantillas:'Plantillas',informes:'Informes',ajustes:'Ajustes',detalle:'Detalle'};
+  const navMap = {dashboard:'Dashboard',documentos:'Documentos',Nuevo:'Nuevo documento',contactos:'Contactos',plantillas:'Plantillas',informes:'Informes',ajustes:'Ajustes',detalle:'Detalle'};
   document.getElementById('topbarTitle').textContent = navMap[name]||name;
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(n.textContent.trim().includes(navMap[name]||name)) n.classList.add('active');
@@ -965,7 +960,7 @@ function showDetail(doc){
   if(doc){
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
-    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
+    if(g('detailDocName')) g('detailDocName').textContent = '�$ ' + doc.nombre;
     if(g('detailBadge')){
       g('detailBadge').textContent = doc.estado.toUpperCase();
       g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
@@ -1021,7 +1016,7 @@ function showDashboard(){
   setTimeout(checkPendingSignatures, 1500);
 }
 
-async function checkPendingSignatures(){
+alsync function checkPendingSignatures(){
   const pending = docs.filter(d => d.estado === 'Pendiente');
   if(!pending.length) return;
   let updated = false;
@@ -1093,7 +1088,7 @@ function resetFlow(){
   document.getElementById('sendForm').style.display='block';
   document.getElementById('sentSuccess').style.display='none';
   ['1','2','3','4'].forEach(n=>{
-    const t=document.getElementById('tab'+n);
+    const t=document.getElementById('tab'+n)];
     t.classList.remove('active','done');
   });
   document.getElementById('tab1').classList.add('active');
@@ -1110,7 +1105,7 @@ function flowGo(n){
   }
   if(n===3){
     const name = (document.getElementById('firmanteName')||{}).value||'';
-    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
+    document.getElementById('sigPlaceholderName').textContent = '�ʯt⏏ Firma de '+(name.trim()||'el firmante');
     // Reset sig placeholder position
     const sig = document.getElementById('sigPlaceholder');
     if(sig){ sig.style.left=''; sig.style.top=''; sig.style.right='24px'; sig.style.bottom='40px'; }
@@ -1118,7 +1113,7 @@ function flowGo(n){
     if(window._uploadedFile) renderPdfPreview(window._uploadedFile);
     else {
       const pn = document.getElementById('previewDocName');
-      if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
+      if(pn) pn.textContent = '�$ ' + (window._uploadedFileName || 'Documento cargado');
     }
   }
   if(n===4){
@@ -1138,7 +1133,7 @@ if(typeof pdfjsLib !== 'undefined'){
 }
 let _pdfDragOffX = 0, _pdfDragOffY = 0;
 
-async function renderPdfPreview(file){
+alsync function renderPdfPreview(file){
   const box = document.getElementById('pdfViewerBox');
   const cc  = document.getElementById('pdfCanvasContainer');
   const lm  = document.getElementById('pdfLoadingMsg');
@@ -1147,7 +1142,22 @@ async function renderPdfPreview(file){
   if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⏳</div><p style="font-size:13px;color:#eee">Cargando PDF…</p>'; }
   const _ext = (file.name||'').split('.').pop().toLowerCase();
   if(_ext === 'docx' || _ext === 'doc'){
-    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">📝</div><p style="font-size:13px;color:#eee">'+file.name+'</p><p style="font-size:11px;color:#aaa;margin-top:6px">El documento Word se enviará para firma correctamente</p>'; }
+    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:30px;margin-bottom:8px">⏳</div><p style="font-size:13px;color:#eee">Convirtiendo documento Word…</p>'; }
+    if(typeof mammoth === 'undefined'){
+      if(lm){ lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">📝</div><p style="font-size:13px;color:#eee">' + file.name + '</p><p style="font-size:11px;color:#aaa;margin-top:6px">No se pudo cargar el visualizador. Verificá tu conexión.</p>'; }
+      return;
+    }
+    try{
+      const buf = await file.arrayBuffer();
+      const result = await mammoth.convertToHtml({arrayBuffer: buf});
+      const docDiv = document.createElement('div');
+      docDiv.style.cssText = 'background:white;color:#111;padding:48px 56px;min-height:500px;font-family:serif;font-size:13px;line-height:1.7;box-shadow:0 2px 12px rgba(0,0,0,.5);border-radius:2px;width:100%';
+      docDiv.innerHTML = result.value;
+      cc.appendChild(docDiv);
+      if(lm) lm.style.display='none';
+    } catch(e){
+      if(lm){ lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">No se pudo previsualizar el archivo Word.</p><p style="font-size:11px;color:#aaa;margin-top:6px">El documento se enviará para firma correctamente.</p>'; }
+    }
     return;
   }
   pdfjsLib.GlobalWorkerOptions.workerSrc = '';
@@ -1216,7 +1226,7 @@ function sendDoc(method){
   const today = new Date();
   const fecha = today.getDate().toString().padStart(2,'0') + '/' + (today.getMonth()+1).toString().padStart(2,'0') + '/' + today.getFullYear();
   const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
-  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'');
+  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^\.]+$/,'');
   docs.unshift({
     id: newId,
     nombre: docNombre.toUpperCase(),
@@ -1243,13 +1253,32 @@ function sendDoc(method){
   if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
   // Copiar al portapapeles automáticamente
   try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
-  // Llamar al Worker si el método es email
-  if(method === 'email' && email){
-    fetch(FIRMAYA_WORKER + '/api/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, docNombre, firmante: window._signerName||'', emailFirmante: email, firmarUrl })
-    }).catch(err => console.warn('Worker /api/send:', err));
+  // Registrar en Worker SIEMPRE (email Y WhatsApp), enviar email solo si corresponde
+  fetch(FIRMAYA_WORKER + '/api/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token, docNombre,
+      firmante: window._signerName || '',
+      emailFirmante: email,
+      firmarUrl,
+      sendEmail: method === 'email'
+    })
+  }).catch(err => console.warn('Worker /api/send:', err));
+
+  // Subir el archivo al Worker para que el cliente pueda verlo antes de firmar
+  if(window._uploadedFile){
+    const fileMime   = window._uploadedFile.type || 'application/octet-stream';
+    const fileNombre = window._uploadedFile.name  || 'documento';
+    window._uploadedFile.arrayBuffer().then(buf => {
+      fetch(FIRMAYA_WORKER + '/api/upload?token=' + encodeURIComponent(token)
+        + '&mime=' + encodeURIComponent(fileMime)
+        + '&nombre=' + encodeURIComponent(fileNombre), {
+        method: 'POST',
+        headers: { 'Content-Type': fileMime },
+        body: buf
+      }).catch(() => {});
+    }).catch(() => {});
   }
 }
 
