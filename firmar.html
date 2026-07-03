@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FirmaYa — Firma tu documento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#0D6278;--primary-dark:#0A4E62;--primary-light:#1A7A92;
+  --primary-pale:#EBF4F7;--white:#fff;--text-dark:#1A2B35;
+  --text-medium:#4A6070;--text-light:#8A9BAB;--bg:#F5F8FA;
+  --success:#27AE60;--success-pale:#D5F5E3;--border:#D0DDE5;
+}
+body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);min-height:100vh}
+
+/* ---- TOP BAR ---- */
+.topbar{
+  background:var(--primary-dark);color:white;
+  padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50
+}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+.topbar-logo span{font-family:'Inter',sans-serif;font-size:9px;font-weight:400;opacity:.55;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-top:1px}
+.secure-badge{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.12);border-radius:20px;padding:4px 10px;
+  font-size:11px;font-weight:500;color:rgba(255,255,255,.85)
+}
+
+/* ---- PROGRESS ---- */
+.progress-wrap{background:white;border-bottom:1px solid var(--border);padding:0 20px}
+.steps-row{display:flex;align-items:center;justify-content:center;gap:0;padding:14px 0}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:80px;opacity:.4;transition:opacity .3s}
+.step.active{opacity:1}
+.step.done{opacity:.7}
+.step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-light);
+  transition:all .3s
+}
+.step.active .step-num{background:var(--primary);color:white;box-shadow:0 0 0 3px rgba(13,98,120,.2)}
+.step.done .step-num{background:var(--success);color:white}
+.step-label{font-size:10px;font-weight:500;color:var(--text-medium);text-align:center;line-height:1.2}
+.step-connector{flex:1;height:2px;background:var(--border);max-width:30px;margin:0 4px;margin-bottom:18px}
+.step-connector.done{background:var(--success)}
+
+/* ---- MAIN CARD ---- */
+.page{display:none;padding:24px 20px;max-width:520px;margin:0 auto}
+.page.on{display:block}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+.card-subtitle{font-size:13px;color:var(--text-medium);line-height:1.5}
+
+/* ---- DOC INFO BANNER ---- */
+.doc-banner{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+  border-radius:14px;padding:20px;color:white;margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:14px
+}
+.doc-icon{font-size:36px;flex-shrink:0;margin-top:2px}
+.doc-info-wrap{flex:1}
+.doc-info-name{font-size:16px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.doc-info-meta{font-size:12px;opacity:.8;line-height:1.6}
+.doc-meta-item{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+
+/* ---- FORM ---- */
+.form-group{margin-bottom:16px}
+.form-label{
+  display:block;font-size:11px;font-weight:600;color:var(--text-medium);
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px
+}
+.form-input{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;color:var(--text-dark)
+}
+.form-input:focus{border-color:var(--primary)}
+.form-input:read-only{background:#F5F8FA;color:var(--text-medium)}
+
+/* ---- LEGAL CHECKBOX ---- */
+.check-row{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--primary-pale);border-radius:10px;padding:14px;cursor:pointer;
+  border:1.5px solid transparent;transition:border-color .2s;margin-top:4px
+}
+.check-row.checked{border-color:var(--primary)}
+.check-box{
+  width:20px;height:20px;border:2px solid var(--border);border-radius:5px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:white;transition:all .2s;margin-top:1px
+}
+.check-row.checked .check-box{background:var(--primary);border-color:var(--primary)}
+.check-mark{display:none;color:white;font-size:12px;font-weight:700}
+.check-row.checked .check-mark{display:block}
+.check-text{font-size:13px;color:var(--text-medium);line-height:1.5}
+.check-text strong{color:var(--text-dark)}
+
+/* ---- SIGNATURE CANVAS ---- */
+.sig-canvas-wrap{
+  border:2px dashed var(--border);border-radius:12px;
+  background:#FAFCFD;position:relative;overflow:hidden;
+  margin-bottom:12px;touch-action:none;
+  cursor:crosshair
+}
+.sig-canvas-wrap.has-sig{border-color:var(--primary);border-style:solid}
+#sigCanvas{display:block;width:100%;height:200px}
+.sig-placeholder-text{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;transition:opacity .3s
+}
+.sig-placeholder-icon{font-size:32px;color:var(--border);margin-bottom:6px}
+.sig-placeholder-label{font-size:13px;color:var(--text-light)}
+.sig-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:4px}
+.sig-btn{
+  padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;
+  background:var(--bg);color:var(--text-medium);border:1px solid var(--border);transition:all .2s
+}
+.sig-btn:hover{background:white;color:var(--text-dark)}
+.sig-btn-clear{color:var(--danger, #E74C3C);border-color:#FDEDEC;background:#FDEDEC}
+.sig-btn-clear:hover{background:#f5c6c2}
+
+/* ---- SELFIE ---- */
+.selfie-wrap{position:relative;overflow:hidden;border-radius:12px;background:#0D0D0D}
+#selfieVideo{width:100%;display:block;transform:scaleX(-1)}
+#selfieCanvas{display:none}
+#selfiePreview{
+  width:100%;display:none;border-radius:12px;
+  border:2px solid var(--success)
+}
+.selfie-overlay{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:140px;height:140px;border:3px solid rgba(255,255,255,.6);border-radius:50%;
+  pointer-events:none
+}
+.selfie-controls{
+  position:absolute;bottom:12px;left:0;right:0;
+  display:flex;justify-content:center;gap:12px
+}
+.selfie-btn{
+  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all .2s
+}
+.selfie-btn-capture{background:white;color:var(--primary)}
+.selfie-btn-retake{background:rgba(255,255,255,.2);color:white;backdrop-filter:blur(4px)}
+.selfie-status{font-size:12px;color:var(--text-light);text-align:center;margin-top:8px}
+
+/* ---- STEP ACTIONS ---- */
+.step-footer{
+  padding:16px 20px;background:white;border-top:1px solid var(--border);
+  position:sticky;bottom:0;z-index:40
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:14px 24px;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;border:none;transition:all .2s;text-decoration:none;width:100%
+}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled,.btn-primary[disabled]{background:#B0C8D2;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text-medium);border:1px solid var(--border);font-size:14px;padding:12px 20px}
+.btn-ghost:hover{background:var(--bg)}
+.btn-success{background:var(--success);color:white}
+.btn-success:hover{background:#219A52}
+
+/* ---- SUCCESS SCREEN ---- */
+.success-wrap{
+  min-height:calc(100vh - 56px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 20px;text-align:center
+}
+.success-icon{
+  width:80px;height:80px;background:var(--success-pale);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  margin:0 auto 20px;border:3px solid var(--success)
+}
+.success-title{font-size:24px;font-weight:700;color:var(--text-dark);margin-bottom:8px}
+.success-subtitle{font-size:15px;color:var(--text-medium);line-height:1.6;margin-bottom:28px}
+.cert-card{
+  background:white;border:1px solid var(--border);border-radius:16px;
+  padding:20px;text-align:left;width:100%;max-width:400px;margin:0 auto 24px
+}
+.cert-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg)}
+.cert-row:last-child{border-bottom:none}
+.cert-key{font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+.cert-val{font-size:13px;font-weight:600;color:var(--text-dark);text-align:right;max-width:65%}
+.legal-note{
+  background:var(--primary-pale);border-radius:10px;padding:12px 16px;
+  font-size:11px;color:var(--text-medium);line-height:1.6;text-align:left;
+  max-width:400px;margin:0 auto 20px
+}
+.save-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--primary);color:white;border-radius:10px;
+  padding:13px 24px;font-size:14px;font-weight:600;cursor:pointer;border:none;
+  max-width:320px;margin:0 auto;justify-content:center;width:100%
+}
+.save-btn:hover{background:var(--primary-dark)}
+
+/* ---- ERROR SCREEN ---- */
+.error-wrap{
+  min-height:calc(100vh - 56px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 20px;text-align:center
+}
+.error-icon{font-size:56px;margin-bottom:16px}
+.error-title{font-size:20px;font-weight:700;color:var(--text-dark);margin-bottom:8px}
+.error-subtitle{font-size:14px;color:var(--text-medium);line-height:1.6}
+
+/* ---- OPTIONAL BADGE ---- */
+.optional-label{font-size:10px;font-weight:500;color:var(--text-light);margin-left:6px;
+  background:var(--bg);padding:2px 7px;border-radius:10px;border:1px solid var(--border)}
+
+/* ---- LOADING ---- */
+.loading-wrap{
+  min-height:calc(100vh - 56px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 20px;text-align:center
+}
+.spinner{
+  width:44px;height:44px;border:4px solid var(--primary-pale);
+  border-top-color:var(--primary);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 16px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- RESPONSIVE ---- */
+@media(max-width:380px){
+  .card{padding:18px}
+  .doc-info-name{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">FirmaYa <span>FIRMA ELECTRÓNICA</span></div>
+  <div class="secure-badge">🔒 Conexión segura</div>
+</div>
+
+<!-- LOADING -->
+<div id="loadingScreen" class="loading-wrap">
+  <div class="spinner"></div>
+  <div style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:6px">Cargando documento…</div>
+  <div style="font-size:13px;color:var(--text-medium)">Por favor esperá un momento</div>
+</div>
+
+<!-- ERROR -->
+<div id="errorScreen" class="error-wrap" style="display:none">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">Link inválido o expirado</div>
+  <div class="error-subtitle">Este link de firma no es válido o ya fue utilizado.<br>Contactá a quien te envió el documento para que te reenvíe un nuevo link.</div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <div class="steps-row">
+    <div class="step active" id="stp1">
+      <div class="step-num">1</div>
+      <div class="step-label">Verificar</div>
+    </div>
+    <div class="step-connector" id="con1"></div>
+    <div class="step" id="stp2">
+      <div class="step-num">2</div>
+      <div class="step-label">Leer doc</div>
+    </div>
+    <div class="step-connector" id="con2"></div>
+    <div class="step" id="stp3">
+      <div class="step-num">3</div>
+      <div class="step-label">Firmar</div>
+    </div>
+    <div class="step-connector" id="con3"></div>
+    <div class="step" id="stp4">
+      <div class="step-num">4</div>
+      <div class="step-label">Listo ✓</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================ PAGE 1: VERIFICAR IDENTIDAD ================ -->
+<div id="page1" class="page" style="display:none">
+  <div class="doc-banner">
+    <div class="doc-icon">📄</div>
+    <div class="doc-info-wrap">
+      <div class="doc-info-name" id="p1DocName">Cargando…</div>
+      <div class="doc-info-meta">
+        <div class="doc-meta-item">✉️ Enviado por <strong id="p1Sender">London Servicios Inmobiliarios</strong></div>
+        <div class="doc-meta-item">📅 <span id="p1Fecha">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Verificación de identidad</div>
+    <div class="card-subtitle" style="margin-bottom:20px">Confirmá tus datos para continuar con la firma.</div>
+
+    <div class="form-group">
+      <label class="form-label">Nombre completo</label>
+      <input class="form-input" id="verNombre" type="text" placeholder="Ej: Carlos Pérez" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="verEmail" type="email" placeholder="tucorreo@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">DNI</label>
+      <input class="form-input" id="verDni" type="text" placeholder="Ej: 30.456.789" inputmode="numeric" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--primary-pale);border-color:rgba(13,98,120,.2)">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <div style="font-size:20px;margin-top:1px">ℹ️</div>
+      <div style="font-size:13px;color:var(--text-medium);line-height:1.6">
+        Al continuar confirmás que sos <strong style="color:var(--text-dark)" id="p1FirmanteNombre">el firmante</strong> designado para este documento. Tu identidad quedará registrada con fecha y hora exactas.
+      </div>
+    </div>
+  </div>
+
+  <div style="height:80px"></div>
+</div>
+
+<!-- FOOTER 1 -->
+<div id="footer1" class="step-footer" style="display:none">
+  <button class="btn btn-primary" onclick="goStep2()">Verificar identidad →</button>
+</div>
+
+<!-- ================ PAGE 2: LEER DOCUMENTO ================ -->
+<div id="page2" class="page" style="display:none">
+  <div class="card">
+    <div class="card-title">📄 <span id="p2DocName">Documento</span></div>
+    <div class="card-subtitle" style="margin-bottom:16px">Leé el resumen del documento antes de firmar.</div>
+    <div style="background:var(--bg);border-radius:10px;padding:16px;font-size:13px;color:var(--text-medium);line-height:1.8">
+      <strong style="color:var(--text-dark);display:block;margin-bottom:8px">Resumen del documento:</strong>
+      <div id="p2DocContent">
+        Este documento fue preparado por London Servicios Inmobiliarios para tu firma electrónica.<br><br>
+        Al firmar aceptás el contenido del documento indicado arriba. La firma electrónica tiene validez legal conforme a la <strong style="color:var(--text-dark)">Ley 25.506 de Firma Digital</strong> de la República Argentina.<br><br>
+        Si tenés dudas sobre el contenido del documento, comunicáte con quien te lo envió antes de proceder a firmar.
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Datos del documento</div>
+        <table style="width:100%;font-size:12px">
+          <tr><td style="color:var(--text-light);padding:3px 0">Firmante:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Firmante">—</td></tr>
+          <tr><td style="color:var(--text-light);padding:3px 0">Enviado el:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Fecha">—</td></tr>
+          <tr><td style="color:var(--text-light);padding:3px 0">Token:</td><td style="color:var(--text-dark);font-weight:600;text-align:right;font-size:11px" id="p2Token">—</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggleCheckbox(this)" id="docCheckCard" style="cursor:pointer">
+    <div class="check-row" id="docCheck">
+      <div class="check-box"><span class="check-mark">✓</span></div>
+      <div class="check-text">
+        <strong>Confirmo que leí y entiendo el contenido del documento</strong> "<span id="checkDocName">—</span>" y acepto firmarlo electrónicamente.
+      </div>
+    </div>
+  </div>
+
+  <div style="height:80px"></div>
+</div>
+
+<!-- FOOTER 2 -->
+<div id="footer2" class="step-footer" style="display:none">
+  <button class="btn btn-primary" id="btnGoStep3" onclick="goStep3()" disabled>Proceder a firmar →</button>
+</div>
+
+<!-- ================ PAGE 3: FIRMAR ================ -->
+<div id="page3" class="page" style="display:none">
+  <!-- Firma manuscrita -->
+  <div class="card">
+    <div class="card-title">✍️ Tu firma</div>
+    <div class="card-subtitle" style="margin-bottom:14px">Dibujá tu firma con el dedo o el mouse en el área de abajo.</div>
+    <div class="sig-canvas-wrap" id="canvasWrap">
+      <canvas id="sigCanvas"></canvas>
+      <div class="sig-placeholder-text" id="sigPlaceholder">
+        <div class="sig-placeholder-icon">✍️</div>
+        <div class="sig-placeholder-label">Tocá aquí para firmar</div>
+      </div>
+    </div>
+    <div class="sig-actions">
+      <button class="sig-btn sig-btn-clear" onclick="clearCanvas()" type="button">🗑 Borrar</button>
+    </div>
+  </div>
+
+  <!-- Selfie (opcional) -->
+  <div class="card">
+    <div class="card-title">🤳 Foto de identidad <span class="optional-label">Opcional</span></div>
+    <div class="card-subtitle" style="margin-bottom:14px">Tomá una selfie para reforzar la validez legal de la firma.</div>
+
+    <div id="selfieArea">
+      <div id="selfieVideoWrap" class="selfie-wrap" style="display:none">
+        <video id="selfieVideo" autoplay playsinline muted></video>
+        <div class="selfie-overlay"></div>
+        <div class="selfie-controls">
+          <button class="selfie-btn selfie-btn-capture" onclick="captureSelfie()" type="button">📸 Capturar</button>
+          <button class="selfie-btn selfie-btn-retake" onclick="cancelSelfie()" type="button">✕ Cancelar</button>
+        </div>
+      </div>
+      <img id="selfiePreview" alt="Selfie capturada">
+      <canvas id="selfieCanvas"></canvas>
+      <div class="selfie-status" id="selfieStatus"></div>
+      <button class="sig-btn" style="width:100%;padding:12px;font-size:13px;margin-top:4px" onclick="startSelfie()" id="btnSelfie" type="button">📷 Activar cámara</button>
+    </div>
+  </div>
+
+  <div style="height:80px"></div>
+</div>
+
+<!-- FOOTER 3 -->
+<div id="footer3" class="step-footer" style="display:none">
+  <button class="btn btn-success" id="btnFirmar" onclick="confirmarFirma()">✅ Confirmar y firmar</button>
+</div>
+
+<!-- ================ PAGE 4: ÉXITO ================ -->
+<div id="page4" style="display:none">
+  <div class="success-wrap">
+    <div class="success-icon">✅</div>
+    <div class="success-title">¡Firmaste exitosamente!</div>
+    <div class="success-subtitle">Tu firma fue registrada y el documento<br>quedó firmado electrónicamente.</div>
+
+    <div class="cert-card">
+      <div style="font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🏅 Comprobante de Firma</div>
+      <div class="cert-row"><span class="cert-key">Firmante</span><span class="cert-val" id="certNombre">—</span></div>
+      <div class="cert-row"><span class="cert-key">DNI</span><span class="cert-val" id="certDni">—</span></div>
+      <div class="cert-row"><span class="cert-key">Email</span><span class="cert-val" id="certEmail">—</span></div>
+      <div class="cert-row"><span class="cert-key">Documento</span><span class="cert-val" id="certDoc">—</span></div>
+      <div class="cert-row"><span class="cert-key">Fecha y hora</span><span class="cert-val" id="certFecha">—</span></div>
+      <div class="cert-row"><span class="cert-key">Token</span><span class="cert-val" id="certToken">—</span></div>
+      <div class="cert-row"><span class="cert-key">Estado</span><span class="cert-val" style="color:var(--success)">✓ FIRMADO</span></div>
+    </div>
+
+    <div class="legal-note">
+      ⚖️ Esta firma electrónica tiene validez legal bajo la <strong>Ley 25.506</strong> de Firma Digital de la República Argentina. Se registró la identidad del firmante, fecha, hora, dirección IP y firma biométrica.
+    </div>
+
+    <button class="save-btn" onclick="guardarComprobante()" type="button">
+      💾 Guardar comprobante
+    </button>
+
+    <div style="margin-top:20px;font-size:12px;color:var(--text-light);text-align:center">
+      Powered by <strong>FirmaYa</strong> · London Servicios Inmobiliarios
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== LECTURA DE URL PARAMS ====================
+const params = new URLSearchParams(window.location.search);
+const TOKEN  = params.get('t') || '';
+const DOCRAW = params.get('d') || '';
+const FIRMRAW = params.get('r') || '';
+const SENDER = params.get('s') || 'London Servicios Inmobiliarios';
+
+function decodeParam(str){
+  if(!str) return '';
+  try{ return decodeURIComponent(atob(str)); } catch(e){ return str; }
+}
+
+const DOC_NAME   = decodeParam(DOCRAW)  || 'Documento';
+const FIRMANTE   = decodeParam(FIRMRAW) || '';
+
+// Fecha actual
+function fmtDate(d){
+  const date = d || new Date();
+  const dd = date.getDate().toString().padStart(2,'0');
+  const mm = (date.getMonth()+1).toString().padStart(2,'0');
+  const yy = date.getFullYear();
+  const hh = date.getHours().toString().padStart(2,'0');
+  const min = date.getMinutes().toString().padStart(2,'0');
+  return dd+'/'+mm+'/'+yy+' '+hh+':'+min;
+}
+
+// ==================== INICIALIZACIÓN ====================
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(init, 600);
+});
+
+function init(){
+  document.getElementById('loadingScreen').style.display = 'none';
+
+  if(!TOKEN){
+    document.getElementById('errorScreen').style.display = 'flex';
+    return;
+  }
+
+  // Mostrar progress y página 1
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('page1').style.display   = 'block';
+  document.getElementById('footer1').style.display = 'block';
+
+  // Rellenar info del doc
+  document.getElementById('p1DocName').textContent     = DOC_NAME;
+  document.getElementById('p1FirmanteNombre').textContent = FIRMANTE || 'el firmante';
+  document.getElementById('p1Fecha').textContent       = fmtDate();
+
+  // Pre-rellenar nombre si viene en URL
+  if(FIRMANTE) document.getElementById('verNombre').value = FIRMANTE;
+
+  // Ajustar canvas al contenedor
+  initCanvas();
+}
+
+// ==================== NAVEGACIÓN POR PASOS ====================
+let currentStep = 1;
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    const s = document.getElementById('stp'+i);
+    if(i < n) s.className = 'step done';
+    else if(i === n) s.className = 'step active';
+    else s.className = 'step';
+    const s_num = s.querySelector('.step-num');
+    if(i < n) s_num.textContent = '✓';
+    else s_num.textContent = i;
+    if(i <= 3){
+      const con = document.getElementById('con'+i);
+      con.className = 'step-connector' + (i < n ? ' done' : '');
+    }
+  }
+  currentStep = n;
+}
+
+function hidePage(n){
+  const ids = ['page1','page2','page3','page4','footer1','footer2','footer3'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+}
+
+// ---- PASO 1 → 2 ----
+function goStep2(){
+  const nombre = document.getElementById('verNombre').value.trim();
+  const email  = document.getElementById('verEmail').value.trim();
+  const dni    = document.getElementById('verDni').value.trim();
+  if(!nombre){ alert('Por favor ingresá tu nombre completo.'); return; }
+  if(!email || !email.includes('@')){ alert('Por favor ingresá un email válido.'); return; }
+  if(!dni){ alert('Por favor ingresá tu número de DNI.'); return; }
+  window._nombre = nombre;
+  window._email  = email;
+  window._dni    = dni;
+
+  hidePage(1);
+  setStep(2);
+  // Rellenar page 2
+  document.getElementById('p2DocName').textContent   = DOC_NAME;
+  document.getElementById('p2Firmante').textContent  = nombre;
+  document.getElementById('p2Fecha').textContent     = fmtDate();
+  document.getElementById('p2Token').textContent     = TOKEN;
+  document.getElementById('checkDocName').textContent = DOC_NAME;
+  document.getElementById('page2').style.display  = 'block';
+  document.getElementById('footer2').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+// ---- CHECKBOX LECTURA ----
+function toggleCheckbox(card){
+  const row = card.querySelector('.check-row');
+  row.classList.toggle('checked');
+  const confirmed = row.classList.contains('checked');
+  const btn = document.getElementById('btnGoStep3');
+  btn.disabled = !confirmed;
+}
+
+// ---- PASO 2 → 3 ----
+function goStep3(){
+  hidePage(2);
+  setStep(3);
+  document.getElementById('page3').style.display  = 'block';
+  document.getElementById('footer3').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+// ==================== CANVAS FIRMA ====================
+let canvas, ctx, isDrawing = false, hasSig = false;
+
+function initCanvas(){
+  canvas = document.getElementById('sigCanvas');
+  const wrap = document.getElementById('canvasWrap');
+  canvas.width  = wrap.offsetWidth  || 480;
+  canvas.height = 200;
+  ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0A4E62';
+  ctx.lineWidth   = 2.5;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  // Mouse
+  canvas.addEventListener('mousedown', e=>{ isDrawing=true; ctx.beginPath(); ctx.moveTo(getX(e),getY(e)); showPlaceholder(false); });
+  canvas.addEventListener('mousemove', e=>{ if(isDrawing){ ctx.lineTo(getX(e),getY(e)); ctx.stroke(); hasSig=true; }});
+  canvas.addEventListener('mouseup',   ()=>{ isDrawing=false; });
+  canvas.addEventListener('mouseleave',()=>{ isDrawing=false; });
+
+  // Touch
+  canvas.addEventListener('touchstart', e=>{ e.preventDefault(); isDrawing=true; const t=e.touches[0]; ctx.beginPath(); ctx.moveTo(getXt(t),getYt(t)); showPlaceholder(false); }, {passive:false});
+  canvas.addEventListener('touchmove',  e=>{ e.preventDefault(); if(isDrawing){ const t=e.touches[0]; ctx.lineTo(getXt(t),getYt(t)); ctx.stroke(); hasSig=true; }}, {passive:false});
+  canvas.addEventListener('touchend',   ()=>{ isDrawing=false; });
+}
+
+function getX(e){ const r=canvas.getBoundingClientRect(); return (e.clientX-r.left)*(canvas.width/r.width); }
+function getY(e){ const r=canvas.getBoundingClientRect(); return (e.clientY-r.top)*(canvas.height/r.height); }
+function getXt(t){ const r=canvas.getBoundingClientRect(); return (t.clientX-r.left)*(canvas.width/r.width); }
+function getYt(t){ const r=canvas.getBoundingClientRect(); return (t.clientY-r.top)*(canvas.height/r.height); }
+
+function showPlaceholder(show){
+  document.getElementById('sigPlaceholder').style.opacity = show ? '1' : '0';
+  document.getElementById('canvasWrap').classList.toggle('has-sig', !show);
+}
+
+function clearCanvas(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  hasSig = false;
+  showPlaceholder(true);
+}
+
+// ==================== SELFIE ====================
+let stream = null;
+let selfieData = null;
+
+async function startSelfie(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    const video = document.getElementById('selfieVideo');
+    video.srcObject = stream;
+    document.getElementById('selfieVideoWrap').style.display = 'block';
+    document.getElementById('btnSelfie').style.display = 'none';
+    document.getElementById('selfiePreview').style.display = 'none';
+    document.getElementById('selfieStatus').textContent = '';
+  } catch(err){
+    document.getElementById('selfieStatus').textContent = '⚠️ No se pudo acceder a la cámara. Podés continuar sin selfie.';
+  }
+}
+
+function captureSelfie(){
+  const video   = document.getElementById('selfieVideo');
+  const cvs     = document.getElementById('selfieCanvas');
+  const preview = document.getElementById('selfiePreview');
+  cvs.width  = video.videoWidth  || 320;
+  cvs.height = video.videoHeight || 240;
+  cvs.getContext('2d').drawImage(video,0,0);
+  selfieData = cvs.toDataURL('image/jpeg',0.7);
+  preview.src = selfieData;
+  preview.style.display = 'block';
+  document.getElementById('selfieVideoWrap').style.display = 'none';
+  document.getElementById('selfieStatus').textContent = '✅ Selfie capturada correctamente';
+  document.getElementById('btnSelfie').textContent = '🔄 Retomar selfie';
+  document.getElementById('btnSelfie').style.display = 'block';
+  document.getElementById('btnSelfie').onclick = startSelfie;
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+}
+
+function cancelSelfie(){
+  document.getElementById('selfieVideoWrap').style.display = 'none';
+  document.getElementById('btnSelfie').style.display = 'block';
+  document.getElementById('selfieStatus').textContent = '';
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+}
+
+// ==================== CONFIRMAR FIRMA ====================
+async function confirmarFirma(){
+  if(!hasSig){
+    alert('Por favor dibujá tu firma antes de continuar.');
+    return;
+  }
+  const btn = document.getElementById('btnFirmar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Registrando firma…';
+
+  const sigImg    = canvas.toDataURL('image/png');
+  const ts        = new Date();
+  const tsStr     = fmtDate(ts);
+
+  // Datos del evento
+  const payload = {
+    type:        'firma',
+    token:       TOKEN,
+    doc_nombre:  DOC_NAME,
+    firmante:    window._nombre,
+    email:       window._email,
+    dni:         window._dni,
+    timestamp:   ts.toISOString(),
+    fecha_hora:  tsStr,
+    user_agent:  navigator.userAgent,
+    idioma:      navigator.language,
+    selfie:      selfieData ? 'sí' : 'no',
+    estado:      'FIRMADO'
+  };
+
+  // Enviar a Google Sheets (fire-and-forget)
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+  } catch(e){ /* silencioso — no bloquear la firma */ }
+
+  // Detener cámara si quedó abierta
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+
+  // Mostrar pantalla de éxito
+  hidePage(3);
+  setStep(4);
+  document.getElementById('page4').style.display = 'block';
+  document.getElementById('certNombre').textContent = window._nombre;
+  document.getElementById('certDni').textContent    = window._dni;
+  document.getElementById('certEmail').textContent  = window._email;
+  document.getElementById('certDoc').textContent    = DOC_NAME;
+  document.getElementById('certFecha').textContent  = tsStr;
+  document.getElementById('certToken').textContent  = TOKEN;
+  window.scrollTo(0,0);
+
+  // Guardar en localStorage para referencia
+  try{
+    const hist = JSON.parse(localStorage.getItem('firmaya_hist') || '[]');
+    hist.unshift({token:TOKEN, doc:DOC_NAME, nombre:window._nombre, fecha:tsStr});
+    localStorage.setItem('firmaya_hist', JSON.stringify(hist.slice(0,20)));
+  } catch(e){}
+}
+
+// ==================== GUARDAR COMPROBANTE ====================
+function guardarComprobante(){
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante FirmaYa</title>
+<style>body{font-family:Arial,sans-serif;max-width:500px;margin:40px auto;padding:20px;color:#1A2B35}
+h1{color:#0D6278;font-size:20px;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+td{padding:10px 8px;border-bottom:1px solid #eee;font-size:14px}
+td:first-child{color:#8A9BAB;font-size:12px;text-transform:uppercase;letter-spacing:.5px;width:40%}
+td:last-child{font-weight:600}
+.footer{margin-top:24px;font-size:11px;color:#8A9BAB;text-align:center}
+</style></head><body>
+<h1>✅ Comprobante de Firma — FirmaYa</h1>
+<table>
+<tr><td>Firmante</td><td>${window._nombre}</td></tr>
+<tr><td>DNI</td><td>${window._dni}</td></tr>
+<tr><td>Email</td><td>${window._email}</td></tr>
+<tr><td>Documento</td><td>${DOC_NAME}</td></tr>
+<tr><td>Fecha y hora</td><td>${document.getElementById('certFecha').textContent}</td></tr>
+<tr><td>Token</td><td>${TOKEN}</td></tr>
+<tr><td>Estado</td><td style="color:#27AE60">✓ FIRMADO</td></tr>
+</table>
+<div class="footer">Firma electrónica válida bajo Ley 25.506 · FirmaYa · London Servicios Inmobiliarios</div>
+</body></html>`;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'comprobante-firma-' + TOKEN + '.html';
+  a.click();
+}
+
+// ==================== RESIZE CANVAS ====================
+window.addEventListener('resize', ()=>{
+  if(!canvas) return;
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const wrap = document.getElementById('canvasWrap');
+  canvas.width = wrap.offsetWidth || 480;
+  ctx.putImageData(data,0,0);
+  ctx.strokeStyle='#0A4E62'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+});
+</script>
+</body>
+</html>

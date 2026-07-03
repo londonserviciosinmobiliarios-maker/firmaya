@@ -715,7 +715,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <p id="sentMsg" style="font-size:14px;color:var(--text-medium);margin-bottom:24px;line-height:1.7"></p>
                   <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:20px">
                     <div style="font-size:11px;color:var(--text-light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link de firma (para compartir)</div>
-                    <div style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all">firmaya.com.ar/firmar/doc-abc123-xyz789</div>
+                    <div id="sentLink" style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all">—</div>
                   </div>
                   <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Ir al dashboard →</button>
                 </div>
@@ -1093,10 +1093,15 @@ function sendDoc(method){
   document.getElementById('sentSuccess').style.display='block';
   document.getElementById('sentMsg').textContent = msgs[method];
   document.getElementById('flowFooter4').style.display='none';
-  if(method==='wa'){
-    const url='firmaya.com.ar/firmar/'+token;
-    try{ navigator.clipboard.writeText('https://'+url); } catch(e){}
-  }
+  // Construir URL real con params
+  const docB64      = btoa(unescape(encodeURIComponent((window._uploadedFileName||'Documento').replace(/\.[^.]+$/,''))));
+  const firmanteB64 = btoa(unescape(encodeURIComponent(window._signerName||'')));
+  const firmarUrl   = 'https://firmaya.pages.dev/firmar.html?t=' + token + '&d=' + docB64 + '&r=' + firmanteB64;
+  // Mostrar link en pantalla
+  const sentLinkEl = document.getElementById('sentLink');
+  if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
+  // Copiar al portapapeles automáticamente
+  try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
 }
 
 // ---- CHECKBOXES ----
