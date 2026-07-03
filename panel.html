@@ -663,12 +663,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
             <div class="flow-body" id="flowStep3" style="display:none">
               <p style="font-size:13px;color:var(--text-medium);margin-bottom:16px">Marcá dónde va la firma en el documento. Podés moverla arrastrándola.</p>
               <div class="doc-preview">
-                <strong style="display:block;text-align:center;font-size:13px;color:var(--text-dark);margin-bottom:12px">RESERVA DE COMPRA · N° 2026-061</strong>
-                <p>En la ciudad de Córdoba, a los 13 días del mes de junio de 2026, la Sra. <strong>MARIA SILVIA LOPEZ</strong>, DNI 12.345.678, en adelante "EL RESERVANTE", entrega en concepto de reserva la suma de <strong>PESOS OCHOCIENTOS MIL ($800.000)</strong> por la propiedad ubicada en 9 de Julio 1157, Piso 2 PH 33, Ciudad de Córdoba...</p>
-                <br/>
-                <p>La presente reserva tiene validez por el término de 10 (diez) días hábiles a partir de la fecha de suscripción. La suma entregada será imputada al precio de venta acordado...</p>
-                <br/>
-                <p>Precio total acordado: USD 75.000 (dólares setenta y cinco mil). Forma de pago: 30% al boleto, 70% a la escritura...</p>
+                <strong id="previewDocName" style="display:block;text-align:center;font-size:13px;color:var(--text-dark);margin-bottom:12px">📄 Documento cargado</strong>
+                <div style="text-align:center;padding:28px 0 20px;color:var(--text-light)">
+                  <div style="font-size:48px;margin-bottom:10px">📄</div>
+                  <p style="font-size:13px;line-height:1.6">El documento fue cargado correctamente.<br>Arrastrá el bloque de firma a la posición donde debe ir la rúbrica.</p>
+                </div>
                 <div class="sig-placeholder" id="sigPlaceholder" draggable="true">
                   <span id="sigPlaceholderName">✍️ Firma del firmante</span>
                   <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
@@ -740,13 +739,13 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
           <div class="detail-header">
             <div class="detail-status">
-              <div class="status-big">📄 CONTRAOFERTA DPTO 9 DE JULIO 1157 2 PH 33</div>
-              <span class="badge badge-success">FIRMADO</span>
+              <div class="status-big" id="detailDocName">📄 —</div>
+              <span class="badge badge-success" id="detailBadge">—</span>
             </div>
             <div style="display:flex;gap:24px;font-size:13px;color:var(--text-medium)">
-              <span>🆔 Doc ID: 61</span>
-              <span>📅 Creado: 13/06/2026 20:41</span>
-              <span>✅ Firmado: 13/06/2026 20:46</span>
+              <span id="detailDocId">🆔 Doc ID: —</span>
+              <span id="detailCreado">📅 Creado: —</span>
+              <span id="detailFirmadoSpan">✅ Firmado: —</span>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">
               <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
@@ -770,7 +769,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <div class="timeline-content">
                   <div class="timeline-title">Firmante notificado por email</div>
                   <div class="timeline-time">13/06/2026 · 20:41:42</div>
-                  <div class="timeline-detail">📧 mariasilvialopez1973@gmail.com</div>
+                  <div class="timeline-detail" id="detailEmail">📧 —</div>
                 </div>
               </div>
               <div class="timeline-item">
@@ -792,20 +791,20 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <div class="timeline-content">
                   <div class="timeline-title">Documento firmado</div>
                   <div class="timeline-time">13/06/2026 · 20:46:27</div>
-                  <div class="timeline-detail" style="color:var(--success)">✅ MARIA SILVIA LOPEZ firmó el documento</div>
+                  <div class="timeline-detail" style="color:var(--success)" id="detailTimelineName">✅ — firmó el documento</div>
                 </div>
               </div>
             </div>
 
             <div class="timeline">
               <div style="font-size:15px;font-weight:700;margin-bottom:16px">🔒 Evidencia de autenticación</div>
-              <div style="font-size:13px;color:var(--text-medium);margin-bottom:4px"><strong>MARIA SILVIA LOPEZ</strong></div>
-              <div style="font-size:12px;color:var(--text-light);margin-bottom:16px">Token: e0a6cb32-39ab-45a9-ab93-d48dfe3dc4b0</div>
+              <div style="font-size:13px;color:var(--text-medium);margin-bottom:4px"><strong id="detailFirmante">—</strong></div>
+              <div style="font-size:12px;color:var(--text-light);margin-bottom:16px" id="detailToken">Token: —</div>
               <div class="evidence-grid">
                 <div class="evidence-item">
                   <div class="evidence-icon">📧</div>
                   <div class="evidence-label">Email</div>
-                  <div class="evidence-value">mariasil...@gmail.com ✓</div>
+                  <div class="evidence-value" id="detailEmailEvid">— ✓</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🤳</div>
@@ -862,16 +861,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
 <script>
 // ---- DOCS DATA ----
-const docs = [
-  {id:61,nombre:"CONTRAOFERTA DPTO 9 DE JULIO 1157 2 PH 33",firmante:"Pablo Rodriguez",enviado:"13/06/2026",estado:"Firmado"},
-  {id:60,nombre:"RESERVA CALLE LIMA 540 DPTO 4B",firmante:"Carlos Eduardo Gomez",enviado:"10/06/2026",estado:"Firmado"},
-  {id:59,nombre:"CONTRATO ALQUILER BULEVAR 1245 3°A",firmante:"Ana Maria Fernandez",enviado:"08/06/2026",estado:"Firmado"},
-  {id:58,nombre:"BOLETO COMPRAVENTA CRISOL 890 PB",firmante:"Roberto Diaz",enviado:"05/06/2026",estado:"Firmado"},
-  {id:57,nombre:"RESERVA HIPÓLITO YRIGOYEN 2340 1°C",firmante:"Marcela Torres",enviado:"01/06/2026",estado:"Firmado"},
-  {id:56,nombre:"CONTRAOFERTA DEAN FUNES 780 3°B",firmante:"Juan Carlos Perez",enviado:"28/05/2026",estado:"Pendiente"},
-  {id:55,nombre:"CONTRATO ALQUILER SAN MARTIN 456 PH",firmante:"Laura Martinez",enviado:"25/05/2026",estado:"Firmado"},
-  {id:54,nombre:"RESERVA CORRIENTES 1120 DPTO 8",firmante:"Diego Ramirez",enviado:"22/05/2026",estado:"Firmado"},
-];
+const docs = [];
 
 function statusBadge(s){
   if(s==='Firmado') return '<span class="badge badge-success">FIRMADO</span>';
@@ -896,7 +886,7 @@ function renderDocs(data, bodyId){
       <td>${statusBadge(d.estado)}</td>
       <td>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" onclick="showDetail()">Ver</button>
+          <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.id===${d.id}))">Ver</button>
           <button class="btn btn-ghost btn-sm">⬇</button>
         </div>
       </td>
@@ -940,7 +930,26 @@ function showView(name){
   closeSidebarOnMobile();
 }
 
-function showDetail(){ showView('detalle'); }
+function showDetail(doc){
+  if(doc){
+    const g = id => document.getElementById(id);
+    const firmado = doc.estado === 'Firmado';
+    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
+    if(g('detailBadge')){
+      g('detailBadge').textContent = doc.estado.toUpperCase();
+      g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
+    }
+    if(g('detailDocId')) g('detailDocId').textContent = '🆔 Doc ID: ' + doc.id;
+    if(g('detailCreado')) g('detailCreado').textContent = '📅 Creado: ' + doc.enviado;
+    if(g('detailFirmadoSpan')) g('detailFirmadoSpan').style.display = firmado ? '' : 'none';
+    if(g('detailEmail')) g('detailEmail').textContent = '📧 ' + (doc.email || '—');
+    if(g('detailTimelineName')) g('detailTimelineName').textContent = '✅ ' + doc.firmante + ' firmó el documento';
+    if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
+    if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
+    if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
+  }
+  showView('detalle');
+}
 
 // ---- LOGIN / LOGOUT ----
 function doLogin(){
@@ -1040,6 +1049,8 @@ function flowGo(n){
   if(n===3){
     const name = (document.getElementById('firmanteName')||{}).value||'';
     document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
+    const pn = document.getElementById('previewDocName');
+    if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
   }
   if(n===4){
     const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
@@ -1055,17 +1066,35 @@ function flowGo(n){
 // ---- SEND ----
 function sendDoc(method){
   const name = window._signerName || 'el firmante';
+  const email = window._signerEmail || '';
   const msgs = {
     email:'El link de firma fue enviado automáticamente al email de '+name+'. Te avisaremos cuando firme.',
     wa:'Copiá el link y enviáselo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
   };
+  // Agregar documento al array
+  const newId = docs.length > 0 ? Math.max(...docs.map(d=>d.id)) + 1 : 1;
+  const today = new Date();
+  const fecha = today.getDate().toString().padStart(2,'0') + '/' + (today.getMonth()+1).toString().padStart(2,'0') + '/' + today.getFullYear();
+  const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
+  docs.unshift({
+    id: newId,
+    nombre: (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'').toUpperCase(),
+    firmante: window._signerName || '—',
+    email: email,
+    token: token,
+    enviado: fecha,
+    estado: 'Pendiente'
+  });
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
   document.getElementById('sendForm').style.display='none';
   document.getElementById('sentSuccess').style.display='block';
   document.getElementById('sentMsg').textContent = msgs[method];
   document.getElementById('flowFooter4').style.display='none';
   if(method==='wa'){
-    // simulate copy
-    const url='firmaya.com.ar/firmar/doc-abc123-xyz789';
+    const url='firmaya.com.ar/firmar/'+token;
     try{ navigator.clipboard.writeText('https://'+url); } catch(e){}
   }
 }
