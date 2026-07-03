@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FirmaYa — Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#0D6278;--primary-dark:#0A4E62;--primary-light:#1A7A92;
+  --primary-pale:#EBF4F7;--white:#fff;--text-dark:#1A2B35;
+  --text-medium:#4A6070;--text-light:#8A9BAB;--bg:#F5F8FA;
+  --success:#27AE60;--warning:#F39C12;--danger:#E74C3C;--border:#D0DDE5;
+}
+body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);min-height:100vh}
+
+/* ---- UTILS ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--primary);color:white}.btn-primary:hover{background:var(--primary-dark)}
+.btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}.btn-outline:hover{background:var(--primary);color:white}
+.btn-ghost{background:transparent;color:var(--text-medium);border:1px solid var(--border)}.btn-ghost:hover{background:var(--white);color:var(--text-dark)}
+.btn-success{background:var(--success);color:white}.btn-success:hover{background:#219A52}
+.btn-wa{background:#25D366;color:white}.btn-wa:hover{background:#1DAA56}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-lg{padding:13px 28px;font-size:15px}
+.screen{display:none}.screen.on{display:flex;flex-direction:column;min-height:100vh}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:#D5F5E3;color:#1E8449}
+.badge-warning{background:#FEF9E7;color:#9A7D0A}
+.badge-danger{background:#FDEDEC;color:#922B21}
+.badge-gray{background:#EEF1F3;color:#5D7080}
+
+/* ---- LOGIN ---- */
+.login-wrap{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(140deg,var(--primary-dark) 0%,var(--primary) 60%,#1A8EA8 100%)
+}
+.login-card{background:white;border-radius:20px;padding:48px 44px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--primary)}
+.login-logo-sub{font-size:10px;letter-spacing:2px;color:var(--text-light);text-transform:uppercase;margin-top:4px}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-medium);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-input{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;color:var(--text-dark)
+}
+.form-input:focus{border-color:var(--primary)}
+.login-footer{text-align:center;margin-top:16px;font-size:12px;color:var(--text-light)}
+
+/* ---- LAYOUT ---- */
+.layout{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  width:240px;background:var(--primary-dark);color:white;
+  display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;bottom:0;left:0;z-index:50
+}
+.sidebar-logo{
+  padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700
+}
+.sidebar-logo span{display:block;font-family:'Inter',sans-serif;font-size:10px;opacity:.6;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.sidebar-nav{flex:1;padding:16px 12px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;
+  cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.75);
+  transition:all .2s;margin-bottom:4px
+}
+.nav-item:hover{background:rgba(255,255,255,.1);color:white}
+.nav-item.active{background:rgba(255,255,255,.15);color:white;font-weight:600}
+.nav-item-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.1)}
+.sidebar-user{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  background:rgba(255,255,255,.08);border-radius:10px
+}
+.user-avatar{
+  width:36px;height:36px;background:var(--primary-light);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0
+}
+.user-name{font-size:13px;font-weight:600;color:white}
+.user-plan{font-size:10px;color:rgba(255,255,255,.5)}
+
+/* Main content */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{
+  background:white;border-bottom:1px solid var(--border);
+  padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40
+}
+.topbar-title{font-size:18px;font-weight:700;color:var(--text-dark)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.content{padding:32px;flex:1}
+
+/* ---- STATS CARDS ---- */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+.stat-card{
+  background:white;border:1px solid var(--border);border-radius:14px;
+  padding:22px 24px;position:relative;overflow:hidden
+}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary)}
+.stat-card.green::before{background:var(--success)}
+.stat-card.orange::before{background:var(--warning)}
+.stat-card.red::before{background:var(--danger)}
+.stat-num{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--text-light);font-weight:500}
+.stat-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.15}
+
+/* ---- TABLE ---- */
+.table-card{background:white;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.table-header{
+  padding:18px 24px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border)
+}
+.table-title{font-size:15px;font-weight:700}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:12px 20px;text-align:left;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);
+  background:var(--bg);border-bottom:1px solid var(--border)
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--primary-pale)}
+td{padding:14px 20px;font-size:13px;color:var(--text-medium)}
+td.td-name{font-weight:600;color:var(--text-dark)}
+.doc-icon{font-size:18px;margin-right:8px}
+
+/* ---- NEW DOC FLOW ---- */
+.flow-card{
+  background:white;border:1px solid var(--border);border-radius:16px;
+  max-width:720px;margin:0 auto;overflow:hidden
+}
+.flow-steps-bar{
+  display:flex;background:var(--bg);border-bottom:1px solid var(--border)
+}
+.flow-step-tab{
+  flex:1;padding:16px 10px;text-align:center;font-size:12px;
+  font-weight:600;color:var(--text-light);border-bottom:3px solid transparent;transition:all .2s
+}
+.flow-step-tab.active{color:var(--primary);border-bottom-color:var(--primary);background:white}
+.flow-step-tab.done{color:var(--success);border-bottom-color:var(--success)}
+.flow-step-num{
+  width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--text-light);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;margin-bottom:6px
+}
+.flow-step-tab.active .flow-step-num{background:var(--primary);color:white}
+.flow-step-tab.done .flow-step-num{background:var(--success);color:white}
+.flow-body{padding:32px}
+.flow-footer{
+  padding:20px 32px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;background:var(--bg)
+}
+
+/* Upload zone */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:12px;padding:48px 24px;
+  text-align:center;cursor:pointer;transition:all .3s;background:#FAFBFC
+}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:var(--primary-pale)}
+.upload-icon{font-size:48px;margin-bottom:14px}
+.upload-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.upload-sub{font-size:13px;color:var(--text-light)}
+.upload-link{color:var(--primary);font-weight:600;cursor:pointer}
+.uploaded-file{
+  display:flex;align-items:center;gap:14px;padding:16px;
+  background:var(--primary-pale);border:1px solid var(--primary);
+  border-radius:10px;margin-top:16px
+}
+.uploaded-file-icon{font-size:32px}
+.uploaded-file-name{font-weight:600;font-size:14px;color:var(--text-dark)}
+.uploaded-file-size{font-size:12px;color:var(--text-light)}
+
+/* Signer form */
+.signer-card{
+  border:1px solid var(--border);border-radius:12px;padding:22px;
+  margin-bottom:16px;position:relative;background:var(--bg)
+}
+.signer-card-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.section-label{font-size:12px;font-weight:700;color:var(--text-medium);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;margin-top:20px}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check-item{
+  display:flex;align-items:center;gap:9px;padding:10px 13px;
+  border:1.5px solid var(--border);border-radius:8px;cursor:pointer;
+  font-size:13px;color:var(--text-medium);transition:all .2s;background:white
+}
+.check-item:hover{border-color:var(--primary);color:var(--text-dark)}
+.check-item.checked{border-color:var(--primary);background:var(--primary-pale);color:var(--primary);font-weight:600}
+.check-item input[type=checkbox]{accent-color:var(--primary);width:15px;height:15px}
+
+/* Doc preview with signature area */
+.doc-preview{
+  border:1.5px solid var(--border);border-radius:10px;background:#777;
+  padding:12px;font-size:12px;color:var(--text-medium);line-height:1.9;
+  min-height:260px;max-height:500px;overflow-y:auto;position:relative
+}
+.sig-placeholder{
+  display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;
+  background:#FFF9E6;border:2px dashed #F0C040;
+  border-radius:8px;padding:10px 18px;cursor:move;
+  font-size:12px;color:#856404;font-weight:600;
+  position:absolute;bottom:40px;right:24px;z-index:10;user-select:none
+}
+.sig-placeholder-move{font-size:10px;color:#A07800;display:block;margin-top:2px;font-weight:400}
+
+/* Send screen */
+.send-summary{background:var(--primary-pale);border:1px solid var(--primary);border-radius:12px;padding:22px;margin-bottom:24px}
+.send-summary h4{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:12px}
+.send-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(13,98,120,.1);font-size:13px}
+.send-row:last-child{border-bottom:none}
+.send-row-label{color:var(--text-light)}
+.send-row-val{font-weight:600;color:var(--text-dark)}
+.send-options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.send-option{
+  border:1.5px solid var(--border);border-radius:12px;padding:20px;
+  text-align:center;cursor:pointer;transition:all .2s;background:white
+}
+.send-option:hover{border-color:var(--primary);background:var(--primary-pale)}
+.send-option-icon{font-size:32px;margin-bottom:10px}
+.send-option-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.send-option-sub{font-size:12px;color:var(--text-light)}
+
+/* Sent success */
+.sent-success{text-align:center;padding:32px 0}
+.sent-circle{
+  width:80px;height:80px;background:var(--success);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:36px;color:white;
+  box-shadow:0 6px 24px rgba(39,174,96,.3)
+}
+
+/* Detail panel */
+.detail-header{
+  background:white;border:1px solid var(--border);border-radius:14px;
+  padding:24px 28px;margin-bottom:20px
+}
+.detail-status{
+  display:flex;align-items:center;gap:16px;margin-bottom:16px
+}
+.status-big{
+  font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px
+}
+.timeline{
+  background:white;border:1px solid var(--border);border-radius:14px;padding:24px 28px
+}
+.timeline-item{
+  display:flex;gap:16px;padding-bottom:20px;position:relative
+}
+.timeline-item::before{
+  content:'';position:absolute;left:15px;top:30px;bottom:-5px;
+  width:2px;background:var(--border)
+}
+.timeline-item:last-child::before{display:none}
+.timeline-dot{
+  width:32px;height:32px;border-radius:50%;background:var(--success);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:14px;flex-shrink:0;z-index:1
+}
+.timeline-dot.pending{background:var(--border)}
+.timeline-content{flex:1}
+.timeline-title{font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:3px}
+.timeline-time{font-size:11px;color:var(--text-light)}
+.timeline-detail{font-size:12px;color:var(--text-medium);margin-top:6px;background:var(--bg);padding:8px 12px;border-radius:6px}
+
+/* Evidence card */
+.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.evidence-item{
+  background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  padding:14px;text-align:center
+}
+.evidence-icon{font-size:24px;margin-bottom:6px}
+.evidence-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);font-weight:600;margin-bottom:3px}
+.evidence-value{font-size:12px;font-weight:600;color:var(--text-dark);word-break:break-all}
+
+/* ---- MISC ---- */
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--text-medium)}
+.empty-state{text-align:center;padding:48px;color:var(--text-light)}
+.empty-icon{font-size:48px;margin-bottom:14px}
+.search-bar{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  font-size:13px;color:var(--text-light)
+}
+.search-bar input{border:none;background:transparent;outline:none;font-family:'Inter',sans-serif;font-size:13px;width:220px}
+.tag-filter{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--border);background:white;color:var(--text-medium);transition:all .2s
+}
+.tag-filter.active{background:var(--primary);color:white;border-color:var(--primary)}
+.alert-info{
+  background:var(--primary-pale);border:1px solid rgba(13,98,120,.2);
+  border-radius:10px;padding:14px 16px;font-size:13px;color:var(--primary);
+  display:flex;align-items:center;gap:10px;margin-bottom:20px
+}
+
+/* ---- RESPONSIVE MOBILE ---- */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49;cursor:pointer}
+.sidebar-overlay.open{display:block}
+.hamburger-btn{display:none;background:none;border:none;cursor:pointer;padding:8px 6px;font-size:22px;line-height:1;color:var(--text-dark);flex-shrink:0}
+
+@media(max-width:768px){
+  /* Sidebar como drawer lateral */
+  .sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .sidebar.open{transform:translateX(0);box-shadow:6px 0 28px rgba(0,0,0,.22)}
+  /* Main ocupa todo el ancho */
+  .main{margin-left:0}
+  /* Topbar */
+  .topbar{padding:0 14px;gap:10px}
+  .search-bar{display:none}
+  .hamburger-btn{display:flex;align-items:center}
+  .topbar-right .btn-ghost{display:none}
+  .topbar-right .btn-primary{font-size:12px;padding:8px 12px;white-space:nowrap}
+  /* Content */
+  .content{padding:14px}
+  /* Login */
+  .login-wrap{padding:20px 16px;align-items:flex-start;padding-top:60px}
+  .login-card{width:100%;max-width:420px;padding:32px 20px;border-radius:14px}
+  /* Stats 2x2 */
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .stat-card{padding:14px 14px}
+  /* Grids a 1 columna */
+  .form-row,.form-row-3,.check-grid,.send-options{grid-template-columns:1fr}
+  /* Evidence 1 col */
+  .evidence-grid{grid-template-columns:1fr 1fr}
+  /* Flow tabs: compactos y deslizables */
+  .flow-steps-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .flow-steps-bar::-webkit-scrollbar{display:none}
+  .flow-step-tab{min-width:72px;padding:12px 6px;font-size:11px}
+  .flow-body{padding:16px}
+  .flow-footer{padding:14px 16px;flex-wrap:wrap;gap:10px}
+  /* Tablas: ocultar cols secundarias */
+  table th:nth-child(4),table td:nth-child(4){display:none}
+  /* Topbar title */
+  .topbar-title{font-size:15px}
+  /* Page headers */
+  .page-title{font-size:18px}
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .evidence-grid{grid-template-columns:1fr}
+  .topbar-title{font-size:13px}
+  table th:nth-child(3),table td:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ======== LOGIN ======== -->
+<div id="loginScreen" style="display:flex;flex-direction:column;min-height:100vh">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
+          <rect width="52" height="52" rx="13" fill="#0D6278"/>
+          <rect x="5" y="5" width="42" height="42" rx="9" fill="none" stroke="white" stroke-width="1" stroke-opacity=".3"/>
+          <line x1="34" y1="10" x2="21" y2="28" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="19,32 21,28 25,30" fill="white"/>
+          <path d="M13,39 Q18,34 23,38 Q27,41 31,37 Q36,32 41,35" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="login-logo-name">FirmaYa</div>
+        <div class="login-logo-sub">Firma Electrónica Digital</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="text" id="loginEmail" value="london@firmaya.com.ar" placeholder="tu@email.com" autocomplete="off" readonly style="background:#f5f8fa;cursor:default">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="new-password">
+      </div>
+      <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseña incorrectos.</div>
+      <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="doLogin()">
+        Ingresar al panel →
+      </button>
+      <div class="login-footer">¿Olvidaste tu contraseña? <a href="#" style="color:var(--primary)">Recuperar</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== MAIN APP ======== -->
+<div id="appScreen" style="display:none">
+  <div class="layout">
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        FirmaYa
+        <span>Panel de gestión</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" onclick="showView('dashboard')">
+          <span class="nav-item-icon">📊</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showView('documentos')">
+          <span class="nav-item-icon">📄</span> Documentos
+        </div>
+        <div class="nav-item" onclick="showView('nuevo')">
+          <span class="nav-item-icon">➕</span> Nuevo documento
+        </div>
+        <div class="nav-item" onclick="showView('contactos')">
+          <span class="nav-item-icon">👥</span> Contactos
+        </div>
+        <div class="nav-item" onclick="showView('plantillas')">
+          <span class="nav-item-icon">📋</span> Plantillas
+        </div>
+        <div class="nav-item" onclick="showView('informes')">
+          <span class="nav-item-icon">📈</span> Informes
+        </div>
+        <div class="nav-item" onclick="showView('ajustes')">
+          <span class="nav-item-icon">⚙️</span> Ajustes
+        </div>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-user">
+          <div class="user-avatar">LF</div>
+          <div>
+            <div class="user-name">Luciano F.</div>
+            <div class="user-plan">Plan Pro · 38/50 docs</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-right">
+          <div class="search-bar">
+            <span>🔍</span>
+            <input placeholder="Buscar documentos o firmantes...">
+          </div>
+          <button class="btn btn-primary" onclick="showView('nuevo')">+ Nuevo documento</button>
+          <button class="btn btn-ghost btn-sm" onclick="logout()">Salir</button>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- ===== DASHBOARD ===== -->
+        <div id="view-dashboard" class="view on">
+          <div class="page-header">
+            <div class="page-title">Bienvenido 👋</div>
+            <div class="page-sub">Resumen de tu actividad · Julio 2026</div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-num">26</div>
+              <div class="stat-lbl">Total enviados</div>
+              <div class="stat-icon">📤</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-num">25</div>
+              <div class="stat-lbl">Firmados</div>
+              <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-num">1</div>
+              <div class="stat-lbl">Pendientes</div>
+              <div class="stat-icon">⏳</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-num">0</div>
+              <div class="stat-lbl">Rechazados</div>
+              <div class="stat-icon">❌</div>
+            </div>
+          </div>
+
+          <div class="alert-info">
+            ⚡ Tenés 12 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">Documentos recientes</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="tag-filter active" onclick="filterDocs(this,null)">Todos</span>
+                <span class="tag-filter" onclick="filterDocs(this,'Firmado')">Firmados</span>
+                <span class="tag-filter" onclick="filterDocs(this,'Pendiente')">Pendientes</span>
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
+              </div>
+            </div>
+            <table id="docsTable">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody')" title="Seleccionar todos"></th>
+                  <th>N°</th>
+                  <th>Documento</th>
+                  <th>Firmante</th>
+                  <th>Enviado</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="docsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===== DOCUMENTOS ===== -->
+        <div id="view-documentos" class="view" style="display:none">
+          <div class="page-header">
+            <div class="page-title">Documentos</div>
+            <div class="page-sub">Todos tus documentos enviados para firma</div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title" id="docsCount">26 documentos</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody2')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
+                <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo</button>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody2')" title="Seleccionar todos"></th>
+                  <th>N°</th><th>Documento</th><th>Firmante</th><th>Enviado</th><th>Estado</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="docsBody2"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===== NUEVO DOCUMENTO ===== -->
+        <div id="view-nuevo" class="view" style="display:none">
+          <div class="page-header">
+            <div class="page-title">Nuevo documento</div>
+            <div class="page-sub">Enviá un documento para firma electrónica</div>
+          </div>
+          <div class="flow-card">
+
+            <!-- Steps bar -->
+            <div class="flow-steps-bar">
+              <div class="flow-step-tab active" id="tab1">
+                <div class="flow-step-num">1</div>
+                <div>Subir documento</div>
+              </div>
+              <div class="flow-step-tab" id="tab2">
+                <div class="flow-step-num">2</div>
+                <div>Agregar firmante</div>
+              </div>
+              <div class="flow-step-tab" id="tab3">
+                <div class="flow-step-num">3</div>
+                <div>Posicionar firma</div>
+              </div>
+              <div class="flow-step-tab" id="tab4">
+                <div class="flow-step-num">4</div>
+                <div>Enviar</div>
+              </div>
+            </div>
+
+            <!-- Step 1: Upload -->
+            <div class="flow-body" id="flowStep1">
+              <input type="file" id="realFileInput" accept=".pdf,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
+              <div class="upload-zone" id="uploadZone" onclick="document.getElementById('realFileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
+                <div class="upload-icon">📂</div>
+                <div class="upload-title">Arrastrá el documento aquí</div>
+                <div class="upload-sub">o <span class="upload-link">buscá el archivo</span> en tu computadora</div>
+                <div class="upload-sub" style="margin-top:8px">PDF o DOCX · Máximo 10MB</div>
+              </div>
+              <div id="uploadedFile" style="display:none">
+                <div class="uploaded-file">
+                  <div class="uploaded-file-icon">📄</div>
+                  <div>
+                    <div class="uploaded-file-name" id="uploadedFileName">—</div>
+                    <div class="uploaded-file-size" id="uploadedFileSize">Subido correctamente ✓</div>
+                  </div>
+                  <button onclick="resetUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light)">✕</button>
+                </div>
+              </div>
+            </div>
+            <div class="flow-footer" id="flowFooter1">
+              <div style="font-size:13px;color:var(--text-light)">Paso 1 de 4</div>
+              <button class="btn btn-primary" id="btnNext1" onclick="flowGo(2)" disabled>Siguiente →</button>
+            </div>
+
+            <!-- Step 2: Signer -->
+            <div class="flow-body" id="flowStep2" style="display:none">
+              <div class="signer-card">
+                <div class="signer-card-title">✍️ Firmante 1</div>
+                <div class="form-row">
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">Nombre completo *</label>
+                    <input class="form-input" type="text" id="firmanteName" placeholder="Ej: Juan García">
+                  </div>
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">Email *</label>
+                    <input class="form-input" type="email" id="firmanteEmail" placeholder="email@ejemplo.com">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">Celular (opcional)</label>
+                    <input class="form-input" type="tel" placeholder="+54 9 351 000-0000">
+                  </div>
+                  <div class="form-group" style="margin:0">
+                    <label class="form-label">Rol del firmante</label>
+                    <select class="form-input">
+                      <option>Firmar</option>
+                      <option>Aprobar</option>
+                      <option>Solo ver</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="section-label">🔵 Autenticación Estándar</div>
+                <div class="check-grid">
+                  <div class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked> Firma en pantalla
+                  </div>
+                  <div class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked> Código por e-mail
+                  </div>
+                  <div class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Código por SMS
+                  </div>
+                  <div class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Código por WhatsApp
+                  </div>
+                </div>
+
+                <div class="section-label">🟣 Autenticación Avanzada</div>
+                <div class="check-grid">
+                  <div class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked> Selfie — foto del rostro
+                  </div>
+                  <div class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Foto del DNI
+                  </div>
+                  <div class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Reconocimiento facial
+                  </div>
+                  <div class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Biometría — prueba de vida
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-top:4px">+ Agregar otro firmante</button>
+            </div>
+            <div class="flow-footer" id="flowFooter2" style="display:none">
+              <button class="btn btn-ghost" onclick="flowGo(1)">← Atrás</button>
+              <div style="font-size:13px;color:var(--text-light)">Paso 2 de 4</div>
+              <button class="btn btn-primary" onclick="flowGo(3)">Siguiente →</button>
+            </div>
+
+            <!-- Step 3: Position signature -->
+            <div class="flow-body" id="flowStep3" style="display:none">
+              <p style="font-size:13px;color:var(--text-medium);margin-bottom:12px">Arrastrá el recuadro amarillo hasta donde debe ir la firma del cliente.</p>
+              <div class="doc-preview" id="pdfViewerBox"
+                   ondragover="handlePdfDragOver(event)" ondrop="handlePdfDrop(event)">
+                <div id="pdfCanvasContainer" style="display:flex;flex-direction:column;gap:10px;align-items:center">
+                  <div id="pdfLoadingMsg" style="text-align:center;padding:48px 20px;color:#eee">
+                    <div style="font-size:48px;margin-bottom:10px">📄</div>
+                    <p id="previewDocName" style="font-size:13px">Cargando documento…</p>
+                  </div>
+                </div>
+                <div class="sig-placeholder" id="sigPlaceholder" draggable="true"
+                     ondragstart="handleSigDragStart(event)">
+                  <span id="sigPlaceholderName">✍️ Firma del firmante</span>
+                  <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
+                </div>
+              </div>
+              <p style="font-size:11px;color:var(--text-light);margin-top:8px;text-align:center">💡 Arrastrá el bloque amarillo hasta donde debe firmar el cliente</p>
+            </div>
+            <div class="flow-footer" id="flowFooter3" style="display:none">
+              <button class="btn btn-ghost" onclick="flowGo(2)">← Atrás</button>
+              <div style="font-size:13px;color:var(--text-light)">Paso 3 de 4</div>
+              <button class="btn btn-primary" onclick="flowGo(4)">Siguiente →</button>
+            </div>
+
+            <!-- Step 4: Send -->
+            <div class="flow-body" id="flowStep4" style="display:none">
+              <div id="sendForm">
+                <div class="send-summary">
+                  <h4>📋 Resumen</h4>
+                  <div class="send-row"><span class="send-row-label">Documento</span><span class="send-row-val" id="resumeDoc">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Firmante</span><span class="send-row-val" id="resumeFirmante">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Email</span><span class="send-row-val" id="resumeEmail">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Validaciones</span><span class="send-row-val">Firma + Email + Selfie</span></div>
+                  <div class="send-row"><span class="send-row-label">Vencimiento</span><span class="send-row-val">7 días</span></div>
+                </div>
+                <p style="font-size:13px;font-weight:600;margin-bottom:14px">¿Cómo querés enviar el link de firma?</p>
+                <div class="send-options">
+                  <div class="send-option" onclick="sendDoc('email')">
+                    <div class="send-option-icon">📧</div>
+                    <div class="send-option-title">Por email</div>
+                    <div class="send-option-sub">El sistema envía el link automáticamente al email del firmante</div>
+                  </div>
+                  <div class="send-option" onclick="sendDoc('wa')">
+                    <div class="send-option-icon">💬</div>
+                    <div class="send-option-title">Link para WhatsApp</div>
+                    <div class="send-option-sub">Copiás el link y lo mandás vos por WhatsApp</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sent success -->
+              <div id="sentSuccess" style="display:none">
+                <div class="sent-success">
+                  <div class="sent-circle">✓</div>
+                  <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:var(--success)">¡Enviado!</h3>
+                  <p id="sentMsg" style="font-size:14px;color:var(--text-medium);margin-bottom:24px;line-height:1.7"></p>
+                  <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:20px">
+                    <div style="font-size:11px;color:var(--text-light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link de firma (para compartir)</div>
+                    <div id="sentLink" style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all;margin-bottom:8px">—</div>
+                    <button onclick="copiarLink()" class="btn btn-ghost btn-sm" style="width:100%;margin-top:4px">📋 Copiar link</button>
+                  </div>
+                  <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Ir al dashboard →</button>
+                </div>
+              </div>
+            </div>
+            <div class="flow-footer" id="flowFooter4" style="display:none">
+              <button class="btn btn-ghost" id="btnBack4" onclick="flowGo(3)">← Atrás</button>
+              <div style="font-size:13px;color:var(--text-light)">Paso 4 de 4</div>
+              <div></div>
+            </div>
+
+          </div><!-- /flow-card -->
+        </div>
+
+        <!-- ===== DETAIL VIEW ===== -->
+        <div id="view-detalle" class="view" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <button class="btn btn-ghost btn-sm" onclick="showView('dashboard')">← Volver</button>
+            <div class="page-title" style="font-size:20px">Detalle del documento</div>
+          </div>
+
+          <div class="detail-header">
+            <div class="detail-status">
+              <div class="status-big" id="detailDocName">📄 —</div>
+              <span class="badge badge-success" id="detailBadge">—</span>
+            </div>
+            <div style="display:flex;gap:24px;font-size:13px;color:var(--text-medium)">
+              <span id="detailDocId">🆔 Doc ID: —</span>
+              <span id="detailCreado">📅 Creado: —</span>
+              <span id="detailFirmadoSpan">✅ Firmado: —</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
+              <button class="btn btn-ghost btn-sm">📋 Ver informe de firmas</button>
+              <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="timeline">
+              <div style="font-size:15px;font-weight:700;margin-bottom:20px">⏱ Historial de eventos</div>
+              <div class="timeline-item">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Documento creado y enviado</div>
+                  <div class="timeline-time">13/06/2026 · 20:41:40</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Firmante notificado por email</div>
+                  <div class="timeline-time">13/06/2026 · 20:41:42</div>
+                  <div class="timeline-detail" id="detailEmail">📧 —</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Documento abierto por el firmante</div>
+                  <div class="timeline-time">13/06/2026 · 20:44:18</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Selfie capturada</div>
+                  <div class="timeline-time">13/06/2026 · 20:45:55</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:var(--success)">✓</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Documento firmado</div>
+                  <div class="timeline-time">13/06/2026 · 20:46:27</div>
+                  <div class="timeline-detail" style="color:var(--success)" id="detailTimelineName">✅ — firmó el documento</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline">
+              <div style="font-size:15px;font-weight:700;margin-bottom:16px">🔒 Evidencia de autenticación</div>
+              <div style="font-size:13px;color:var(--text-medium);margin-bottom:4px"><strong id="detailFirmante">—</strong></div>
+              <div style="font-size:12px;color:var(--text-light);margin-bottom:16px" id="detailToken">Token: —</div>
+              <div class="evidence-grid">
+                <div class="evidence-item">
+                  <div class="evidence-icon">📧</div>
+                  <div class="evidence-label">Email</div>
+                  <div class="evidence-value" id="detailEmailEvid">— ✓</div>
+                </div>
+                <div class="evidence-item">
+                  <div class="evidence-icon">🤳</div>
+                  <div class="evidence-label">Selfie</div>
+                  <div class="evidence-value">Capturada 20:46:27 ✓</div>
+                </div>
+                <div class="evidence-item">
+                  <div class="evidence-icon">🌍</div>
+                  <div class="evidence-label">Ubicación GPS</div>
+                  <div class="evidence-value">-35.666012, -63.747082</div>
+                </div>
+                <div class="evidence-item">
+                  <div class="evidence-icon">🖥</div>
+                  <div class="evidence-label">IP</div>
+                  <div class="evidence-value">190.105.160.18</div>
+                </div>
+                <div class="evidence-item">
+                  <div class="evidence-icon">📱</div>
+                  <div class="evidence-label">Dispositivo</div>
+                  <div class="evidence-value">Android · Chrome 149</div>
+                </div>
+                <div class="evidence-item">
+                  <div class="evidence-icon">🔐</div>
+                  <div class="evidence-label">Hash SHA-256</div>
+                  <div class="evidence-value">2105b99a9e...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== OTHER VIEWS (placeholder) ===== -->
+        <div id="view-contactos" class="view" style="display:none">
+          <div class="page-header"><div class="page-title">Contactos</div><div class="page-sub">Tus firmantes frecuentes</div></div>
+          <div class="empty-state"><div class="empty-icon">👥</div><p>Próximamente disponible</p></div>
+        </div>
+        <div id="view-plantillas" class="view" style="display:none">
+          <div class="page-header"><div class="page-title">Plantillas</div><div class="page-sub">Documentos preconfigurados</div></div>
+          <div class="empty-state"><div class="empty-icon">📋</div><p>Próximamente disponible</p></div>
+        </div>
+        <div id="view-informes" class="view" style="display:none">
+          <div class="page-header"><div class="page-title">Informes</div><div class="page-sub">Estadísticas de firma</div></div>
+          <div class="empty-state"><div class="empty-icon">📈</div><p>Próximamente disponible</p></div>
+        </div>
+        <div id="view-ajustes" class="view" style="display:none">
+          <div class="page-header"><div class="page-title">Ajustes</div><div class="page-sub">Configuración de tu cuenta</div></div>
+          <div class="empty-state"><div class="empty-icon">⚙️</div><p>Próximamente disponible</p></div>
+        </div>
+
+      </div><!-- /content -->
+    </main>
+  </div>
+</div>
+
+<script>
+// ---- DOCS DATA ----
+const docs = [];
+
+function statusBadge(s){
+  if(s==='Firmado') return '<span class="badge badge-success">FIRMADO</span>';
+  if(s==='Pendiente') return '<span class="badge badge-warning">PENDIENTE</span>';
+  return '<span class="badge badge-danger">RECHAZADO</span>';
+}
+
+function renderDocs(data, bodyId){
+  const body = document.getElementById(bodyId);
+  if(!body) return;
+  if(!data.length){
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-light)">No hay documentos</td></tr>';
+    return;
+  }
+  body.innerHTML = data.map(d=>`
+    <tr>
+      <td><input type="checkbox" class="doc-check" data-id="${d.id}"></td>
+      <td style="font-weight:600;color:var(--text-light)">#${d.id}</td>
+      <td class="td-name"><span class="doc-icon">📄</span>${d.nombre}</td>
+      <td>${d.firmante}</td>
+      <td>${d.enviado}</td>
+      <td>${statusBadge(d.estado)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.id===${d.id}))">Ver</button>
+          <button class="btn btn-ghost btn-sm">⬇</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function toggleAllDocs(cb, bodyId){
+  document.querySelectorAll('#'+bodyId+' .doc-check').forEach(c => c.checked = cb.checked);
+}
+
+function deleteSelected(bodyId){
+  const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
+  if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
+  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = docs.length + ' documentos';
+}
+
+function filterDocs(el, estado){
+  document.querySelectorAll('.tag-filter').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const data = estado ? docs.filter(d=>d.estado===estado) : docs;
+  renderDocs(data, 'docsBody');
+}
+
+// ---- VIEWS ----
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.style.display='none');
+  document.getElementById('view-'+name).style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navMap = {dashboard:'Dashboard',documentos:'Documentos',nuevo:'Nuevo documento',contactos:'Contactos',plantillas:'Plantillas',informes:'Informes',ajustes:'Ajustes',detalle:'Detalle'};
+  document.getElementById('topbarTitle').textContent = navMap[name]||name;
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.trim().includes(navMap[name]||name)) n.classList.add('active');
+  });
+  if(name==='nuevo') resetFlow();
+  closeSidebarOnMobile();
+}
+
+function showDetail(doc){
+  if(doc){
+    const g = id => document.getElementById(id);
+    const firmado = doc.estado === 'Firmado';
+    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
+    if(g('detailBadge')){
+      g('detailBadge').textContent = doc.estado.toUpperCase();
+      g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
+    }
+    if(g('detailDocId')) g('detailDocId').textContent = '🆔 Doc ID: ' + doc.id;
+    if(g('detailCreado')) g('detailCreado').textContent = '📅 Creado: ' + doc.enviado;
+    if(g('detailFirmadoSpan')) g('detailFirmadoSpan').style.display = firmado ? '' : 'none';
+    if(g('detailEmail')) g('detailEmail').textContent = '📧 ' + (doc.email || '—');
+    if(g('detailTimelineName')) g('detailTimelineName').textContent = '✅ ' + doc.firmante + ' firmó el documento';
+    if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
+    if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
+    if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
+  }
+  showView('detalle');
+}
+
+// ---- LOGIN / LOGOUT ----
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
+    err.style.display='none';
+    showDashboard();
+  } else {
+    err.style.display='block';
+  }
+}
+// Allow Enter key on password
+document.addEventListener('DOMContentLoaded', ()=>{
+  const p = document.getElementById('loginPass');
+  if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+});
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebarOnMobile(){
+  if(window.innerWidth<=768){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+}
+
+function showDashboard(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+}
+
+function logout(){
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+}
+
+// ---- UPLOAD REAL ----
+function handleFileSelect(input){
+  if(input.files && input.files[0]) showUploadedFile(input.files[0]);
+}
+function handleFileDrop(event){
+  event.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = event.dataTransfer.files[0];
+  if(file) showUploadedFile(file);
+}
+function showUploadedFile(file){
+  const allowed = ['pdf','docx','doc'];
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(!allowed.includes(ext)){ alert('Solo se aceptan archivos PDF o DOCX'); return; }
+  const kb = Math.round(file.size/1024);
+  const size = kb>1024?(kb/1024).toFixed(1)+' MB':kb+' KB';
+  document.getElementById('uploadZone').style.display='none';
+  document.getElementById('uploadedFile').style.display='block';
+  document.getElementById('uploadedFileName').textContent = file.name;
+  document.getElementById('uploadedFileSize').textContent = size+' · '+ext.toUpperCase()+' · Subido correctamente ✓';
+  document.getElementById('btnNext1').removeAttribute('disabled');
+  window._uploadedFileName = file.name;
+  window._uploadedFile = file;
+}
+function resetUpload(){
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('uploadedFile').style.display='none';
+  const inp = document.getElementById('realFileInput');
+  if(inp) inp.value='';
+  document.getElementById('btnNext1').setAttribute('disabled','');
+  window._uploadedFileName = null;
+}
+
+// ---- FLOW ----
+function resetFlow(){
+  flowGo(1);
+  resetUpload();
+  document.getElementById('sendForm').style.display='block';
+  document.getElementById('sentSuccess').style.display='none';
+  ['1','2','3','4'].forEach(n=>{
+    const t=document.getElementById('tab'+n);
+    t.classList.remove('active','done');
+  });
+  document.getElementById('tab1').classList.add('active');
+}
+
+function flowGo(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('flowStep'+i).style.display = (i===n)?'block':'none';
+    document.getElementById('flowFooter'+i).style.display = (i===n)?'flex':'none';
+    const t = document.getElementById('tab'+i);
+    t.classList.remove('active','done');
+    if(i<n) t.classList.add('done');
+    if(i===n) t.classList.add('active');
+  }
+  if(n===3){
+    const name = (document.getElementById('firmanteName')||{}).value||'';
+    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
+    // Reset sig placeholder position
+    const sig = document.getElementById('sigPlaceholder');
+    if(sig){ sig.style.left=''; sig.style.top=''; sig.style.right='24px'; sig.style.bottom='40px'; }
+    // Render PDF
+    if(window._uploadedFile) renderPdfPreview(window._uploadedFile);
+    else {
+      const pn = document.getElementById('previewDocName');
+      if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
+    }
+  }
+  if(n===4){
+    const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
+    const email = ((document.getElementById('firmanteEmail')||{}).value||'').trim();
+    window._signerName = name || '—';
+    window._signerEmail = email || '—';
+    document.getElementById('resumeDoc').textContent = window._uploadedFileName || '—';
+    document.getElementById('resumeFirmante').textContent = window._signerName;
+    document.getElementById('resumeEmail').textContent = window._signerEmail;
+  }
+}
+
+// ---- PDF.JS VIEWER ----
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+let _pdfDragOffX = 0, _pdfDragOffY = 0;
+
+async function renderPdfPreview(file){
+  const box = document.getElementById('pdfViewerBox');
+  const cc  = document.getElementById('pdfCanvasContainer');
+  const lm  = document.getElementById('pdfLoadingMsg');
+  if(!cc) return;
+  cc.querySelectorAll('canvas').forEach(c=>c.remove());
+  if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⏳</div><p style="font-size:13px;color:#eee">Cargando PDF…</p>'; }
+  if(typeof pdfjsLib === 'undefined'){
+    if(lm) lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">PDF.js no disponible. Verificá tu conexión a internet.</p>';
+    return;
+  }
+  try{
+    const buf  = await file.arrayBuffer();
+    const pdf  = await pdfjsLib.getDocument({data: buf}).promise;
+    if(lm) lm.style.display='none';
+    const availW = (box ? box.offsetWidth : 600) - 32;
+    for(let p=1; p<=Math.min(pdf.numPages, 20); p++){
+      const page = await pdf.getPage(p);
+      const vp0  = page.getViewport({scale:1});
+      const scale = Math.min(availW / vp0.width, 2);
+      const vp   = page.getViewport({scale});
+      const cvs  = document.createElement('canvas');
+      cvs.width  = vp.width;
+      cvs.height = vp.height;
+      cvs.style.cssText = 'display:block;box-shadow:0 2px 8px rgba(0,0,0,.5);border-radius:2px;background:white';
+      cc.appendChild(cvs);
+      await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
+    }
+  } catch(e){
+    if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:36px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">No se pudo mostrar el PDF. El archivo puede estar protegido con contraseña o no es un PDF válido.</p>'; }
+  }
+}
+
+function handleSigDragStart(e){
+  const r = e.currentTarget.getBoundingClientRect();
+  _pdfDragOffX = e.clientX - r.left;
+  _pdfDragOffY = e.clientY - r.top;
+  e.dataTransfer.setData('text/plain','sig');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function handlePdfDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function handlePdfDrop(e){
+  e.preventDefault();
+  const box = document.getElementById('pdfViewerBox');
+  if(!box) return;
+  const br  = box.getBoundingClientRect();
+  const sig = document.getElementById('sigPlaceholder');
+  if(!sig) return;
+  const x = e.clientX - br.left - _pdfDragOffX;
+  const y = e.clientY - br.top  + box.scrollTop - _pdfDragOffY;
+  sig.style.left   = Math.max(0, x) + 'px';
+  sig.style.top    = Math.max(0, y) + 'px';
+  sig.style.right  = 'auto';
+  sig.style.bottom = 'auto';
+}
+
+// ---- WORKER URL ----
+const FIRMAYA_WORKER = 'https://firmaya-worker.londonserviciosinmobiliarios.workers.dev';
+
+// ---- SEND ----
+function sendDoc(method){
+  const name  = window._signerName  || 'el firmante';
+  const email = window._signerEmail || '';
+  const msgs = {
+    email:'El link de firma fue enviado automáticamente al email de '+name+'. Te avisaremos cuando firme.',
+    wa:'Copiá el link y enviáselo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
+  };
+  // Agregar documento al array
+  const newId = docs.length > 0 ? Math.max(...docs.map(d=>d.id)) + 1 : 1;
+  const today = new Date();
+  const fecha = today.getDate().toString().padStart(2,'0') + '/' + (today.getMonth()+1).toString().padStart(2,'0') + '/' + today.getFullYear();
+  const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
+  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'');
+  docs.unshift({
+    id: newId,
+    nombre: docNombre.toUpperCase(),
+    firmante: window._signerName || '—',
+    email: email,
+    token: token,
+    enviado: fecha,
+    estado: 'Pendiente'
+  });
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
+  document.getElementById('sendForm').style.display='none';
+  document.getElementById('sentSuccess').style.display='block';
+  document.getElementById('sentMsg').textContent = msgs[method];
+  document.getElementById('flowFooter4').style.display='none';
+  // Construir URL real con params
+  const docB64      = btoa(unescape(encodeURIComponent(docNombre)));
+  const firmanteB64 = btoa(unescape(encodeURIComponent(window._signerName||'')));
+  const firmarUrl   = 'https://firmaya.londonserviciosinmobiliarios.com.ar/firmar.html?t=' + token + '&d=' + docB64 + '&r=' + firmanteB64;
+  // Mostrar link en pantalla
+  const sentLinkEl = document.getElementById('sentLink');
+  if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
+  // Copiar al portapapeles automáticamente
+  try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
+  // Llamar al Worker si el método es email
+  if(method === 'email' && email){
+    fetch(FIRMAYA_WORKER + '/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, docNombre, firmante: window._signerName||'', emailFirmante: email, firmarUrl })
+    }).catch(err => console.warn('Worker /api/send:', err));
+  }
+}
+
+// ---- COPY LINK ----
+function copiarLink(){
+  const link = document.getElementById('sentLink')?.textContent || '';
+  if(!link || link === '—') return;
+  try{ navigator.clipboard.writeText(link); } catch(e){}
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✅ Copiado!';
+  setTimeout(()=>{ btn.textContent = orig; }, 2000);
+}
+
+// ---- CHECKBOXES ----
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  el.querySelector('input').checked = el.classList.contains('checked');
+}
+
+// ---- DRAG SIG PLACEHOLDER ----
+const ph = document.getElementById('sigPlaceholder');
+if(ph){
+  let ox=0,oy=0,x=0,y=0;
+  ph.addEventListener('mousedown',e=>{
+    ox=e.clientX-ph.offsetLeft; oy=e.clientY-ph.offsetTop;
+    document.onmousemove=m=>{ ph.style.position='absolute'; ph.style.left=(m.clientX-ox)+'px'; ph.style.top=(m.clientY-oy)+'px'; };
+    document.onmouseup=()=>{ document.onmousemove=null; document.onmouseup=null; };
+  });
+}
+</script>
+</body>
+</html>
