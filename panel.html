@@ -866,7 +866,16 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
 <script>
 // ---- DOCS DATA ----
-const docs = [];
+// Load persisted docs from localStorage
+let docs = [];
+try {
+  const saved = localStorage.getItem('london_docs_v4');
+  if(saved) docs = JSON.parse(saved);
+} catch(e) { docs = []; }
+
+function saveDocs(){
+  try { localStorage.setItem('london_docs_v4', JSON.stringify(docs)); } catch(e){}
+}
 
 function renderStats(){
   const total = docs.length;
@@ -925,6 +934,7 @@ function deleteSelected(bodyId){
   if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
   if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
   checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
+  saveDocs();
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
   renderStats();
@@ -1007,6 +1017,35 @@ function showDashboard(){
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
   renderStats();
+  // Auto-check signatures after a brief delay
+  setTimeout(checkPendingSignatures, 1500);
+}
+
+async function checkPendingSignatures(){
+  const pending = docs.filter(d => d.estado === 'Pendiente');
+  if(!pending.length) return;
+  let updated = false;
+  for(const doc of pending){
+    try{
+      const r = await fetch(FIRMAYA_WORKER + '/api/check?token=' + doc.token, {signal: AbortSignal.timeout(5000)});
+      if(r.ok){
+        const data = await r.json();
+        if(data && data.firmado){
+          doc.estado = 'Firmado';
+          if(data.firmadoEn) doc.firmadoEn = data.firmadoEn;
+          if(data.firmante) doc.firmante = data.firmante;
+          if(data.dni) doc.dni = data.dni;
+          updated = true;
+        }
+      }
+    }catch(e){}
+  }
+  if(updated){
+    saveDocs();
+    renderDocs(docs.slice(0,5), 'docsBody');
+    renderDocs(docs, 'docsBody2');
+    renderStats();
+  }
 }
 
 function logout(){
@@ -1162,7 +1201,7 @@ function handlePdfDrop(e){
 }
 
 // ---- WORKER URL ----
-const FIRMAYA_WORKER = 'https://firmaya-worker.londonserviciosinmobiliarios.workers.dev';
+const FIRMAYA_WORKER = 'https://api.londonserviciosinmobiliarios.com.ar';
 
 // ---- SEND ----
 function sendDoc(method){
@@ -1187,6 +1226,7 @@ function sendDoc(method){
     enviado: fecha,
     estado: 'Pendiente'
   });
+  saveDocs();
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
   renderStats();

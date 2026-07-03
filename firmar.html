@@ -629,6 +629,27 @@ async function startSelfie(){
     document.getElementById('btnSelfie').style.display = 'none';
     document.getElementById('selfiePreview').style.display = 'none';
     document.getElementById('selfieStatus').textContent = '';
+
+    // Flash/torch si la imagen es oscura (mobile)
+    setTimeout(async () => {
+      try {
+        const track = stream && stream.getVideoTracks()[0];
+        if(!track) return;
+        const img = document.createElement('canvas');
+        const ctx2 = img.getContext('2d');
+        img.width = 16; img.height = 16;
+        ctx2.drawImage(video, 0, 0, 16, 16);
+        const px = ctx2.getImageData(0, 0, 16, 16).data;
+        let brightness = 0;
+        for(let i = 0; i < px.length; i += 4) brightness += (px[i] + px[i+1] + px[i+2]) / 3;
+        brightness /= (px.length / 4);
+        // Si la imagen es oscura (< 60/255) activar torch
+        if(brightness < 60 && track.applyConstraints) {
+          await track.applyConstraints({ advanced: [{ torch: true }] }).catch(()=>{});
+        }
+      } catch(e){}
+    }, 800);
+
   } catch(err){
     document.getElementById('selfieStatus').textContent = '⚠️ No se pudo acceder a la cámara. Podés continuar sin selfie.';
   }
@@ -689,7 +710,25 @@ async function confirmarFirma(){
     estado:      'FIRMADO'
   };
 
-  // Enviar a Google Sheets (fire-and-forget)
+  const FIRMAYA_WORKER = 'https://api.londonserviciosinmobiliarios.com.ar';
+
+  // Registrar firma en el Worker (guarda en KV + notifica por email)
+  try{
+    await fetch(FIRMAYA_WORKER + '/api/sign', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        token:    TOKEN,
+        docNombre:DOC_NAME,
+        firmante: window._nombre,
+        email:    window._email,
+        dni:      window._dni,
+        device:   navigator.userAgent.substring(0,100)
+      })
+    });
+  } catch(e){ /* silencioso — no bloquear la firma */ }
+
+  // Enviar a Google Sheets (fire-and-forget backup)
   try{
     await fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
       method: 'POST',
