@@ -1086,7 +1086,7 @@ function flowGo(n){
 
 // ---- PDF.JS VIEWER ----
 if(typeof pdfjsLib !== 'undefined'){
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 }
 let _pdfDragOffX = 0, _pdfDragOffY = 0;
 
@@ -1096,6 +1096,14 @@ async function renderPdfPreview(file){
   const lm  = document.getElementById('pdfLoadingMsg');
   if(!cc) return;
   cc.querySelectorAll('canvas').forEach(c=>c.remove());
+  // Handle DOCX/DOC — PDF.js cannot render Word files
+  const _ext = (file.name||'').split('.').pop().toLowerCase();
+  if(_ext==='docx'||_ext==='doc'){
+    if(lm){lm.style.display='block';lm.innerHTML='<div style="font-size:52px;margin-bottom:12px">\u{1F4DD}</div><p style="font-size:15px;color:#fff;font-weight:600;margin-bottom:6px">'+file.name+'</p><p style="font-size:12px;color:#ccc">Documento Word cargado \u2713<br>Posicion\u00e1 el recuadro amarillo donde debe ir la firma.</p>';}
+    return;
+  }
+  // Always set worker inline (avoids CORS issues)
+  if(typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = '';
   if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⏳</div><p style="font-size:13px;color:#eee">Cargando PDF…</p>'; }
   if(typeof pdfjsLib === 'undefined'){
     if(lm) lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">⚠️</div><p style="font-size:13px;color:#eee">PDF.js no disponible. Verificá tu conexión a internet.</p>';
@@ -1103,7 +1111,7 @@ async function renderPdfPreview(file){
   }
   try{
     const buf  = await file.arrayBuffer();
-    const pdf  = await pdfjsLib.getDocument({data: buf}).promise;
+    const pdf  = await pdfjsLib.getDocument({data: new Uint8Array(buf)}).promise;
     if(lm) lm.style.display='none';
     const availW = (box ? box.offsetWidth : 600) - 32;
     for(let p=1; p<=Math.min(pdf.numPages, 20); p++){
