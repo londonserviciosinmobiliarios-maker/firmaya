@@ -300,6 +300,56 @@ td.td-name{font-weight:600;color:var(--text-dark)}
   border-radius:10px;padding:14px 16px;font-size:13px;color:var(--primary);
   display:flex;align-items:center;gap:10px;margin-bottom:20px
 }
+
+/* ---- RESPONSIVE MOBILE ---- */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49;cursor:pointer}
+.sidebar-overlay.open{display:block}
+.hamburger-btn{display:none;background:none;border:none;cursor:pointer;padding:8px 6px;font-size:22px;line-height:1;color:var(--text-dark);flex-shrink:0}
+
+@media(max-width:768px){
+  /* Sidebar como drawer lateral */
+  .sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .sidebar.open{transform:translateX(0);box-shadow:6px 0 28px rgba(0,0,0,.22)}
+  /* Main ocupa todo el ancho */
+  .main{margin-left:0}
+  /* Topbar */
+  .topbar{padding:0 14px;gap:10px}
+  .search-bar{display:none}
+  .hamburger-btn{display:flex;align-items:center}
+  .topbar-right .btn-ghost{display:none}
+  .topbar-right .btn-primary{font-size:12px;padding:8px 12px;white-space:nowrap}
+  /* Content */
+  .content{padding:14px}
+  /* Login */
+  .login-wrap{padding:20px 16px;align-items:flex-start;padding-top:60px}
+  .login-card{width:100%;max-width:420px;padding:32px 20px;border-radius:14px}
+  /* Stats 2x2 */
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .stat-card{padding:14px 14px}
+  /* Grids a 1 columna */
+  .form-row,.form-row-3,.check-grid,.send-options{grid-template-columns:1fr}
+  /* Evidence 1 col */
+  .evidence-grid{grid-template-columns:1fr 1fr}
+  /* Flow tabs: compactos y deslizables */
+  .flow-steps-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .flow-steps-bar::-webkit-scrollbar{display:none}
+  .flow-step-tab{min-width:72px;padding:12px 6px;font-size:11px}
+  .flow-body{padding:16px}
+  .flow-footer{padding:14px 16px;flex-wrap:wrap;gap:10px}
+  /* Tablas: ocultar cols secundarias */
+  table th:nth-child(4),table td:nth-child(4){display:none}
+  /* Topbar title */
+  .topbar-title{font-size:15px}
+  /* Page headers */
+  .page-title{font-size:18px}
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .evidence-grid{grid-template-columns:1fr}
+  .topbar-title{font-size:13px}
+  table th:nth-child(3),table td:nth-child(3){display:none}
+}
 </style>
 </head>
 <body>
@@ -340,8 +390,9 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 <div id="appScreen" style="display:none">
   <div class="layout">
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         FirmaYa
         <span>Panel de gestión</span>
@@ -385,6 +436,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
       <!-- TOP BAR -->
       <div class="topbar">
+        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
         <div class="topbar-title" id="topbarTitle">Dashboard</div>
         <div class="topbar-right">
           <div class="search-bar">
@@ -857,6 +909,7 @@ function showView(name){
     if(n.textContent.trim().includes(navMap[name]||name)) n.classList.add('active');
   });
   if(name==='nuevo') resetFlow();
+  closeSidebarOnMobile();
 }
 
 function showDetail(){ showView('detalle'); }
@@ -878,6 +931,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const p = document.getElementById('loginPass');
   if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 });
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebarOnMobile(){
+  if(window.innerWidth<=768){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+}
 
 function showDashboard(){
   document.getElementById('loginScreen').style.display='none';
