@@ -321,11 +321,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input class="form-input" type="email" id="loginEmail" value="london@firmaya.com.ar" placeholder="tu@email.com">
+        <input class="form-input" type="text" id="loginEmail" value="london@firmaya.com.ar" placeholder="tu@email.com" autocomplete="off" readonly style="background:#f5f8fa;cursor:default">
       </div>
       <div class="form-group">
         <label class="form-label">Contraseña</label>
-        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña">
+        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="new-password">
       </div>
       <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseña incorrectos.</div>
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="doLogin()">
@@ -865,7 +865,7 @@ function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
   const err = document.getElementById('loginError');
-  if(email === 'london@firmaya.com.ar' && pass === 'London2026'){
+  if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
     err.style.display='none';
     showDashboard();
   } else {
