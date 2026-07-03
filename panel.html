@@ -487,15 +487,17 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           <div class="table-card">
             <div class="table-header">
               <div class="table-title">Documentos recientes</div>
-              <div style="display:flex;gap:8px">
-                <span class="tag-filter active">Todos</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="tag-filter active" onclick="filterDocs(this,null)">Todos</span>
                 <span class="tag-filter" onclick="filterDocs(this,'Firmado')">Firmados</span>
                 <span class="tag-filter" onclick="filterDocs(this,'Pendiente')">Pendientes</span>
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
               </div>
             </div>
             <table id="docsTable">
               <thead>
                 <tr>
+                  <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody')" title="Seleccionar todos"></th>
                   <th>N°</th>
                   <th>Documento</th>
                   <th>Firmante</th>
@@ -517,12 +519,18 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           </div>
           <div class="table-card">
             <div class="table-header">
-              <div class="table-title">26 documentos</div>
-              <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo</button>
+              <div class="table-title" id="docsCount">26 documentos</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody2')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
+                <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo</button>
+              </div>
             </div>
             <table>
               <thead>
-                <tr><th>N°</th><th>Documento</th><th>Firmante</th><th>Enviado</th><th>Firmado</th><th>Estado</th><th></th></tr>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllDocs(this,'docsBody2')" title="Seleccionar todos"></th>
+                  <th>N°</th><th>Documento</th><th>Firmante</th><th>Enviado</th><th>Estado</th><th></th>
+                </tr>
               </thead>
               <tbody id="docsBody2"></tbody>
             </table>
@@ -855,11 +863,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 <script>
 // ---- DOCS DATA ----
 const docs = [
-  {id:61,nombre:"CONTRAOFERTA DPTO 9 DE JULIO 1157 2 PH 33",firmante:"Maria Silvia Lopez",enviado:"13/06/2026",estado:"Firmado"},
+  {id:61,nombre:"CONTRAOFERTA DPTO 9 DE JULIO 1157 2 PH 33",firmante:"Pablo Rodriguez",enviado:"13/06/2026",estado:"Firmado"},
   {id:60,nombre:"RESERVA CALLE LIMA 540 DPTO 4B",firmante:"Carlos Eduardo Gomez",enviado:"10/06/2026",estado:"Firmado"},
   {id:59,nombre:"CONTRATO ALQUILER BULEVAR 1245 3°A",firmante:"Ana Maria Fernandez",enviado:"08/06/2026",estado:"Firmado"},
   {id:58,nombre:"BOLETO COMPRAVENTA CRISOL 890 PB",firmante:"Roberto Diaz",enviado:"05/06/2026",estado:"Firmado"},
-  {id:57,nombre:"RESERVA HIPÓLITO YRIGOYEN 2340 1°C",firmante:"Silvia Morales",enviado:"01/06/2026",estado:"Firmado"},
+  {id:57,nombre:"RESERVA HIPÓLITO YRIGOYEN 2340 1°C",firmante:"Marcela Torres",enviado:"01/06/2026",estado:"Firmado"},
   {id:56,nombre:"CONTRAOFERTA DEAN FUNES 780 3°B",firmante:"Juan Carlos Perez",enviado:"28/05/2026",estado:"Pendiente"},
   {id:55,nombre:"CONTRATO ALQUILER SAN MARTIN 456 PH",firmante:"Laura Martinez",enviado:"25/05/2026",estado:"Firmado"},
   {id:54,nombre:"RESERVA CORRIENTES 1120 DPTO 8",firmante:"Diego Ramirez",enviado:"22/05/2026",estado:"Firmado"},
@@ -874,8 +882,13 @@ function statusBadge(s){
 function renderDocs(data, bodyId){
   const body = document.getElementById(bodyId);
   if(!body) return;
+  if(!data.length){
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-light)">No hay documentos</td></tr>';
+    return;
+  }
   body.innerHTML = data.map(d=>`
     <tr>
+      <td><input type="checkbox" class="doc-check" data-id="${d.id}"></td>
       <td style="font-weight:600;color:var(--text-light)">#${d.id}</td>
       <td class="td-name"><span class="doc-icon">📄</span>${d.nombre}</td>
       <td>${d.firmante}</td>
@@ -889,6 +902,21 @@ function renderDocs(data, bodyId){
       </td>
     </tr>
   `).join('');
+}
+
+function toggleAllDocs(cb, bodyId){
+  document.querySelectorAll('#'+bodyId+' .doc-check').forEach(c => c.checked = cb.checked);
+}
+
+function deleteSelected(bodyId){
+  const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
+  if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
+  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = docs.length + ' documentos';
 }
 
 function filterDocs(el, estado){
