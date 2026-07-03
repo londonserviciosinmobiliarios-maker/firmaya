@@ -426,7 +426,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           <div class="user-avatar">LF</div>
           <div>
             <div class="user-name">Luciano F.</div>
-            <div class="user-plan">Plan Pro · 38/50 docs</div>
+            <div class="user-plan" id="planCounter">Plan Pro · 0/50 docs</div>
           </div>
         </div>
       </div>
@@ -460,29 +460,29 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
           <div class="stats-row">
             <div class="stat-card">
-              <div class="stat-num">26</div>
+              <div class="stat-num" id="statTotal">0</div>
               <div class="stat-lbl">Total enviados</div>
               <div class="stat-icon">📤</div>
             </div>
             <div class="stat-card green">
-              <div class="stat-num">25</div>
+              <div class="stat-num" id="statFirmados">0</div>
               <div class="stat-lbl">Firmados</div>
               <div class="stat-icon">✅</div>
             </div>
             <div class="stat-card orange">
-              <div class="stat-num">1</div>
+              <div class="stat-num" id="statPendientes">0</div>
               <div class="stat-lbl">Pendientes</div>
               <div class="stat-icon">⏳</div>
             </div>
             <div class="stat-card red">
-              <div class="stat-num">0</div>
+              <div class="stat-num" id="statRechazados">0</div>
               <div class="stat-lbl">Rechazados</div>
               <div class="stat-icon">❌</div>
             </div>
           </div>
 
           <div class="alert-info">
-            ⚡ Tenés 12 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>
+            ⚡ Tenés 50 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>
           </div>
 
           <div class="table-card">
@@ -520,7 +520,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
           </div>
           <div class="table-card">
             <div class="table-header">
-              <div class="table-title" id="docsCount">26 documentos</div>
+              <div class="table-title" id="docsCount">0 documentos</div>
               <div style="display:flex;gap:8px">
                 <button class="btn btn-ghost btn-sm" onclick="deleteSelected('docsBody2')" style="color:var(--danger);border-color:var(--danger)">🗑 Borrar seleccionados</button>
                 <button class="btn btn-primary btn-sm" onclick="showView('nuevo')">+ Nuevo</button>
@@ -868,6 +868,14 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 // ---- DOCS DATA ----
 const docs = [];
 
+function renderStats(){
+  const total=docs.length,firmados=docs.filter(d=>d.estado==='Firmado').length,pendientes=docs.filter(d=>d.estado==='Pendiente').length,rechazados=docs.filter(d=>d.estado==='Rechazado').length;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('statTotal',total);set('statFirmados',firmados);set('statPendientes',pendientes);set('statRechazados',rechazados);
+  set('docsCount',total+' documentos');
+  const pc=document.getElementById('planCounter');if(pc)pc.textContent='Plan Pro · '+total+'/50 docs';
+  const a=document.querySelector('.alert-info');if(a)a.innerHTML='⚡ Tenés '+(50-total)+' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
+}
 function statusBadge(s){
   if(s==='Firmado') return '<span class="badge badge-success">FIRMADO</span>';
   if(s==='Pendiente') return '<span class="badge badge-warning">PENDIENTE</span>';
@@ -910,8 +918,7 @@ function deleteSelected(bodyId){
   checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  const cnt = document.getElementById('docsCount');
-  if(cnt) cnt.textContent = docs.length + ' documentos';
+  renderStats();
 }
 
 function filterDocs(el, estado){
@@ -990,6 +997,7 @@ function showDashboard(){
   document.getElementById('appScreen').style.display='block';
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
+  renderStats();
 }
 
 function logout(){
@@ -1166,8 +1174,7 @@ function sendDoc(method){
   });
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  const cnt = document.getElementById('docsCount');
-  if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
+  renderStats();
   document.getElementById('sendForm').style.display='none';
   document.getElementById('sentSuccess').style.display='block';
   document.getElementById('sentMsg').textContent = msgs[method];
