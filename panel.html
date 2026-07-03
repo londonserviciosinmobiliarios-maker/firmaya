@@ -376,7 +376,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
       </div>
       <div class="form-group">
         <label class="form-label">Contraseña</label>
-        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="new-password">
+        <input class="form-input" id="loginPass" type="tel" inputmode="text" placeholder="Contraseña" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="-webkit-text-security:disc">
       </div>
       <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseña incorrectos.</div>
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="doLogin()">
@@ -1096,6 +1096,9 @@ async function renderPdfPreview(file){
   const lm  = document.getElementById('pdfLoadingMsg');
   if(!cc) return;
   cc.querySelectorAll('canvas').forEach(c=>c.remove());
+  const _ext=(file.name||'').split('.').pop().toLowerCase();
+  if(_ext==='docx'||_ext==='doc'){if(lm){lm.style.display='block';lm.innerHTML='<div style="font-size:52px;margin-bottom:12px">📝</div><p style="font-size:15px;color:#fff;font-weight:600;margin-bottom:6px">'+file.name+'</p><p style="font-size:12px;color:#ccc">Documento Word cargado ✓<br>Posicioná el recuadro amarillo donde debe ir la firma.</p>';}return;}
+  if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='';
   // Handle DOCX/DOC — PDF.js cannot render Word files
   const _ext = (file.name||'').split('.').pop().toLowerCase();
   if(_ext==='docx'||_ext==='doc'){
