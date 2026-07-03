@@ -452,7 +452,14 @@ const SENDER = params.get('s') || 'London Servicios Inmobiliarios';
 
 function decodeParam(str){
   if(!str) return '';
-  try{ return decodeURIComponent(atob(str)); } catch(e){ return str; }
+  try{
+    // Panel encodes with btoa(unescape(encodeURIComponent(text)))
+    // Decode: get UTF-8 bytes from binary string via TextDecoder
+    const binary = atob(str);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  } catch(e){ try{ return atob(str); } catch(e2){ return str; } }
 }
 
 const DOC_NAME   = decodeParam(DOCRAW)  || 'Documento';
