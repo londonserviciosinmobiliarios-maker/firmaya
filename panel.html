@@ -537,11 +537,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <div class="form-row">
                   <div class="form-group" style="margin:0">
                     <label class="form-label">Nombre completo *</label>
-                    <input class="form-input" type="text" placeholder="Ej: Maria Silvia Lopez" value="Maria Silvia Lopez">
+                    <input class="form-input" type="text" id="firmanteName" placeholder="Ej: Juan García">
                   </div>
                   <div class="form-group" style="margin:0">
                     <label class="form-label">Email *</label>
-                    <input class="form-input" type="email" placeholder="email@ejemplo.com" value="mariasilvialopez1973@gmail.com">
+                    <input class="form-input" type="email" id="firmanteEmail" placeholder="email@ejemplo.com">
                   </div>
                 </div>
                 <div class="form-row">
@@ -610,7 +610,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <br/>
                 <p>Precio total acordado: USD 75.000 (dólares setenta y cinco mil). Forma de pago: 30% al boleto, 70% a la escritura...</p>
                 <div class="sig-placeholder" id="sigPlaceholder" draggable="true">
-                  ✍️ Firma de Maria Silvia Lopez
+                  <span id="sigPlaceholderName">✍️ Firma del firmante</span>
                   <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
                 </div>
               </div>
@@ -627,9 +627,9 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <div id="sendForm">
                 <div class="send-summary">
                   <h4>📋 Resumen</h4>
-                  <div class="send-row"><span class="send-row-label">Documento</span><span class="send-row-val">RESERVA DPTO 9 DE JULIO 1157 PH 33.pdf</span></div>
-                  <div class="send-row"><span class="send-row-label">Firmante</span><span class="send-row-val">Maria Silvia Lopez</span></div>
-                  <div class="send-row"><span class="send-row-label">Email</span><span class="send-row-val">mariasilvialopez1973@gmail.com</span></div>
+                  <div class="send-row"><span class="send-row-label">Documento</span><span class="send-row-val" id="resumeDoc">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Firmante</span><span class="send-row-val" id="resumeFirmante">—</span></div>
+                  <div class="send-row"><span class="send-row-label">Email</span><span class="send-row-val" id="resumeEmail">—</span></div>
                   <div class="send-row"><span class="send-row-label">Validaciones</span><span class="send-row-val">Firma + Email + Selfie</span></div>
                   <div class="send-row"><span class="send-row-label">Vencimiento</span><span class="send-row-val">7 días</span></div>
                 </div>
@@ -913,9 +913,6 @@ function showUploadedFile(file){
   document.getElementById('uploadedFileSize').textContent = size+' · '+ext.toUpperCase()+' · Subido correctamente ✓';
   document.getElementById('btnNext1').removeAttribute('disabled');
   window._uploadedFileName = file.name;
-  // update step 4 send row
-  const sendVal = document.querySelector('.send-row-val');
-  if(sendVal) sendVal.textContent = file.name;
 }
 function resetUpload(){
   document.getElementById('uploadZone').style.display='block';
@@ -948,13 +945,27 @@ function flowGo(n){
     if(i<n) t.classList.add('done');
     if(i===n) t.classList.add('active');
   }
+  if(n===3){
+    const name = (document.getElementById('firmanteName')||{}).value||'';
+    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
+  }
+  if(n===4){
+    const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
+    const email = ((document.getElementById('firmanteEmail')||{}).value||'').trim();
+    window._signerName = name || '—';
+    window._signerEmail = email || '—';
+    document.getElementById('resumeDoc').textContent = window._uploadedFileName || '—';
+    document.getElementById('resumeFirmante').textContent = window._signerName;
+    document.getElementById('resumeEmail').textContent = window._signerEmail;
+  }
 }
 
 // ---- SEND ----
 function sendDoc(method){
+  const name = window._signerName || 'el firmante';
   const msgs = {
-    email:'El link de firma fue enviado automáticamente al email de Maria Silvia Lopez. Te avisaremos cuando firme.',
-    wa:'Copiá el link y enviáselo a Maria Silvia Lopez por WhatsApp. Te notificaremos cuando firme.'
+    email:'El link de firma fue enviado automáticamente al email de '+name+'. Te avisaremos cuando firme.',
+    wa:'Copiá el link y enviáselo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
   };
   document.getElementById('sendForm').style.display='none';
   document.getElementById('sentSuccess').style.display='block';
