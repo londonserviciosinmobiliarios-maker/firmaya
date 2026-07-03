@@ -507,7 +507,8 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
             <!-- Step 1: Upload -->
             <div class="flow-body" id="flowStep1">
-              <div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
+              <input type="file" id="realFileInput" accept=".pdf,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
+              <div class="upload-zone" id="uploadZone" onclick="document.getElementById('realFileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
                 <div class="upload-icon">📂</div>
                 <div class="upload-title">Arrastrá el documento aquí</div>
                 <div class="upload-sub">o <span class="upload-link">buscá el archivo</span> en tu computadora</div>
@@ -517,8 +518,8 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <div class="uploaded-file">
                   <div class="uploaded-file-icon">📄</div>
                   <div>
-                    <div class="uploaded-file-name">RESERVA DPTO 9 DE JULIO 1157 PH 33.pdf</div>
-                    <div class="uploaded-file-size">284 KB · PDF · Subido correctamente ✓</div>
+                    <div class="uploaded-file-name" id="uploadedFileName">—</div>
+                    <div class="uploaded-file-size" id="uploadedFileSize">Subido correctamente ✓</div>
                   </div>
                   <button onclick="resetUpload()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light)">✕</button>
                 </div>
@@ -890,22 +891,39 @@ function logout(){
   document.getElementById('loginScreen').style.display='flex';
 }
 
-// ---- UPLOAD SIMULATION ----
-function simulateUpload(){
-  const zone = document.getElementById('uploadZone');
-  zone.innerHTML = '<div class="upload-icon">⏳</div><div class="upload-title">Subiendo...</div>';
-  setTimeout(()=>{
-    zone.style.display='none';
-    document.getElementById('uploadedFile').style.display='block';
-    document.getElementById('btnNext1').removeAttribute('disabled');
-  }, 1200);
+// ---- UPLOAD REAL ----
+function handleFileSelect(input){
+  if(input.files && input.files[0]) showUploadedFile(input.files[0]);
 }
-
+function handleFileDrop(event){
+  event.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = event.dataTransfer.files[0];
+  if(file) showUploadedFile(file);
+}
+function showUploadedFile(file){
+  const allowed = ['pdf','docx','doc'];
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(!allowed.includes(ext)){ alert('Solo se aceptan archivos PDF o DOCX'); return; }
+  const kb = Math.round(file.size/1024);
+  const size = kb>1024?(kb/1024).toFixed(1)+' MB':kb+' KB';
+  document.getElementById('uploadZone').style.display='none';
+  document.getElementById('uploadedFile').style.display='block';
+  document.getElementById('uploadedFileName').textContent = file.name;
+  document.getElementById('uploadedFileSize').textContent = size+' · '+ext.toUpperCase()+' · Subido correctamente ✓';
+  document.getElementById('btnNext1').removeAttribute('disabled');
+  window._uploadedFileName = file.name;
+  // update step 4 send row
+  const sendVal = document.querySelector('.send-row-val');
+  if(sendVal) sendVal.textContent = file.name;
+}
 function resetUpload(){
   document.getElementById('uploadZone').style.display='block';
-  document.getElementById('uploadZone').innerHTML = '<div class="upload-icon">📂</div><div class="upload-title">Arrastrá el documento aquí</div><div class="upload-sub">o <span class="upload-link">buscá el archivo</span> en tu computadora</div><div class="upload-sub" style="margin-top:8px">PDF o DOCX · Máximo 10MB</div>';
   document.getElementById('uploadedFile').style.display='none';
+  const inp = document.getElementById('realFileInput');
+  if(inp) inp.value='';
   document.getElementById('btnNext1').setAttribute('disabled','');
+  window._uploadedFileName = null;
 }
 
 // ---- FLOW ----
