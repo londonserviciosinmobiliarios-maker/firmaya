@@ -4,7 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>FirmaYa — Firma tu documento</title>
+<!-- OG / WhatsApp preview -->
+<meta property="og:title" content="FirmaYa — Firma tu documento">
+<meta property="og:description" content="London Servicios Inmobiliarios te envió un documento para firma electrónica digital.">
+<meta property="og:image" content="https://firmaya.londonserviciosinmobiliarios.com.ar/firmaya-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://firmaya.londonserviciosinmobiliarios.com.ar/firmaya-og.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -327,14 +338,22 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 <div id="page2" class="page" style="display:none">
   <div class="card">
     <div class="card-title">📄 <span id="p2DocName">Documento</span></div>
-    <div class="card-subtitle" style="margin-bottom:16px">Leé el resumen del documento antes de firmar.</div>
-    <div style="background:var(--bg);border-radius:10px;padding:16px;font-size:13px;color:var(--text-medium);line-height:1.8">
-      <strong style="color:var(--text-dark);display:block;margin-bottom:8px">Resumen del documento:</strong>
-      <div id="p2DocContent">
+    <div class="card-subtitle" style="margin-bottom:12px">Leé el documento completo antes de firmar.</div>
+
+    <!-- Visor del documento -->
+    <div id="docViewerWrap" style="border-radius:10px;overflow:hidden;margin-bottom:4px">
+      <div id="docViewerLoading" style="background:var(--bg);border-radius:10px;padding:24px;text-align:center;font-size:13px;color:var(--text-medium)">
+        <div style="font-size:28px;margin-bottom:8px">⏳</div>
+        Cargando documento…
+      </div>
+      <div id="docViewerContent" style="display:none;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+      <div id="docViewerFallback" style="display:none;background:var(--bg);border-radius:10px;padding:16px;font-size:13px;color:var(--text-medium);line-height:1.8">
         Este documento fue preparado por London Servicios Inmobiliarios para tu firma electrónica.<br><br>
         Al firmar aceptás el contenido del documento indicado arriba. La firma electrónica tiene validez legal conforme a la <strong style="color:var(--text-dark)">Ley 25.506 de Firma Digital</strong> de la República Argentina.<br><br>
-        Si tenés dudas sobre el contenido del documento, comunicáte con quien te lo envió antes de proceder a firmar.
+        Si tenés dudas, comunicáte con quien te lo envió antes de proceder.
       </div>
+    </div>
+    <div id="p2DocContent" style="display:none"></div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
         <div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Datos del documento</div>
         <table style="width:100%;font-size:12px">
@@ -554,6 +573,67 @@ function goStep2(){
   document.getElementById('page2').style.display  = 'block';
   document.getElementById('footer2').style.display = 'block';
   window.scrollTo(0,0);
+  // Cargar el documento real desde el Worker
+  loadDocumentPreview(TOKEN);
+}
+
+// ---- VISOR DE DOCUMENTO ----
+async function loadDocumentPreview(token){
+  const loading  = document.getElementById('docViewerLoading');
+  const content  = document.getElementById('docViewerContent');
+  const fallback = document.getElementById('docViewerFallback');
+  if(!loading || !content || !fallback) return;
+
+  try{
+    const resp = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(token));
+    if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; return; }
+
+    const mime = resp.headers.get('content-type') || '';
+    const buf  = await resp.arrayBuffer();
+    loading.style.display = 'none';
+
+    if(mime.includes('pdf')){
+      // Renderizar PDF con PDF.js
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+      content.style.display = 'block';
+      content.style.background = '#555';
+      content.style.padding = '8px';
+      const availW = content.offsetWidth - 16;
+      for(let p = 1; p <= Math.min(pdf.numPages, 10); p++){
+        const page = await pdf.getPage(p);
+        const vp0  = page.getViewport({scale:1});
+        const scale = Math.min((availW || 320) / vp0.width, 2);
+        const vp   = page.getViewport({scale});
+        const cvs  = document.createElement('canvas');
+        cvs.width  = vp.width;
+        cvs.height = vp.height;
+        cvs.style.cssText = 'display:block;margin:0 auto 6px;box-shadow:0 2px 6px rgba(0,0,0,.4);border-radius:2px';
+        content.appendChild(cvs);
+        await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
+      }
+
+    } else if(mime.includes('word') || mime.includes('docx') || mime.includes('officedocument')){
+      // Renderizar DOCX con mammoth.js
+      if(typeof mammoth !== 'undefined'){
+        const result = await mammoth.convertToHtml({arrayBuffer: buf});
+        const div = document.createElement('div');
+        div.style.cssText = 'background:white;color:#111;padding:24px;font-family:serif;font-size:13px;line-height:1.7';
+        div.innerHTML = result.value;
+        content.style.display = 'block';
+        content.appendChild(div);
+      } else {
+        fallback.style.display = 'block';
+      }
+
+    } else {
+      fallback.style.display = 'block';
+    }
+
+  }catch(e){
+    if(loading) loading.style.display = 'none';
+    if(fallback) fallback.style.display = 'block';
+  }
 }
 
 // ---- CHECKBOX LECTURA ----
