@@ -365,7 +365,11 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
     </div>
   </div>
 
-  <div class="card" onclick="toggleCheckbox(this)" id="docCheckCard" style="cursor:pointer">
+  <div id="scrollHint" style="display:none;text-align:center;padding:10px 0 4px;font-size:12px;color:var(--text-light)">
+    ⬇ Desplazá hacia abajo para leer el documento completo
+  </div>
+
+  <div class="card" onclick="toggleCheckbox(this)" id="docCheckCard" style="cursor:pointer;display:none;opacity:0;transition:opacity 0.4s ease">
     <div class="check-row" id="docCheck">
       <div class="check-box"><span class="check-mark">✓</span></div>
       <div class="check-text">
@@ -590,7 +594,7 @@ async function loadDocumentPreview(token){
 
   try{
     const resp = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(token));
-    if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; return; }
+    if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; setTimeout(revealCheckbox, 3000); return; }
 
     const buf = await resp.arrayBuffer();
     let mime = resp.headers.get('content-type') || '';
@@ -621,6 +625,7 @@ async function loadDocumentPreview(token){
         content.appendChild(cvs);
         await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
       }
+      setupScrollReveal();
 
     } else if(mime.includes('word') || mime.includes('docx') || mime.includes('officedocument')){
       // Renderizar DOCX con mammoth.js
@@ -631,17 +636,21 @@ async function loadDocumentPreview(token){
         div.innerHTML = result.value;
         content.style.display = 'block';
         content.appendChild(div);
+        setupScrollReveal();
       } else {
         fallback.style.display = 'block';
+        setTimeout(revealCheckbox, 3000);
       }
 
     } else {
       fallback.style.display = 'block';
+      setTimeout(revealCheckbox, 3000);
     }
 
   }catch(e){
     if(loading) loading.style.display = 'none';
     if(fallback) fallback.style.display = 'block';
+    setTimeout(revealCheckbox, 3000);
   }
 }
 
@@ -652,6 +661,38 @@ function toggleCheckbox(card){
   const confirmed = row.classList.contains('checked');
   const btn = document.getElementById('btnGoStep3');
   btn.disabled = !confirmed;
+}
+
+
+
+// ---- REVELAR CHECKBOX TRAS LECTURA ----
+function setupScrollReveal(){
+  const content = document.getElementById('docViewerContent');
+  const hint    = document.getElementById('scrollHint');
+  if(!content) return;
+  setTimeout(function(){
+    if(content.scrollHeight <= content.clientHeight + 20){
+      revealCheckbox();
+    } else {
+      if(hint) hint.style.display = 'block';
+      function onScroll(){
+        const pct = (content.scrollTop + content.clientHeight) / content.scrollHeight;
+        if(pct >= 0.88){
+          revealCheckbox();
+          if(hint) hint.style.display = 'none';
+          content.removeEventListener('scroll', onScroll);
+        }
+      }
+      content.addEventListener('scroll', onScroll);
+    }
+  }, 400);
+}
+
+function revealCheckbox(){
+  const card = document.getElementById('docCheckCard');
+  if(!card || card.style.display !== 'none') return;
+  card.style.display = 'block';
+  requestAnimationFrame(function(){ card.style.opacity = '1'; });
 }
 
 // ---- PASO 2 → 3 ----
