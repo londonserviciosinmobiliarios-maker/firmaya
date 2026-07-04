@@ -755,7 +755,6 @@ td.td-name{font-weight:600;color:var(--text-dark)}
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">
               <button class="btn btn-primary btn-sm" onclick="descargarFirmado()">⬇ Descargar firmado</button>
-              <button class="btn btn-ghost btn-sm" onclick="verInforme(window._currentDoc)">📋 Ver informe de firmas</button>
               <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
           </div>
@@ -963,18 +962,19 @@ function showView(name){
 }
 
 let currentDoc = null;
+let currentDoc = null;
 
 function showDetail(doc){
-  window._currentDoc = doc;
   if(doc){
+    currentDoc = doc;
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
-    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + dob.nombre;
+    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
     if(g('detailBadge')){
       g('detailBadge').textContent = doc.estado.toUpperCase();
       g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
     }
-    if(g('detailDocId')) g('detailDocId').textContent = '🆔 Doc ID: ' + doc.id;
+    if(g('detailDocId')) g('detailDocId').textContent = '🆆 Doc ID: ' + doc.id;
     if(g('detailCreado')) g('detailCreado').textContent = '📅 Creado: ' + doc.enviado;
     if(g('detailFirmadoSpan')) g('detailFirmadoSpan').style.display = firmado ? '' : 'none';
     if(g('detailEmail')) g('detailEmail').textContent = '📧 ' + (doc.email || '—');
