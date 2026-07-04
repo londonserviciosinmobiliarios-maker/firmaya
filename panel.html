@@ -57,12 +57,12 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 /* Sidebar */
 .sidebar{
   width:240px;background:var(--primary-dark);color:white;
-  display:flex;flex-direction:column;lex-shrink:0;position:fixed;top:0;bottom:0;left:0;z-index:50
+  display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;bottom:0;left:0;z-index:50
 }
 .sidebar-logo{
   padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);
   font-family:'Playfair Display',serif;font-size:22px;font-weight:700
-	}
+}
 .sidebar-logo span{display:block;font-family:'Inter',sans-serif;font-size:10px;opacity:.6;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
 .sidebar-nav{flex:1;padding:16px 12px}
 .nav-item{
@@ -702,7 +702,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <div class="send-option" onclick="sendDoc('email')">
                     <div class="send-option-icon">📧</div>
                     <div class="send-option-title">Por email</div>
-                    <div class="send-option-sub">El sistema envia el link automaticamente al email del firmante</div>
+                    <div class="send-option-sub">El sistema envía el link automáticamente al email del firmante</div>
                   </div>
                   <div class="send-option" onclick="sendDoc('wa')">
                     <div class="send-option-icon">💬</div>
@@ -749,8 +749,13 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <span class="badge badge-success" id="detailBadge">—</span>
             </div>
             <div style="display:flex;gap:24px;font-size:13px;color:var(--text-medium)">
-              <span id="detailDocId">🆔 Doc ID: �mary btn-sm">⬇ Descargar firmado</button>
-              <button class="btn btn-ghost btn-sm">📋 Ver informe de firmas</button>
+              <span id="detailDocId">🆔 Doc ID: —</span>
+              <span id="detailCreado">📅 Creado: —</span>
+              <span id="detailFirmadoSpan">✅ Firmado: —</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
+              <button class="btn btn-ghost btn-sm" onclick="verInforme(window._currentDoc)">📋 Ver informe de firmas</button>
               <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
           </div>
@@ -859,6 +864,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     </main>
   </div>
 </div>
+
 <script>
 // ---- DOCS DATA ----
 // Load persisted docs from localStorage
@@ -886,7 +892,7 @@ function renderStats(){
   const pc = document.getElementById('planCounter');
   if(pc) pc.textContent = 'Plan Pro · ' + total + '/50 docs';
   const alert = document.querySelector('.alert-info');
-  if(alert) alert.innerHTML = '⚩ Tenés ' + (50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
+  if(alert) alert.innerHTML = '⚡ Tenés ' + (50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
 }
 
 function statusBadge(s){
@@ -913,7 +919,7 @@ function renderDocs(data, bodyId){
       <td>
         <div style="display:flex;gap:6px">
           <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.id===${d.id}))">Ver</button>
-          <button class="btn btn-ghost btn-sm">⬇</button>
+          <button class="btn btn-ghost btn-sm" onclick="descargarDoc(docs.find(x=>x.id===${d.id}))">⬇</button>
         </div>
       </td>
     </tr>
@@ -927,7 +933,7 @@ function toggleAllDocs(cb, bodyId){
 function deleteSelected(bodyId){
   const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
   if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
-  if(!confirm('«Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
   checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
   saveDocs();
   renderDocs(docs.slice(0,5), 'docsBody');
@@ -947,7 +953,7 @@ function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   document.getElementById('view-'+name).style.display='block';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap = {dashboard:'Dashboard',documentos:'Documentos',Nuevo:'Nuevo documento',contactos:'Contactos',plantillas:'Plantillas',informes:'Informes',ajustes:'Ajustes',detalle:'Detalle'};
+  const navMap = {dashboard:'Dashboard',documentos:'Documentos',nuevo:'Nuevo documento',contactos:'Contactos',plantillas:'Plantillas',informes:'Informes',ajustes:'Ajustes',detalle:'Detalle'};
   document.getElementById('topbarTitle').textContent = navMap[name]||name;
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(n.textContent.trim().includes(navMap[name]||name)) n.classList.add('active');
@@ -957,10 +963,11 @@ function showView(name){
 }
 
 function showDetail(doc){
+  window._currentDoc = doc;
   if(doc){
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
-    if(g('detailDocName')) g('detailDocName').textContent = '�$ ' + doc.nombre;
+    if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + dob.nombre;
     if(g('detailBadge')){
       g('detailBadge').textContent = doc.estado.toUpperCase();
       g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
@@ -984,15 +991,17 @@ function doLogin(){
   const err = document.getElementById('loginError');
   if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
     err.style.display='none';
+    try{ localStorage.setItem('firmaya_session','1'); }catch(e){}
     showDashboard();
   } else {
     err.style.display='block';
   }
 }
-// Allow Enter key on password
+// Allow Enter key on password + auto-login si hay sesión guardada
 document.addEventListener('DOMContentLoaded', ()=>{
   const p = document.getElementById('loginPass');
   if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  try{ if(localStorage.getItem('firmaya_session')==='1') showDashboard(); }catch(e){}
 });
 
 function toggleSidebar(){
@@ -1016,7 +1025,7 @@ function showDashboard(){
   setTimeout(checkPendingSignatures, 1500);
 }
 
-alsync function checkPendingSignatures(){
+apync function checkPendingSignatures(){
   const pending = docs.filter(d => d.estado === 'Pendiente');
   if(!pending.length) return;
   let updated = false;
@@ -1044,6 +1053,7 @@ alsync function checkPendingSignatures(){
 }
 
 function logout(){
+  try{ localStorage.removeItem('firmaya_session'); }catch(e){}
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
 }
@@ -1088,7 +1098,7 @@ function resetFlow(){
   document.getElementById('sendForm').style.display='block';
   document.getElementById('sentSuccess').style.display='none';
   ['1','2','3','4'].forEach(n=>{
-    const t=document.getElementById('tab'+n)];
+    const t=document.getElementById('tab'+n);
     t.classList.remove('active','done');
   });
   document.getElementById('tab1').classList.add('active');
@@ -1105,7 +1115,7 @@ function flowGo(n){
   }
   if(n===3){
     const name = (document.getElementById('firmanteName')||{}).value||'';
-    document.getElementById('sigPlaceholderName').textContent = '�ʯt⏏ Firma de '+(name.trim()||'el firmante');
+    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
     // Reset sig placeholder position
     const sig = document.getElementById('sigPlaceholder');
     if(sig){ sig.style.left=''; sig.style.top=''; sig.style.right='24px'; sig.style.bottom='40px'; }
@@ -1113,7 +1123,7 @@ function flowGo(n){
     if(window._uploadedFile) renderPdfPreview(window._uploadedFile);
     else {
       const pn = document.getElementById('previewDocName');
-      if(pn) pn.textContent = '�$ ' + (window._uploadedFileName || 'Documento cargado');
+      if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
     }
   }
   if(n===4){
@@ -1133,7 +1143,7 @@ if(typeof pdfjsLib !== 'undefined'){
 }
 let _pdfDragOffX = 0, _pdfDragOffY = 0;
 
-alsync function renderPdfPreview(file){
+async function renderPdfPreview(file){
   const box = document.getElementById('pdfViewerBox');
   const cc  = document.getElementById('pdfCanvasContainer');
   const lm  = document.getElementById('pdfLoadingMsg');
@@ -1144,7 +1154,7 @@ alsync function renderPdfPreview(file){
   if(_ext === 'docx' || _ext === 'doc'){
     if(lm){ lm.style.display='block'; lm.innerHTML='<div style="font-size:30px;margin-bottom:8px">⏳</div><p style="font-size:13px;color:#eee">Convirtiendo documento Word…</p>'; }
     if(typeof mammoth === 'undefined'){
-      if(lm){ lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">📝</div><p style="font-size:13px;color:#eee">' + file.name + '</p><p style="font-size:11px;color:#aaa;margin-top:6px">No se pudo cargar el visualizador. Verificá tu conexión.</p>'; }
+      if(lm){ lm.innerHTML='<div style="font-size:40px;margin-bottom:10px">📝</div><p style="font-size:13px;color:#eee">'+file.name+'</p><p style="font-size:11px;color:#aaa;margin-top:6px">No se pudo cargar el visualizador. Verificá tu conexión.</p>'; }
       return;
     }
     try{
@@ -1178,7 +1188,7 @@ alsync function renderPdfPreview(file){
       const cvs  = document.createElement('canvas');
       cvs.width  = vp.width;
       cvs.height = vp.height;
-      cvs.style.cssText = 'display:block;box-shadow:0 2px 8px rgba(0,0,0,.5);border-radius:2px;background:white';
+      cvs.style.cssText = 'display:block;bo-shadow:0 2px 8px rgba(0,0,0,.5);border-radius:2px;background:white';
       cc.appendChild(cvs);
       await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
     }
@@ -1213,6 +1223,64 @@ function handlePdfDrop(e){
 // ---- WORKER URL ----
 const FIRMAYA_WORKER = 'https://api.londonserviciosinmobiliarios.com.ar';
 
+// ---- DESCARGAR ARCHIVO ----
+async function descargarDoc(doc){
+  if(!doc || !doc.token){ alert('No hay archivo guardado para este documento.'); return; }
+  try{
+    const r = await fetch(FIRMAYA_WORKER + '/api/file?token=' + encodeURIComponent(doc.to/ken));
+    if(!r.ok){ alert('No se encontró el archivo. El documento fue enviado sin adjuntar archivo.'); return; }
+    const blob = await r.blob();
+    const mime = r.headers.get('content-type') || '';
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word') || mime.includes('officedocument')) ? '.docx' : '';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (doc.nombre || 'documento') + ext;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }catch(e){ alert('Error al descargar: ' + e.message); }
+}
+
+// ---- VER INFORME DE FIRMA ----
+async function verInforme(doc){
+  if(!doc || !doc.token){ alert('No se encontró el token del documento.'); return; }
+  let modal = document.getElementById('informeModal');
+  if(modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = 'informeModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick = e => { if(e.target===modal) modal.remove(); };
+  modal.innerHTML = '<div style="background:white;border-radius:16px;padding:32px;max-width:480px;width:100%;text-align:center"><div style="font-size:32px;margin-bottom:12px">⏳</div><p style="color:#666">Consultando informe...</p></div>';
+  document.body.appendChild(modal);
+  try{
+    const r = await fetch(FIRMAYA_WORKER + '/api/check?token=' + encodeURIComponent(doc.token));
+    const data = await r.json();
+    const firmado = data.firmado;
+    modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:32px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#0D6278">📋 Informe de Firma</div>
+        <button onclick="document.getElementById('informeModal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999">✕</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <tr><td style="padding:10px 8px;color:#8A9BAB;width:38%">Documento</td><td style="padding:10px 8px;font-weight:600">${doc.nombre}</td></tr>
+        <tr style="background:#f5f8fa"><td style="padding:10px 8px;color:#8A9BAB">Estado</td><td style="padding:10px 8px;font-weight:700;color:${firmado?'#1a7a4a':'#b45309'}">${firmado?'✅ FIRMADO':'⏳ PENDIENTE'}</td></tr>
+        <tr><td style="padding:10px 8px;color:#8A9BAB">Token</td><td style="padding:10px 8px;font-size:11px;font-family:monospace;word-break:break-all">${doc.token}</td></tr>
+        ${firmado ? `
+        <tr style="background:#f5f8fa"><td style="padding:10px 8px;color:#8A9BAB">Firmante</td><td style="padding:10px 8px;font-weight:600">${data.firmante||'—'}</td></tr>
+        <tr><td style="padding:10px 8px;color:#8A9BAB">Email</td><td style="padding:10px 8px">${data.email||'—'}</td></tr>
+        <tr style="background:#f5f8fa"><td style="padding:10px 8px;color:#8A9BAB">DNI</td><td style="padding:10px 8px">${data.dni||'—'}</td></tr>
+        <tr><td style="padding:10px 8px;color:#8A9BAB">Fecha y hora</td><td style="padding:10px 8px;font-weight:600">${data.firmadoEn ? new Date(data.firmadoEn).toLocaleString('es-AR') : '—'}</td></tr>
+        ` : `<tr style="background:#f5f8fa"><td colspan="2" style="padding:16px 8px;text-align:center;color:#b45309">El documento aún no fue firmado.</td></tr>`}
+      </table>
+      <p style="font-size:11px;color:#8A9BAB;text-align:center;margin-top:20px">Powered by FirmaYa · London Servicios Inmobiliarios</p>
+    </div>`;
+  }catch(e){
+    modal.innerHTML = `<div style="background:white;border-radius:16px;padding:32px;max-width:480px;width:100%"><p style="color:red">Error: ${e.message}</p><button onclick="document.getElementById('informeModal').remove()">Cerrar</button></div>`;
+  }
+}
+
 // ---- SEND ----
 function sendDoc(method){
   const name  = window._signerName  || 'el firmante';
@@ -1226,7 +1294,7 @@ function sendDoc(method){
   const today = new Date();
   const fecha = today.getDate().toString().padStart(2,'0') + '/' + (today.getMonth()+1).toString().padStart(2,'0') + '/' + today.getFullYear();
   const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
-  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^\.]+$/,'');
+  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'');
   docs.unshift({
     id: newId,
     nombre: docNombre.toUpperCase(),
