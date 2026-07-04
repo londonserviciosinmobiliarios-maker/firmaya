@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FirmaYa — Panel</title
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -812,29 +813,29 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <div class="evidence-value" id="detailEmailEvid">— ✓</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">🤳</div>
-                  <div class="evidence-label">Selfie</div>
-                  <div class="evidence-value">Capturada 20:46:27 ✓</div>
+                  <div class="evidence-icon">📅</div>
+                  <div class="evidence-label">Firmado el</div>
+                  <div class="evidence-value" id="detailFirmadoEn">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🌍</div>
                   <div class="evidence-label">Ubicación GPS</div>
-                  <div class="evidence-value">-35.666012, -63.747082</div>
+                  <div class="evidence-value" id="detailGps">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🖥</div>
                   <div class="evidence-label">IP</div>
-                  <div class="evidence-value">190.105.160.18</div>
+                  <div class="evidence-value" id="detailIp">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">📱</div>
                   <div class="evidence-label">Dispositivo</div>
-                  <div class="evidence-value">Android · Chrome 149</div>
+                  <div class="evidence-value" id="detailDevice">—</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">🔐</div>
-                  <div class="evidence-label">Hash SHA-256</div>
-                  <div class="evidence-value">2105b99a9e...</div>
+                  <div class="evidence-icon">🆔</div>
+                  <div class="evidence-label">DNI</div>
+                  <div class="evidence-value" id="detailDni">—</div>
                 </div>
               </div>
             </div>
@@ -961,11 +962,14 @@ function showView(name){
   closeSidebarOnMobile();
 }
 
+const WORKER = 'https://api.londonserviciosinmobiliarios.com.ar';
 let currentDoc = null;
+let currentDocMeta = null;
 
 function showDetail(doc){
   if(doc){
     currentDoc = doc;
+    currentDocMeta = null;
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
     if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
@@ -973,7 +977,7 @@ function showDetail(doc){
       g('detailBadge').textContent = doc.estado.toUpperCase();
       g('detailBadge').className = 'badge badge-' + (firmado?'success':doc.estado==='Pendiente'?'warning':'danger');
     }
-    if(g('detailDocId')) g('detailDocId').textContent = '🆆 Doc ID: ' + doc.id;
+    if(g('detailDocId')) g('detailDocId').textContent = '🆔 Doc ID: ' + doc.id;
     if(g('detailCreado')) g('detailCreado').textContent = '📅 Creado: ' + doc.enviado;
     if(g('detailFirmadoSpan')) g('detailFirmadoSpan').style.display = firmado ? '' : 'none';
     if(g('detailEmail')) g('detailEmail').textContent = '📧 ' + (doc.email || '—');
@@ -981,33 +985,105 @@ function showDetail(doc){
     if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
     if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
     if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
+    ['detailFirmadoEn','detailGps','detailIp','detailDevice','detailDni'].forEach(id=>{ if(g(id)) g(id).textContent='—'; });
+    if(doc.token && firmado){
+      fetch(WORKER + '/api/doc?token=' + encodeURIComponent(doc.token))
+        .then(r=>r.json()).then(meta=>{
+          if(!meta.ok) return;
+          currentDocMeta = meta;
+          if(g('detailFirmadoEn')) g('detailFirmadoEn').textContent = meta.firmadoEn ? new Date(meta.firmadoEn).toLocaleString('es-AR') : '—';
+          if(g('detailGps')) g('detailGps').textContent = (meta.lat && meta.lng) ? meta.lat.toFixed(6)+', '+meta.lng.toFixed(6) : '—';
+          if(g('detailIp')) g('detailIp').textContent = meta.ip || '—';
+          if(g('detailDevice')){
+            const ua = meta.device || '—';
+            let disp = ua;
+            if(ua.includes('Android')) disp = 'Android · ' + (ua.match(/Chrome\/([\d]+)/)?.[0] || 'Chrome');
+            else if(ua.includes('iPhone')||ua.includes('iPad')) disp = 'iOS · Safari';
+            else if(ua.includes('Windows')) disp = 'Windows · Browser';
+            g('detailDevice').textContent = disp.substring(0,40);
+          }
+          if(g('detailDni')) g('detailDni').textContent = meta.dni || '—';
+        }).catch(()=>{});
+    }
   }
   showView('detalle');
 }
 
+function descargarBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.style.display = 'none';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+}
+
 async function descargarFirmado(){
-  if(!currentDoc || !currentDoc.token){
-    alert('No hay token de documento disponible.');
-    return;
-  }
+  if(!currentDoc || !currentDoc.token){ alert('No hay token de documento disponible.'); return; }
+  const btn = document.querySelector('[onclick="descargarFirmado()"]');
+  const origText = btn ? btn.textContent : '';
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Generando...'; }
   try{
-    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(currentDoc.token));
-    if(!r.ok){ alert('No se encontró el archivo firmado. El documento aún puede no haber sido firmado o el archivo fue eliminado.'); return; }
-    const buf = await r.arrayBuffer();
-    let mime = r.headers.get('content-type') || '';
+    const [fileResp, metaResp] = await Promise.all([
+      fetch(WORKER + '/api/file?token=' + encodeURIComponent(currentDoc.token)),
+      fetch(WORKER + '/api/doc?token='  + encodeURIComponent(currentDoc.token))
+    ]);
+    if(!fileResp.ok){ alert('No se encontró el archivo. El documento puede no haber sido firmado aún.'); return; }
+    const buf = await fileResp.arrayBuffer();
+    const meta = metaResp.ok ? await metaResp.json() : {};
+    let mime = fileResp.headers.get('content-type') || '';
     if(!mime || mime.includes('octet-stream')){
       const p = new Uint8Array(buf, 0, 8);
       if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
       else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
+    const nombre = (currentDoc.nombre || meta.nombre || 'documento').replace(/\.[^.]+$/,'');
+    if(mime.includes('pdf') && typeof PDFLib !== 'undefined'){
+      try{
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+        const hashHex = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        const pdfDoc = await PDFDocument.load(buf);
+        const hv  = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const hvB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const pg = pdfDoc.addPage([595.28, 841.89]);
+        const { width, height } = pg.getSize();
+        const M = 50;
+        pg.drawRectangle({ x:0, y:height-80, width, height:80, color:rgb(0.051,0.384,0.471) });
+        pg.drawText('FirmaYa', { x:M, y:height-38, size:26, font:hvB, color:rgb(1,1,1) });
+        pg.drawText('Certificado de Firma Electronica', { x:M, y:height-58, size:11, font:hv, color:rgb(0.8,0.93,0.97) });
+        let y = height-110;
+        pg.drawText('DOCUMENTO FIRMADO ELECTRONICAMENTE', { x:M, y, size:13, font:hvB, color:rgb(0.051,0.384,0.471) });
+        y-=6; pg.drawLine({ start:{x:M,y}, end:{x:width-M,y}, thickness:1.5, color:rgb(0.051,0.384,0.471) }); y-=22;
+        const fila = (label, value, bg) => {
+          if(bg) pg.drawRectangle({ x:M, y:y-4, width:width-M*2, height:20, color:rgb(0.96,0.97,0.98) });
+          pg.drawText(label.toUpperCase(), { x:M+6, y, size:8, font:hv, color:rgb(0.54,0.60,0.66) });
+          pg.drawText(String(value||'—').substring(0,80), { x:M+160, y, size:9, font:hvB, color:rgb(0.10,0.17,0.21) });
+          y-=22;
+        };
+        fila('Firmante',      meta.firmante||currentDoc.firmante);
+        fila('DNI',           meta.dni||'—', true);
+        fila('Email',         meta.email||currentDoc.email);
+        fila('Documento',     meta.nombre||currentDoc.nombre, true);
+        fila('Token',         meta.token||currentDoc.token);
+        fila('Fecha firma',   meta.firmadoEn ? new Date(meta.firmadoEn).toLocaleString('es-AR') : '—', true);
+        fila('IP',            meta.ip||'—');
+        fila('GPS',           (meta.lat&&meta.lng) ? meta.lat.toFixed(6)+', '+meta.lng.toFixed(6) : '—', true);
+        fila('Dispositivo',   meta.device ? meta.device.substring(0,80) : '—');
+        y-=8;
+        pg.drawRectangle({ x:M, y:y-8, width:width-M*2, height:36, color:rgb(0.94,0.98,0.99), borderColor:rgb(0.051,0.384,0.471), borderWidth:0.5 });
+        pg.drawText('HASH SHA-256 DEL DOCUMENTO ORIGINAL', { x:M+8, y:y+16, size:7, font:hvB, color:rgb(0.051,0.384,0.471) });
+        pg.drawText(hashHex, { x:M+8, y, size:6.5, font:hv, color:rgb(0.10,0.17,0.21) });
+        pg.drawLine({ start:{x:M,y:70}, end:{x:width-M,y:70}, thickness:0.5, color:rgb(0.80,0.87,0.91) });
+        pg.drawText('Ley 25.506 Firma Digital Argentina · FirmaYa / London Servicios Inmobiliarios', { x:M, y:56, size:7, font:hv, color:rgb(0.54,0.60,0.66), maxWidth:width-M*2 });
+        const pdfBytes = await pdfDoc.save();
+        descargarBlob(new Blob([pdfBytes],{type:'application/pdf'}), nombre+'-firmado.pdf');
+        return;
+      }catch(pdfErr){ console.warn('pdf-lib error:', pdfErr); }
+    }
     const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
-    const nombre = (currentDoc.nombre || 'documento-firmado').replace(/\.[^.]+$/, '');
-    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = nombre + '-firmado' + ext;
-    a.click();
-  }catch(e){ alert('Error al descargar: ' + e.message); }
+    descargarBlob(new Blob([buf],{type:mime||'application/octet-stream'}), nombre+'-firmado'+ext);
+  }catch(e){ alert('Error al descargar: ' + e.message);
+  }finally{ if(btn){ btn.disabled=false; btn.textContent=origText; } }
 }
 
 // ---- LOGIN / LOGOUT ----
