@@ -754,7 +754,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <span id="detailFirmadoSpan">✅ Firmado: —</span>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">
-              <button class="btn btn-primary btn-sm">⬇ Descargar firmado</button>
+              <button class="btn btn-primary btn-sm" onclick="descargarFirmado()">⬇ Descargar firmado</button>
               <button class="btn btn-ghost btn-sm" onclick="verInforme(window._currentDoc)">📋 Ver informe de firmas</button>
               <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
@@ -962,6 +962,8 @@ function showView(name){
   closeSidebarOnMobile();
 }
 
+let currentDoc = null;
+
 function showDetail(doc){
   window._currentDoc = doc;
   if(doc){
@@ -982,6 +984,31 @@ function showDetail(doc){
     if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
   }
   showView('detalle');
+}
+
+async function descargarFirmado(){
+  if(!currentDoc || !currentDoc.token){
+    alert('No hay token de documento disponible.');
+    return;
+  }
+  try{
+    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(currentDoc.token));
+    if(!r.ok){ alert('No se encontró el archivo firmado. El documento aún puede no haber sido firmado o el archivo fue eliminado.'); return; }
+    const buf = await r.arrayBuffer();
+    let mime = r.headers.get('content-type') || '';
+    if(!mime || mime.includes('octet-stream')){
+      const p = new Uint8Array(buf, 0, 8);
+      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
+      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
+    const nombre = (currentDoc.nombre || 'documento-firmado').replace(/\.[^.]+$/, '');
+    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre + '-firmado' + ext;
+    a.click();
+  }catch(e){ alert('Error al descargar: ' + e.message); }
 }
 
 // ---- LOGIN / LOGOUT ----
