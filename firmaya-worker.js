@@ -248,6 +248,34 @@ export default {
       }
     }
 
+    // ── GET /api/doc ─────────────────────────────────────────────────────────
+    // Devuelve todos los metadatos del doc (incluyendo evidencia de firma)
+    if(url.pathname === '/api/doc'){
+      const token = url.searchParams.get('token');
+      if(!token) return json({ ok: false, error: 'Token requerido' }, 400);
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' });
+      try{
+        const data = await env.FIRMAYA_KV.get('doc:' + token, 'json');
+        if(!data) return json({ ok: false, error: 'Documento no encontrado' }, 404);
+        return json({
+          ok: true,
+          token:     data.token,
+          nombre:    data.docNombre || data.fileNombre || data.nombre,
+          firmante:  data.firmante,
+          email:     data.email || data.emailFirmante,
+          dni:       data.dni,
+          estado:    data.estado,
+          creadoEn:  data.creadoEn,
+          firmadoEn: data.firmadoEn,
+          lat:       data.lat,
+          lng:       data.lng,
+          ip:        data.ip,
+          device:    data.device,
+          fileMime:  data.fileMime
+        });
+      }catch(e){ return json({ ok: false, error: e.message }, 500); }
+    }
+
     return new Response('', { status: 200, headers: CORS });
   }
 };
