@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FirmaYa — Panel</title>
+<title>FirmaYa — Panel</title
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
@@ -1025,7 +1025,7 @@ function showDashboard(){
   setTimeout(checkPendingSignatures, 1500);
 }
 
-apync function checkPendingSignatures(){
+async function checkPendingSignatures(){
   const pending = docs.filter(d => d.estado === 'Pendiente');
   if(!pending.length) return;
   let updated = false;
