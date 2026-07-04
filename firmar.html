@@ -592,8 +592,13 @@ async function loadDocumentPreview(token){
     const resp = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(token));
     if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; return; }
 
-    const mime = resp.headers.get('content-type') || '';
-    const buf  = await resp.arrayBuffer();
+    const buf = await resp.arrayBuffer();
+    let mime = resp.headers.get('content-type') || '';
+    if(!mime || mime.includes('octet-stream')){
+      const p = new Uint8Array(buf, 0, 8);
+      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
+      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
     loading.style.display = 'none';
 
     if(mime.includes('pdf')){
@@ -850,9 +855,15 @@ async function descargarDocumento(){
   try{
     const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(TOKEN));
     if(!r.ok){ alert('No se encontró el archivo. Contactá a London Servicios Inmobiliarios.'); return; }
-    const blob = await r.blob();
-    const mime = r.headers.get('content-type') || '';
-    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word') || mime.includes('officedocument')) ? '.docx' : '';
+    const buf = await r.arrayBuffer();
+    let mime = r.headers.get('content-type') || '';
+    if(!mime || mime.includes('octet-stream')){
+      const p = new Uint8Array(buf, 0, 8);
+      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
+      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
+    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'documento-firmado' + ext;
