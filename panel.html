@@ -1126,12 +1126,8 @@ async function descargarFirmado(){
     }
 
     // 4. Fallback: DOCX — abrir URL directa (compatible con iOS)
-    if(mime.includes('word') || mime.includes('officedocument') || mime.includes('docx')){
-      window.open(WORKER + '/api/file?token=' + encodeURIComponent(currentDoc.token), '_blank');
-      return;
-    }
-    // PDF sin lib — descarga como blob
-    const ext = mime.includes('pdf') ? '.pdf' : '';
+        // PDF sin lib — descarga como blob
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('docx')||mime.includes('officedocument')||mime.includes('word')) ? '.docx' : '.bin';
     descargarBlob(new Blob([buf],{type:mime||'application/octet-stream'}), nombre+'-firmado'+ext);
 
   }catch(e){
