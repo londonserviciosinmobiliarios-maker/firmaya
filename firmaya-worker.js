@@ -1,4 +1,4 @@
-// FirmaYa Worker â Cloudflare Worker
+// FirmaYa Worker – restored 2026-07-05 â Cloudflare Worker
 // Endpoints:
 //   POST /api/send    â registra doc en KV y envÃ­a email al firmante (opcional)
 //   POST /api/upload  â sube archivo del doc a KV para que el cliente lo vea
