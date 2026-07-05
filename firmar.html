@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>FirmaYa — Firma tu documento</title>
+<title>FirmaYa â Firma tu documento</title>
 <!-- OG / WhatsApp preview -->
-<meta property="og:title" content="FirmaYa — Firma tu documento">
-<meta property="og:description" content="London Servicios Inmobiliarios te envió un documento para firma electrónica digital.">
+<meta property="og:title" content="FirmaYa â Firma tu documento">
+<meta property="og:description" content="London Servicios Inmobiliarios te enviÃ³ un documento para firma electrÃ³nica digital.">
 <meta property="og:image" content="https://firmaya.londonserviciosinmobiliarios.com.ar/firmaya-og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -41,7 +41,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 }
 
 /* ---- PROGRESS ---- */
-.progress-wrap{background:white;border-bottom:1px solid var(--border);padding:0 20px}
+.progrest-wrap{background:white;border-bottom:1px solid var(--border);padding:0 20px}
 .steps-row{display:flex;align-items:center;justify-content:center;gap:0;padding:14px 0}
 .step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:80px;opacity:.4;transition:opacity .3s}
 .step.active{opacity:1}
@@ -243,22 +243,22 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-logo">FirmaYa <span>FIRMA ELECTRÓNICA</span></div>
-  <div class="secure-badge">🔒 Conexión segura</div>
+  <div class="topbar-logo">FirmaYa <span>FIRMA ELECTRÃNICA</span></div>
+  <div class="secure-badge">ð ConexiÃ³n segura</div>
 </div>
 
 <!-- LOADING -->
 <div id="loadingScreen" class="loading-wrap">
   <div class="spinner"></div>
-  <div style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:6px">Cargando documento…</div>
-  <div style="font-size:13px;color:var(--text-medium)">Por favor esperá un momento</div>
+  <div style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:6px">Cargando documentoâ¦</div>
+  <div style="font-size:13px;color:var(--text-medium)">Por favor esperÃ¡ un momento</div>
 </div>
 
 <!-- ERROR -->
 <div id="errorScreen" class="error-wrap" style="display:none">
-  <div class="error-icon">⚠️</div>
-  <div class="error-title">Link inválido o expirado</div>
-  <div class="error-subtitle">Este link de firma no es válido o ya fue utilizado.<br>Contactá a quien te envió el documento para que te reenvíe un nuevo link.</div>
+  <div class="error-icon">â ï¸</div>
+  <div class="error-title">Link invÃ¡lido o expirado</div>
+  <div class="error-subtitle">Este link de firma no es vÃ¡lido o ya fue utilizado.<br>ContactÃ¡ a quien te enviÃ³ el documento para que te reenvÃ­e un nuevo link.</div>
 </div>
 
 <!-- PROGRESS BAR -->
@@ -281,7 +281,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
     <div class="step-connector" id="con3"></div>
     <div class="step" id="stp4">
       <div class="step-num">4</div>
-      <div class="step-label">Listo ✓</div>
+      <div class="step-label">Listo â</div>
     </div>
   </div>
 </div>
@@ -289,23 +289,23 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 <!-- ================ PAGE 1: VERIFICAR IDENTIDAD ================ -->
 <div id="page1" class="page" style="display:none">
   <div class="doc-banner">
-    <div class="doc-icon">📄</div>
+    <div class="doc-icon">ð</div>
     <div class="doc-info-wrap">
-      <div class="doc-info-name" id="p1DocName">Cargando…</div>
+      <div class="doc-info-name" id="p1DocName">Cargandoâ¦</div>
       <div class="doc-info-meta">
-        <div class="doc-meta-item">✉️ Enviado por <strong id="p1Sender">London Servicios Inmobiliarios</strong></div>
-        <div class="doc-meta-item">📅 <span id="p1Fecha">—</span></div>
+        <div class="doc-meta-item">âï¸ Enviado por <strong id="p1Sender">London Servicios Inmobiliarios</strong></div>
+        <div class="doc-meta-item">ð <span id="p1Fecha">â</span></div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Verificación de identidad</div>
-    <div class="card-subtitle" style="margin-bottom:20px">Confirmá tus datos para continuar con la firma.</div>
+    <div class="card-title">VerificaciÃ³n de identidad</div>
+    <div class="card-subtitle" style="margin-bottom:20px">ConfirmÃ¡ tus datos para continuar con la firma.</div>
 
     <div class="form-group">
       <label class="form-label">Nombre completo</label>
-      <input class="form-input" id="verNombre" type="text" placeholder="Ej: Carlos Pérez" autocomplete="name">
+      <input class="form-input" id="verNombre" type="text" placeholder="Ej: Carlos PÃ©rez" autocomplete="name">
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
@@ -319,9 +319,9 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
   <div class="card" style="background:var(--primary-pale);border-color:rgba(13,98,120,.2)">
     <div style="display:flex;align-items:flex-start;gap:10px">
-      <div style="font-size:20px;margin-top:1px">ℹ️</div>
+      <div style="font-size:20px;margin-top:1px">â¹ï¸</div>
       <div style="font-size:13px;color:var(--text-medium);line-height:1.6">
-        Al continuar confirmás que sos <strong style="color:var(--text-dark)" id="p1FirmanteNombre">el firmante</strong> designado para este documento. Tu identidad quedará registrada con fecha y hora exactas.
+        Al continuar confirmÃ¡s que sos <strong style="color:var(--text-dark)" id="p1FirmanteNombre">el firmante</strong> designado para este documento. Tu identidad quedarÃ¡ registrada con fecha y hora exactas.
       </div>
     </div>
   </div>
@@ -331,49 +331,49 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
 <!-- FOOTER 1 -->
 <div id="footer1" class="step-footer" style="display:none">
-  <button class="btn btn-primary" onclick="goStep2()">Verificar identidad →</button>
+  <button class="btn btn-primary" onclick="goStep2()">Verificar identidad â</button>
 </div>
 
 <!-- ================ PAGE 2: LEER DOCUMENTO ================ -->
 <div id="page2" class="page" style="display:none">
   <div class="card">
-    <div class="card-title">📄 <span id="p2DocName">Documento</span></div>
-    <div class="card-subtitle" style="margin-bottom:12px">Leé el documento completo antes de firmar.</div>
+    <div class="card-title">ð <span id="p2DocName">Documento</span></div>
+    <div class="card-subtitle" style="margin-bottom:12px">LeÃ© el documento completo antes de firmar.</div>
 
     <!-- Visor del documento -->
     <div id="docViewerWrap" style="border-radius:10px;overflow:hidden;margin-bottom:4px">
       <div id="docViewerLoading" style="background:var(--bg);border-radius:10px;padding:24px;text-align:center;font-size:13px;color:var(--text-medium)">
-        <div style="font-size:28px;margin-bottom:8px">⏳</div>
-        Cargando documento…
+        <div style="font-size:28px;margin-bottom:8px">â³</div>
+        Cargando documentoâ¦
       </div>
       <div id="docViewerContent" style="display:none;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
       <div id="docViewerFallback" style="display:none;background:var(--bg);border-radius:10px;padding:16px;font-size:13px;color:var(--text-medium);line-height:1.8">
-        Este documento fue preparado por London Servicios Inmobiliarios para tu firma electrónica.<br><br>
-        Al firmar aceptás el contenido del documento indicado arriba. La firma electrónica tiene validez legal conforme a la <strong style="color:var(--text-dark)">Ley 25.506 de Firma Digital</strong> de la República Argentina.<br><br>
-        Si tenés dudas, comunicáte con quien te lo envió antes de proceder.
+        Este documento fue preparado por London Servicios Inmobiliarios para tu firma electrÃ³nica.<br><br>
+        Al firmar aceptÃ¡s el contenido del documento indicado arriba. La firma electrÃ³nica tiene validez legal conforme a la <strong style="color:var(--text-dark)">Ley 25.506 de Firma Digital</strong> de la RepÃºblica Argentina.<br><br>
+        Si tenÃ©s dudas, comunicÃ¡te con quien te lo enviÃ³ antes de proceder.
       </div>
     </div>
     <div id="p2DocContent" style="display:none"></div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
         <div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Datos del documento</div>
         <table style="width:100%;font-size:12px">
-          <tr><td style="color:var(--text-light);padding:3px 0">Firmante:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Firmante">—</td></tr>
-          <tr><td style="color:var(--text-light);padding:3px 0">Enviado el:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Fecha">—</td></tr>
-          <tr><td style="color:var(--text-light);padding:3px 0">Token:</td><td style="color:var(--text-dark);font-weight:600;text-align:right;font-size:11px" id="p2Token">—</td></tr>
+          <tr><td style="color:var(--text-light);padding:3px 0">Firmante:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Firmante">â</td></tr>
+          <tr><td style="color:var(--text-light);padding:3px 0">Enviado el:</td><td style="color:var(--text-dark);font-weight:600;text-align:right" id="p2Fecha">â</td></tr>
+          <tr><td style="color:var(--text-light);padding:3px 0">Token:</td><td style="color:var(--text-dark);font-weight:600;text-align:right;font-size:11px" id="p2Token">â</td></tr>
         </table>
       </div>
     </div>
   </div>
 
   <div id="scrollHint" style="display:none;text-align:center;padding:10px 0 4px;font-size:12px;color:var(--text-light)">
-    ⬇ Desplazá hacia abajo para leer el documento completo
+    â¬ DesplazÃ¡ hacia abajo para leer el documento completo
   </div>
 
   <div class="card" onclick="toggleCheckbox(this)" id="docCheckCard" style="cursor:pointer;display:none;opacity:0;transition:opacity 0.4s ease">
     <div class="check-row" id="docCheck">
-      <div class="check-box"><span class="check-mark">✓</span></div>
+      <div class="check-box"><span class="check-mark">â</span></div>
       <div class="check-text">
-        <strong>Confirmo que leí y entiendo el contenido del documento</strong> "<span id="checkDocName">—</span>" y acepto firmarlo electrónicamente.
+        <strong>Confirmo que leÃ­ y entiendo el contenido del documento</strong> "<span id="checkDocName">â</span>" y acepto firmarlo electrÃ³nicamente.
       </div>
     </div>
   </div>
@@ -383,45 +383,45 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
 <!-- FOOTER 2 -->
 <div id="footer2" class="step-footer" style="display:none">
-  <button class="btn btn-primary" id="btnGoStep3" onclick="goStep3()" disabled>Proceder a firmar →</button>
+  <button class="btn btn-primary" id="btnGoStep3" onclick="goStep3()" disabled>Proceder a firmar â</button>
 </div>
 
 <!-- ================ PAGE 3: FIRMAR ================ -->
 <div id="page3" class="page" style="display:none">
   <!-- Firma manuscrita -->
   <div class="card">
-    <div class="card-title">✍️ Tu firma</div>
-    <div class="card-subtitle" style="margin-bottom:14px">Dibujá tu firma con el dedo o el mouse en el área de abajo.</div>
+    <div class="card-title">âï¸ Tu firma</div>
+    <div class="card-subtitle" style="margin-bottom:14px">DibujÃ¡ tu firma con el dedo o el mouse en el Ã¡rea de abajo.</div>
     <div class="sig-canvas-wrap" id="canvasWrap">
       <canvas id="sigCanvas"></canvas>
       <div class="sig-placeholder-text" id="sigPlaceholder">
-        <div class="sig-placeholder-icon">✍️</div>
-        <div class="sig-placeholder-label">Tocá aquí para firmar</div>
+        <div class="sig-placeholder-icon">âï¸</div>
+        <div class="sig-placeholder-label">TocÃ¡ aquÃ­ para firmar</div>
       </div>
     </div>
     <div class="sig-actions">
-      <button class="sig-btn sig-btn-clear" onclick="clearCanvas()" type="button">🗑 Borrar</button>
+      <button class="sig-btn sig-btn-clear" onclick="clearCanvas()" type="button">ð Borrar</button>
     </div>
   </div>
 
   <!-- Selfie (opcional) -->
   <div class="card">
-    <div class="card-title">🤳 Foto de identidad <span class="optional-label">Opcional</span></div>
-    <div class="card-subtitle" style="margin-bottom:14px">Tomá una selfie para reforzar la validez legal de la firma.</div>
+    <div class="card-title">ð¤³ Foto de identidad <span class="optional-label">Opcional</span></div>
+    <div class="card-subtitle" style="margin-bottom:14px">TomÃ¡ una selfie para reforzar la validez legal de la firma.</div>
 
     <div id="selfieArea">
       <div id="selfieVideoWrap" class="selfie-wrap" style="display:none">
         <video id="selfieVideo" autoplay playsinline muted></video>
         <div class="selfie-overlay"></div>
         <div class="selfie-controls">
-          <button class="selfie-btn selfie-btn-capture" onclick="captureSelfie()" type="button">📸 Capturar</button>
-          <button class="selfie-btn selfie-btn-retake" onclick="cancelSelfie()" type="button">✕ Cancelar</button>
+          <button class="selfie-btn selfie-btn-capture" onclick="captureSelfie()" type="button">ð¸ Capturar</button>
+          <button class="selfie-btn selfie-btn-retake" onclick="cancelSelfie()" type="button">â Cancelar</button>
         </div>
       </div>
       <img id="selfiePreview" alt="Selfie capturada">
       <canvas id="selfieCanvas"></canvas>
       <div class="selfie-status" id="selfieStatus"></div>
-      <button class="sig-btn" style="width:100%;padding:12px;font-size:13px;margin-top:4px" onclick="startSelfie()" id="btnSelfie" type="button">📷 Activar cámara</button>
+      <button class="sig-btn" style="width:100%;padding:12px;font-size:13px;margin-top:4px" onclick="startSelfie()" id="btnSelfie" type="button">ð· Activar cÃ¡mara</button>
     </div>
   </div>
 
@@ -430,41 +430,37 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
 <!-- FOOTER 3 -->
 <div id="footer3" class="step-footer" style="display:none">
-  <button class="btn btn-success" id="btnFirmar" onclick="confirmarFirma()">✅ Confirmar y firmar</button>
+  <button class="btn btn-success" id="btnFirmar" onclick="confirmarFirma()">â Confirmar y firmar</button>
 </div>
 
-<!-- ================ PAGE 4: ÉXITO ================ -->
+<!-- ================ PAGE 4: ÃXITO ================ -->
 <div id="page4" style="display:none">
   <div class="success-wrap">
-    <div class="success-icon">✅</div>
-    <div class="success-title">¡Firmaste exitosamente!</div>
-    <div class="success-subtitle">Tu firma fue registrada y el documento<br>quedó firmado electrónicamente.</div>
+    <div class="success-icon">â</div>
+    <div class="success-title">Â¡Firmaste exitosamente!</div>
+    <div class="success-subtitle">Tu firma fue registrada y el documento<br>quedÃ³ firmado electrÃ³nicamente.</div>
 
     <div class="cert-card">
-      <div style="font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🏅 Comprobante de Firma</div>
-      <div class="cert-row"><span class="cert-key">Firmante</span><span class="cert-val" id="certNombre">—</span></div>
-      <div class="cert-row"><span class="cert-key">DNI</span><span class="cert-val" id="certDni">—</span></div>
-      <div class="cert-row"><span class="cert-key">Email</span><span class="cert-val" id="certEmail">—</span></div>
-      <div class="cert-row"><span class="cert-key">Documento</span><span class="cert-val" id="certDoc">—</span></div>
-      <div class="cert-row"><span class="cert-key">Fecha y hora</span><span class="cert-val" id="certFecha">—</span></div>
-      <div class="cert-row"><span class="cert-key">Token</span><span class="cert-val" id="certToken">—</span></div>
-      <div class="cert-row"><span class="cert-key">Estado</span><span class="cert-val" style="color:var(--success)">✓ FIRMADO</span></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">ð Comprobante de Firma</div>
+      <div class="cert-row"><span class="cert-key">Firmante</span><span class="cert-val" id="certNombre">â</span></div>
+      <div class="cert-row"><span class="cert-key">DNI</span><span class="cert-val" id="certDni">â</span></div>
+      <div class="cert-row"><span class="cert-key">Email</span><span class="cert-val" id="certEmail">â</span></div>
+      <div class="cert-row"><span class="cert-key">Documento</span><span class="cert-val" id="certDoc">â</span></div>
+      <div class="cert-row"><span class="cert-key">Fecha y hora</span><span class="cert-val" id="certFecha">â</span></div>
+      <div class="cert-row"><span class="cert-key">Token</span><span class="cert-val" id="certToken">â</span></div>
+      <div class="cert-row"><span class="cert-key">Estado</span><span class="cert-val" style="color:var(--success)">â FIRMADO</span></div>
     </div>
 
     <div class="legal-note">
-      ⚖️ Esta firma electrónica tiene validez legal bajo la <strong>Ley 25.506</strong> de Firma Digital de la República Argentina. Se registró la identidad del firmante, fecha, hora, dirección IP y firma biométrica.
+      âï¸ Esta firma electrÃ³nica tiene validez legal bajo la <strong>Ley 25.506</strong> de Firma Digital de la RepÃºblica Argentina. Se registrÃ³ la identidad del firmante, fecha, hora, direcciÃ³n IP y firma biomÃ©trica.
     </div>
 
-    <button class="save-btn" onclick="descargarDocumento()" type="button" style="background:#0A4E62;margin-bottom:10px">
-      📄 Descargar documento
-    </button>
-
     <button class="save-btn" onclick="guardarComprobante()" type="button">
-      💾 Guardar comprobante
+      ð¾ Guardar comprobante
     </button>
 
     <div style="margin-top:20px;font-size:12px;color:var(--text-light);text-align:center">
-      Powered by <strong>FirmaYa</strong> · London Servicios Inmobiliarios
+      Powered by <strong>FirmaYa</strong> Â· London Servicios Inmobiliarios
     </div>
   </div>
 </div>
@@ -503,7 +499,7 @@ function fmtDate(d){
   return dd+'/'+mm+'/'+yy+' '+hh+':'+min;
 }
 
-// ==================== INICIALIZACIÓN ====================
+// ==================== INICIALIZACIÃN ====================
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(init, 600);
 });
@@ -516,7 +512,7 @@ function init(){
     return;
   }
 
-  // Mostrar progress y página 1
+  // Mostrar progress y pÃ¡gina 1
   document.getElementById('progressWrap').style.display = 'block';
   document.getElementById('page1').style.display   = 'block';
   document.getElementById('footer1').style.display = 'block';
@@ -533,7 +529,7 @@ function init(){
   initCanvas();
 }
 
-// ==================== NAVEGACIÓN POR PASOS ====================
+// ==================== NAVEGACIÃN POR PASOS ====================
 let currentStep = 1;
 
 function setStep(n){
@@ -543,7 +539,7 @@ function setStep(n){
     else if(i === n) s.className = 'step active';
     else s.className = 'step';
     const s_num = s.querySelector('.step-num');
-    if(i < n) s_num.textContent = '✓';
+    if(i < n) s_num.textContent = 'â';
     else s_num.textContent = i;
     if(i <= 3){
       const con = document.getElementById('con'+i);
@@ -558,14 +554,14 @@ function hidePage(n){
   ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
 }
 
-// ---- PASO 1 → 2 ----
+// ---- PASO 1 â 2 ----
 function goStep2(){
   const nombre = document.getElementById('verNombre').value.trim();
   const email  = document.getElementById('verEmail').value.trim();
   const dni    = document.getElementById('verDni').value.trim();
-  if(!nombre){ alert('Por favor ingresá tu nombre completo.'); return; }
-  if(!email || !email.includes('@')){ alert('Por favor ingresá un email válido.'); return; }
-  if(!dni){ alert('Por favor ingresá tu número de DNI.'); return; }
+  if(!nombre){ alert('Por favor ingresÃ¡ tu nombre completo.'); return; }
+  if(!email || !email.includes('@')){ alert('Por favor ingresÃ¡ un email vÃ¡lido.'); return; }
+  if(!dni){ alert('Por favor ingresÃ¡ tu nÃºmero de DNI.'); return; }
   window._nombre = nombre;
   window._email  = email;
   window._dni    = dni;
@@ -596,18 +592,13 @@ async function loadDocumentPreview(token){
     const resp = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(token));
     if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; setTimeout(revealCheckbox, 3000); return; }
 
-    const buf = await resp.arrayBuffer();
-    let mime = resp.headers.get('content-type') || '';
-    if(!mime || mime.includes('octet-stream')){
-      const p = new Uint8Array(buf, 0, 8);
-      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
-      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    }
+    const mime = resp.headers.get('content-type') || '';
+    const buf  = await resp.arrayBuffer();
     loading.style.display = 'none';
 
     if(mime.includes('pdf')){
       // Renderizar PDF con PDF.js
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
       const pdf = await pdfjsLib.getDocument({data: buf}).promise;
       content.style.display = 'block';
       content.style.background = '#555';
@@ -663,15 +654,15 @@ function toggleCheckbox(card){
   btn.disabled = !confirmed;
 }
 
-
-
 // ---- REVELAR CHECKBOX TRAS LECTURA ----
 function setupScrollReveal(){
   const content = document.getElementById('docViewerContent');
   const hint    = document.getElementById('scrollHint');
   if(!content) return;
+  // Esperar a que el DOM actualice las alturas del contenido renderizado
   setTimeout(function(){
     if(content.scrollHeight <= content.clientHeight + 20){
+      // Doc corto: no necesita scroll, mostrar el checkbox ya
       revealCheckbox();
     } else {
       if(hint) hint.style.display = 'block';
@@ -695,7 +686,7 @@ function revealCheckbox(){
   requestAnimationFrame(function(){ card.style.opacity = '1'; });
 }
 
-// ---- PASO 2 → 3 ----
+// ---- PASO 2 â 3 ----
 function goStep3(){
   hidePage(2);
   setStep(3);
@@ -781,7 +772,7 @@ async function startSelfie(){
     }, 800);
 
   } catch(err){
-    document.getElementById('selfieStatus').textContent = '⚠️ No se pudo acceder a la cámara. Podés continuar sin selfie.';
+    document.getElementById('selfieStatus').textContent = 'â ï¸ No se pudo acceder a la cÃ¡mara. PodÃ©s continuar sin selfie.';
   }
 }
 
@@ -796,8 +787,8 @@ function captureSelfie(){
   preview.src = selfieData;
   preview.style.display = 'block';
   document.getElementById('selfieVideoWrap').style.display = 'none';
-  document.getElementById('selfieStatus').textContent = '✅ Selfie capturada correctamente';
-  document.getElementById('btnSelfie').textContent = '🔄 Retomar selfie';
+  document.getElementById('selfieStatus').textContent = 'â Selfie capturada correctamente';
+  document.getElementById('btnSelfie').textContent = 'ð Retomar selfie';
   document.getElementById('btnSelfie').style.display = 'block';
   document.getElementById('btnSelfie').onclick = startSelfie;
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
@@ -813,16 +804,28 @@ function cancelSelfie(){
 // ==================== CONFIRMAR FIRMA ====================
 async function confirmarFirma(){
   if(!hasSig){
-    alert('Por favor dibujá tu firma antes de continuar.');
+    alert('Por favor dibujÃ¡ tu firma antes de continuar.');
     return;
   }
   const btn = document.getElementById('btnFirmar');
   btn.disabled = true;
-  btn.textContent = '⏳ Registrando firma…';
+  btn.textContent = 'â³ Registrando firmaâ¦';
 
   const sigImg    = canvas.toDataURL('image/png');
   const ts        = new Date();
   const tsStr     = fmtDate(ts);
+
+  // Obtener GPS (sin bloquear la firma si el usuario deniega)
+  let lat = null, lng = null;
+  try{
+    if(navigator.geolocation){
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000, maximumAge: 60000 })
+      );
+      lat = pos.coords.latitude;
+      lng = pos.coords.longitude;
+    }
+  }catch(gpsErr){ /* GPS no disponible o denegado, continuar igual */ }
 
   // Datos del evento
   const payload = {
@@ -836,7 +839,7 @@ async function confirmarFirma(){
     fecha_hora:  tsStr,
     user_agent:  navigator.userAgent,
     idioma:      navigator.language,
-    selfie:      selfieData ? 'sí' : 'no',
+    selfie:      selfieData ? 'sÃ­' : 'no',
     estado:      'FIRMADO'
   };
 
@@ -853,10 +856,12 @@ async function confirmarFirma(){
         firmante: window._nombre,
         email:    window._email,
         dni:      window._dni,
-        device:   navigator.userAgent.substring(0,100)
+        lat,
+        lng,
+        device:   navigator.userAgent.substring(0,200)
       })
     });
-  } catch(e){ /* silencioso — no bloquear la firma */ }
+  } catch(e){ /* silencioso â no bloquear la firma */ }
 
   // Enviar a Google Sheets (fire-and-forget backup)
   try{
@@ -866,12 +871,12 @@ async function confirmarFirma(){
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(payload)
     });
-  } catch(e){ /* silencioso — no bloquear la firma */ }
+  } catch(e){ /* silencioso â no bloquear la firma */ }
 
-  // Detener cámara si quedó abierta
+  // Detener cÃ¡mara si quedÃ³ abierta
   if(stream){ stream.getTracks().forEach(t=>t.stop()); }
 
-  // Mostrar pantalla de éxito
+  // Mostrar pantalla de Ã©xito
   hidePage(3);
   setStep(4);
   document.getElementById('page4').style.display = 'block';
@@ -892,26 +897,6 @@ async function confirmarFirma(){
 }
 
 // ==================== GUARDAR COMPROBANTE ====================
-async function descargarDocumento(){
-  try{
-    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(TOKEN));
-    if(!r.ok){ alert('No se encontró el archivo. Contactá a London Servicios Inmobiliarios.'); return; }
-    const buf = await r.arrayBuffer();
-    let mime = r.headers.get('content-type') || '';
-    if(!mime || mime.includes('octet-stream')){
-      const p = new Uint8Array(buf, 0, 8);
-      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
-      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    }
-    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
-    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'documento-firmado' + ext;
-    a.click();
-  }catch(e){ alert('Error al descargar: ' + e.message); }
-}
-
 function guardarComprobante(){
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante FirmaYa</title>
 <style>body{font-family:Arial,sans-serif;max-width:500px;margin:40px auto;padding:20px;color:#1A2B35}
@@ -922,7 +907,7 @@ td:first-child{color:#8A9BAB;font-size:12px;text-transform:uppercase;letter-spac
 td:last-child{font-weight:600}
 .footer{margin-top:24px;font-size:11px;color:#8A9BAB;text-align:center}
 </style></head><body>
-<h1>✅ Comprobante de Firma — FirmaYa</h1>
+<h1>â Comprobante de Firma â FirmaYa</h1>
 <table>
 <tr><td>Firmante</td><td>${window._nombre}</td></tr>
 <tr><td>DNI</td><td>${window._dni}</td></tr>
@@ -930,9 +915,9 @@ td:last-child{font-weight:600}
 <tr><td>Documento</td><td>${DOC_NAME}</td></tr>
 <tr><td>Fecha y hora</td><td>${document.getElementById('certFecha').textContent}</td></tr>
 <tr><td>Token</td><td>${TOKEN}</td></tr>
-<tr><td>Estado</td><td style="color:#27AE60">✓ FIRMADO</td></tr>
+<tr><td>Estado</td><td style="color:#27AE60">â FIRMADO</td></tr>
 </table>
-<div class="footer">Firma electrónica válida bajo Ley 25.506 · FirmaYa · London Servicios Inmobiliarios</div>
+<div class="footer">Firma electrÃ³nica vÃ¡lida bajo Ley 25.506 Â· FirmaYa Â· London Servicios Inmobiliarios</div>
 </body></html>`;
   const blob = new Blob([html], {type:'text/html'});
   const a = document.createElement('a');
