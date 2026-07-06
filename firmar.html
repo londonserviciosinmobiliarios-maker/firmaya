@@ -431,7 +431,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 
 <!-- FOOTER 3 -->
 <div id="footer3" class="step-footer" style="display:none">
-  <button class="btn btn-success" id="btnFirmar" onclick="confirmarFirma()">✅ Confirmar y firmar</button>
+  <button class="btn btn-success" id="btnFirmar" onclick="confirmarFirma().catch(e=>{console.error(e);const b=document.getElementById('btnFirmar');if(b){b.disabled=false;b.textContent='Confirmar y firmar';}alert('Error al procesar: '+e.message+'. Intenta de nuevo.');})">✅ Confirmar y firmar</button>
 </div>
 
 <!-- ================ PAGE 4: ÉXITO ================ -->
@@ -862,12 +862,12 @@ async function confirmarFirma(){
 
   // Enviar a Google Sheets (fire-and-forget backup)
   try{
-    fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
+    await fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(payload)
-    }).catch(()=>{});
+    });
   } catch(e){ /* silencioso — no bloquear la firma */ }
 
   // Detener cámara si quedó abierta
