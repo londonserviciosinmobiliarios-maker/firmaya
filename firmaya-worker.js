@@ -301,6 +301,31 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    return new Response('', { status: 200, headers: CORS });
+    
+  // DELETE one document
+  if (pathname === '/api/delete') {
+    const token = url.searchParams.get('token');
+    if (!token) return new Response('Missing token', { status: 400, headers: corsHeaders });
+    await env.FIRMAYA_KV.delete('doc:' + token);
+    await env.FIRMAYA_KV.delete('file:' + token);
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  // DELETE ALL documents (admin reset)
+  if (pathname === '/api/deleteAll') {
+    let cursor = undefined;
+    let totalDeleted = 0;
+    do {
+      const listRes = await env.FIRMAYA_KV.list({ cursor, limit: 100 });
+      for (const key of listRes.keys) {
+        await env.FIRMAYA_KV.delete(key.name);
+        totalDeleted++;
+      }
+      cursor = listRes.list_complete ? undefined : listRes.cursor;
+    } while (cursor);
+    return new Response(JSON.stringify({ ok: true, deleted: totalDeleted }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+return new Response('', { status: 200, headers: CORS });
   }
 };
