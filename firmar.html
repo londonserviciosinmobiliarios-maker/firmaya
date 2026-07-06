@@ -474,6 +474,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 // ==================== LECTURA DE URL PARAMS ====================
 const params = new URLSearchParams(window.location.search);
 const TOKEN  = params.get('t') || '';
+window._gpsLat=null;window._gpsLng=null;if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{window._gpsLat=p.coords.latitude;window._gpsLng=p.coords.longitude;},function(){},{timeout:10000,maximumAge:60000,enableHighAccuracy:true});}
 const DOCRAW = params.get('d') || '';
 const FIRMRAW = params.get('r') || '';
 const SENDER = params.get('s') || 'London Servicios Inmobiliarios';
@@ -874,7 +875,7 @@ async function confirmarFirma(){
   if(stream){ stream.getTracks().forEach(t=>t.stop()); }
 
   window._signedPdfBytes=null;
-  generarPDFFirmado(sigImg,selfieData,ts,tsStr,null,null).then(b=>{window._signedPdfBytes=b;}).catch(()=>{});
+  generarPDFFirmado(sigImg,selfieData,ts,tsStr,window._gpsLat,window._gpsLng).then(b=>{window._signedPdfBytes=b;}).catch(()=>{});
 
   // Mostrar pantalla de éxito
   hidePage(3);
@@ -1053,40 +1054,21 @@ async function descargarDocumento(){
 }
 
 function guardarComprobante(){
-  if(window._signedPdfBytes){
-    const blob=new Blob([window._signedPdfBytes],{type:'application/pdf'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=(DOC_NAME||'documento').replace(/\.[^.]+$/,'')+'-firmado.pdf';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    return;
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(window._signedPdfBytes && !isIOS){
+    try{
+      const blob=new Blob([window._signedPdfBytes],{type:'application/pdf'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;
+      const fname=(typeof DOC_NAME!=='undefined'&&DOC_NAME?DOC_NAME.replace(/\.[^.]+$/,''):'documento')+'_firmado.pdf';
+      a.download=fname;
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+      return;
+    }catch(e){}
   }
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante FirmaYa</title>
-<style>body{font-family:Arial,sans-serif;max-width:500px;margin:40px auto;padding:20px;color:#1A2B35}
-h1{color:#0D6278;font-size:20px;margin-bottom:20px}
-table{width:100%;border-collapse:collapse}
-td{padding:10px 8px;border-bottom:1px solid #eee;font-size:14px}
-td:first-child{color:#8A9BAB;font-size:12px;text-transform:uppercase;letter-spacing:.5px;width:40%}
-td:last-child{font-weight:600}
-.footer{margin-top:24px;font-size:11px;color:#8A9BAB;text-align:center}
-</style></head><body>
-<h1>✅ Comprobante de Firma — FirmaYa</h1>
-<table>
-<tr><td>Firmante</td><td>${window._nombre}</td></tr>
-<tr><td>DNI</td><td>${window._dni}</td></tr>
-<tr><td>Email</td><td>${window._email}</td></tr>
-<tr><td>Documento</td><td>${DOC_NAME}</td></tr>
-<tr><td>Fecha y hora</td><td>${document.getElementById('certFecha').textContent}</td></tr>
-<tr><td>Token</td><td>${TOKEN}</td></tr>
-<tr><td>Estado</td><td style="color:#27AE60">✓ FIRMADO</td></tr>
-</table>
-<div class="footer">Firma electrónica válida bajo Ley 25.506 · FirmaYa · London Servicios Inmobiliarios</div>
-</body></html>`;
-  const blob = new Blob([html], {type:'text/html'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'comprobante-firma-' + TOKEN + '.html';
-  a.click();
+  window.open(FIRMAYA_WORKER+'/api/file'+'?token='+TOKEN,'_blank');
 }
 
 // ==================== RESIZE CANVAS ====================
