@@ -395,7 +395,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
+      <div class="sidebar-logo" style="cursor:pointer" onclick="goHome()" title="Volver al inicio">
         FirmaYa
         <span>Panel de gestión</span>
       </div>
@@ -1155,6 +1155,7 @@ function doLogin(){
   const err = document.getElementById('loginError');
   if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
     err.style.display='none';
+    sessionStorage.setItem('firmaya_auth','1');
     showDashboard();
   } else {
     err.style.display='block';
@@ -1162,6 +1163,7 @@ function doLogin(){
 }
 // Allow Enter key on password
 document.addEventListener('DOMContentLoaded', ()=>{
+  if(sessionStorage.getItem('firmaya_auth')==='1') showDashboard();
   const p = document.getElementById('loginPass');
   if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 });
@@ -1222,6 +1224,7 @@ async function loadDocsFromAPI(){
 }
 
 function logout(){
+  sessionStorage.removeItem('firmaya_auth');
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
 }
@@ -1271,6 +1274,12 @@ function resetFlow(){
     t.classList.remove('active','done');
   });
   document.getElementById('tab1').classList.add('active');
+}
+
+function goHome(){
+  showView('dashboard');
+  loadDocsFromAPI();
+  closeSidebarOnMobile();
 }
 
 function flowGo(n){
