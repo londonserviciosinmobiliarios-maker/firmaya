@@ -41,7 +41,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 }
 
 /* ---- PROGRESS ---- */
-.progrest-wrap{background:white;border-bottom:1px solid var(--border);padding:0 20px}
+.progress-wrap{background:white;border-bottom:1px solid var(--border);padding:0 20px}
 .steps-row{display:flex;align-items:center;justify-content:center;gap:0;padding:14px 0}
 .step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:80px;opacity:.4;transition:opacity .3s}
 .step.active{opacity:1}
@@ -455,6 +455,10 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
       ⚖️ Esta firma electrónica tiene validez legal bajo la <strong>Ley 25.506</strong> de Firma Digital de la República Argentina. Se registró la identidad del firmante, fecha, hora, dirección IP y firma biométrica.
     </div>
 
+    <button class="save-btn" onclick="descargarDocumento()" type="button" style="background:#0A4E62;margin-bottom:10px">
+      📄 Descargar documento
+    </button>
+
     <button class="save-btn" onclick="guardarComprobante()" type="button">
       💾 Guardar comprobante
     </button>
@@ -592,8 +596,13 @@ async function loadDocumentPreview(token){
     const resp = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(token));
     if(!resp.ok){ loading.style.display='none'; fallback.style.display='block'; setTimeout(revealCheckbox, 3000); return; }
 
-    const mime = resp.headers.get('content-type') || '';
-    const buf  = await resp.arrayBuffer();
+    const buf = await resp.arrayBuffer();
+    let mime = resp.headers.get('content-type') || '';
+    if(!mime || mime.includes('octet-stream')){
+      const p = new Uint8Array(buf, 0, 8);
+      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
+      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
     loading.style.display = 'none';
 
     if(mime.includes('pdf')){
@@ -654,15 +663,15 @@ function toggleCheckbox(card){
   btn.disabled = !confirmed;
 }
 
+
+
 // ---- REVELAR CHECKBOX TRAS LECTURA ----
 function setupScrollReveal(){
   const content = document.getElementById('docViewerContent');
   const hint    = document.getElementById('scrollHint');
   if(!content) return;
-  // Esperar a que el DOM actualice las alturas del contenido renderizado
   setTimeout(function(){
     if(content.scrollHeight <= content.clientHeight + 20){
-      // Doc corto: no necesita scroll, mostrar el checkbox ya
       revealCheckbox();
     } else {
       if(hint) hint.style.display = 'block';
@@ -766,7 +775,7 @@ async function startSelfie(){
         brightness /= (px.length / 4);
         // Si la imagen es oscura (< 60/255) activar torch
         if(brightness < 60 && track.applyConstraints) {
-          await track.applyConstraints({ advanced: [{ torch: true }] }).catch(camErr){ try{ document.getElementById('selfieStatus').textContent='No se pudo acceder a la cámara: '+camErr.message; }catch(e){} console.error(camErr); }
+          await track.applyConstraints({ advanced: [{ torch: true }] }).catch(()=>{});
         }
       } catch(e){}
     }, 800);
@@ -815,18 +824,6 @@ async function confirmarFirma(){
   const ts        = new Date();
   const tsStr     = fmtDate(ts);
 
-  // Obtener GPS (sin bloquear la firma si el usuario deniega)
-  let lat = null, lng = null;
-  try{
-    if(navigator.geolocation){
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000, maximumAge: 60000 })
-      );
-      lat = pos.coords.latitude;
-      lng = pos.coords.longitude;
-    }
-  }catch(gpsErr){ /* GPS no disponible o denegado, continuar igual */ }
-
   // Datos del evento
   const payload = {
     type:        'firma',
@@ -856,9 +853,7 @@ async function confirmarFirma(){
         firmante: window._nombre,
         email:    window._email,
         dni:      window._dni,
-        lat,
-        lng,
-        device:   navigator.userAgent.substring(0,200)
+        device:   navigator.userAgent.substring(0,100)
       })
     });
   } catch(e){ /* silencioso — no bloquear la firma */ }
@@ -897,6 +892,26 @@ async function confirmarFirma(){
 }
 
 // ==================== GUARDAR COMPROBANTE ====================
+async function descargarDocumento(){
+  try{
+    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(TOKEN));
+    if(!r.ok){ alert('No se encontró el archivo. Contactá a London Servicios Inmobiliarios.'); return; }
+    const buf = await r.arrayBuffer();
+    let mime = r.headers.get('content-type') || '';
+    if(!mime || mime.includes('octet-stream')){
+      const p = new Uint8Array(buf, 0, 8);
+      if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
+      else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
+    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'documento-firmado' + ext;
+    a.click();
+  }catch(e){ alert('Error al descargar: ' + e.message); }
+}
+
 function guardarComprobante(){
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante FirmaYa</title>
 <style>body{font-family:Arial,sans-serif;max-width:500px;margin:40px auto;padding:20px;color:#1A2B35}
@@ -923,10 +938,7 @@ td:last-child{font-weight:600}
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'comprobante-firma-' + TOKEN + '.html';
-  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
 }
 
 // ==================== RESIZE CANVAS ====================
