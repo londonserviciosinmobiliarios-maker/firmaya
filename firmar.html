@@ -460,9 +460,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
       📄 Descargar documento
     </button>
 
-    <button class="save-btn" onclick="guardarComprobante()" type="button">
-      💾 Guardar comprobante
-    </button>
+    
 
     <div style="margin-top:20px;font-size:12px;color:var(--text-light);text-align:center">
       Powered by <strong>FirmaYa</strong> · London Servicios Inmobiliarios
@@ -475,6 +473,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 const params = new URLSearchParams(window.location.search);
 const TOKEN  = params.get('t') || '';
 window._gpsLat=null;window._gpsLng=null;if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{window._gpsLat=p.coords.latitude;window._gpsLng=p.coords.longitude;},function(){},{timeout:10000,maximumAge:60000,enableHighAccuracy:true});}
+window._sigPos=null;(async()=>{try{if(TOKEN){var _r=await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/doc?token='+encodeURIComponent(TOKEN));if(_r.ok){var _d=await _r.json();if(_d.ok&&_d.sigPos)window._sigPos=_d.sigPos;}}}catch(e){}})();
 const DOCRAW = params.get('d') || '';
 const FIRMRAW = params.get('r') || '';
 const SENDER = params.get('s') || 'London Servicios Inmobiliarios';
@@ -942,6 +941,24 @@ async function generarPDFFirmado(sigImgUrl, selfieUrl, ts, tsStr, lat, lng){
     }catch(e){}
   }
 
+    // ── Embeber firma en posición marcada por el admin ──────────────────────
+  if(hasOrig && window._sigPos && sigImgUrl){
+    try{
+      const sp=window._sigPos;
+      const _pages=pdfDoc.getPages();
+      const _pg=_pages[Math.min(sp.page||0,_pages.length-1)];
+      const {width:_pw,height:_ph}=_pg.getSize();
+      const _sw=160,_sh=55;
+      const _cx=sp.xPct*_pw, _cy=(1-sp.yPct)*_ph;
+      const _sx=Math.max(2,Math.min(_cx-_sw/2,_pw-_sw-2));
+      const _sy=Math.max(20,Math.min(_cy-_sh/2,_ph-_sh-2));
+      const _b64=sigImgUrl.split(',')[1];
+      const _bytes=Uint8Array.from(atob(_b64),c=>c.charCodeAt(0));
+      const _img=await pdfDoc.embedPng(_bytes);
+      _pg.drawImage(_img,{x:_sx,y:_sy,width:_sw,height:_sh});
+      _pg.drawRectangle({x:_sx,y:_sy,width:_sw,height:_sh,borderColor:rgb(0.05,0.38,0.47),borderWidth:1,opacity:0.5});
+    }catch(e){}
+  }
   const W=595.28, H=841.89;
   const ip=pdfDoc.addPage([W,H]);
 
