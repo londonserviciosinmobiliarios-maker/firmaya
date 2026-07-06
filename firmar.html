@@ -874,7 +874,7 @@ async function confirmarFirma(){
   if(stream){ stream.getTracks().forEach(t=>t.stop()); }
 
   window._signedPdfBytes=null;
-  generarPDFFirmado(sigImg,selfieData,ts,tsStr,lat,lng).then(b=>{window._signedPdfBytes=b;}).catch(()=>{});
+  generarPDFFirmado(sigImg,selfieData,ts,tsStr,null,null).then(b=>{window._signedPdfBytes=b;}).catch(()=>{});
 
   // Mostrar pantalla de éxito
   hidePage(3);
