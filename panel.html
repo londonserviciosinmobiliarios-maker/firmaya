@@ -899,17 +899,19 @@ function toggleAllDocs(cb, bodyId){
   document.querySelectorAll('#'+bodyId+' .doc-check').forEach(c => c.checked = cb.checked);
 }
 
-function deleteSelected(bodyId){
-  const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
-  if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
-  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
-  checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
-  renderDocs(docs.slice(0,5), 'docsBody');
-  renderDocs(docs, 'docsBody2');
-  const cnt = document.getElementById('docsCount');
-  if(cnt) cnt.textContent = docs.length + ' documentos';
+function deleteSelected(){
+  const boxes = document.querySelectorAll('.doc-check:checked');
+  if(!boxes.length){ alert('Selecciona al menos un documento para eliminar.'); return; }
+  if(!confirm('\u00BFEliminar '+boxes.length+' documento(s)?')) return;
+  const tokens = Array.from(boxes).map(b => b.dataset.token).filter(Boolean);
+  Promise.all(tokens.map(t =>
+    fetch('https://api.londonserviciosinmobiliarios.com.ar/api/delete?token='+encodeURIComponent(t),{method:'POST'}).catch(()=>{})
+  )).then(() => {
+    allDocs = allDocs.filter(d => !tokens.includes(d.token));
+    renderDocs(allDocs);
+    loadDocsFromAPI();
+  });
 }
-
 function filterDocs(el, estado){
   document.querySelectorAll('.tag-filter').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -1377,7 +1379,7 @@ async function sendDoc(method){
   document.getElementById('flowFooter4').style.display='none';
   const sentLinkEl = document.getElementById('sentLink');
   if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
-  try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
+  try{ navigator.clipboard.writeText((document.getElementById('sentMsg').innerText||'').trim() + '\n' + firmarUrl); } catch(e){}
 }
 
 // ---- CHECKBOXES ----
