@@ -862,12 +862,12 @@ async function confirmarFirma(){
 
   // Enviar a Google Sheets (fire-and-forget backup)
   try{
-    await fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbyLAQMnoQSnEkZdHFRy72hLkWbYQYY5vZNLFDLTsYXX4GxK4awZhdzkB2HFpaGXsS8KwA/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(payload)
-    });
+    }).catch(()=>{});
   } catch(e){ /* silencioso — no bloquear la firma */ }
 
   // Detener cámara si quedó abierta
