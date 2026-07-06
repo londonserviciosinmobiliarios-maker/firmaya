@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -604,6 +605,7 @@ async function loadDocumentPreview(token){
       else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
     loading.style.display = 'none';
+    if(mime.includes('pdf')) window._originalDocBuf = buf.slice(0);
 
     if(mime.includes('pdf')){
       // Renderizar PDF con PDF.js
@@ -616,7 +618,7 @@ async function loadDocumentPreview(token){
       for(let p = 1; p <= Math.min(pdf.numPages, 10); p++){
         const page = await pdf.getPage(p);
         const vp0  = page.getViewport({scale:1});
-        const scale = Math.min((availW || 320) / vp0.width, 2);
+        const scale = Math.max((availW || 360) / vp0.width, 0.8);
         const vp   = page.getViewport({scale});
         const cvs  = document.createElement('canvas');
         cvs.width  = vp.width;
@@ -871,6 +873,9 @@ async function confirmarFirma(){
   // Detener cámara si quedó abierta
   if(stream){ stream.getTracks().forEach(t=>t.stop()); }
 
+  window._signedPdfBytes=null;
+  generarPDFFirmado(sigImg,selfieData,ts,tsStr,lat,lng).then(b=>{window._signedPdfBytes=b;}).catch(()=>{});
+
   // Mostrar pantalla de éxito
   hidePage(3);
   setStep(4);
@@ -891,6 +896,141 @@ async function confirmarFirma(){
   } catch(e){}
 }
 
+
+// ==================== GENERAR PDF FIRMADO ====================
+function dataUrlToBytes(dataUrl){
+  const b64 = dataUrl.split(',')[1];
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+
+async function generarPDFFirmado(sigImgUrl, selfieUrl, ts, tsStr, lat, lng){
+  if(typeof PDFLib === 'undefined') return null;
+  const {PDFDocument, rgb, StandardFonts} = PDFLib;
+  const N = t => (t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x00-\xFF]/g,'?');
+
+  let pdfDoc, hasOrig = false;
+  if(window._originalDocBuf){
+    try{ pdfDoc = await PDFDocument.load(window._originalDocBuf,{ignoreEncryption:true}); hasOrig=true; }
+    catch(e){ pdfDoc = await PDFDocument.create(); }
+  } else { pdfDoc = await PDFDocument.create(); }
+
+  const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  if(hasOrig){
+    const wTxt = N('Firmado via FirmaYa por '+(window._nombre||'')+' | '+tsStr+' | Token: '+TOKEN);
+    for(const pg of pdfDoc.getPages()){
+      const {width} = pg.getSize();
+      pg.drawRectangle({x:0,y:0,width,height:18,color:rgb(0.05,0.38,0.47)});
+      pg.drawText(wTxt,{x:6,y:5,size:6,font,color:rgb(1,1,1),maxWidth:width-12});
+    }
+  }
+
+  let sigImg=null;
+  if(sigImgUrl){ try{ sigImg=await pdfDoc.embedPng(dataUrlToBytes(sigImgUrl)); }catch(e){} }
+
+  let selfieImg=null;
+  if(selfieUrl){
+    try{
+      const fmt=selfieUrl.split(';')[0].split('/')[1];
+      const bytes=dataUrlToBytes(selfieUrl);
+      selfieImg=(fmt==='jpeg'||fmt==='jpg')?await pdfDoc.embedJpg(bytes):await pdfDoc.embedPng(bytes);
+    }catch(e){}
+  }
+
+  const W=595.28, H=841.89;
+  const ip=pdfDoc.addPage([W,H]);
+
+  ip.drawRectangle({x:0,y:H-70,width:W,height:70,color:rgb(0.05,0.38,0.47)});
+  ip.drawText('Informe de Firmas',{x:40,y:H-32,size:18,font:boldFont,color:rgb(1,1,1)});
+  ip.drawText('FirmaYa  London Servicios Inmobiliarios',{x:40,y:H-50,size:9,font,color:rgb(0.7,0.9,0.95)});
+  ip.drawText(N(tsStr||''),(function(){return {x:40,y:H-63,size:8,font,color:rgb(0.6,0.8,0.9)}})());
+
+  let y=H-95;
+  const field=(lbl,val)=>{
+    ip.drawText(N(lbl)+':',{x:40,y,size:8,font:boldFont,color:rgb(0.25,0.35,0.45)});
+    ip.drawText(N(val||'--'),{x:135,y,size:8,font,color:rgb(0.1,0.15,0.2),maxWidth:W-175});
+    y-=15;
+  };
+  field('Estado','Firmado');
+  field('Documento',DOC_NAME||'--');
+  field('Numero de firma',TOKEN);
+  field('Fecha y hora',tsStr||'--');
+
+  y-=8;
+  ip.drawLine({start:{x:40,y},end:{x:W-40,y},thickness:0.8,color:rgb(0.82,0.87,0.90)});
+  y-=18;
+  ip.drawText('Firmas',{x:40,y,size:11,font:boldFont,color:rgb(0.1,0.15,0.2)});
+  ip.drawText('1 de 1',{x:W-90,y,size:9,font,color:rgb(0.55,0.65,0.7)});
+  y-=15;
+
+  const cardTop=y;
+  ip.drawRectangle({x:30,y:y-195,width:W-60,height:210,color:rgb(0.975,0.982,0.988),borderColor:rgb(0.82,0.87,0.90),borderWidth:0.8});
+  y-=5;
+  ip.drawRectangle({x:40,y:y-14,width:65,height:14,color:rgb(0.13,0.68,0.37)});
+  ip.drawText('Firmado',{x:44,y:y-11,size:7.5,font:boldFont,color:rgb(1,1,1)});
+  ip.drawText('via FirmaYa',{x:76,y:y-11,size:7,font,color:rgb(0.85,1,0.88)});
+
+  if(sigImg){
+    const sd=sigImg.scaleToFit(130,60);
+    ip.drawImage(sigImg,{x:W-170,y:cardTop-68,width:sd.width,height:sd.height});
+    ip.drawText(N((window._nombre||'').toUpperCase()),{x:W-170,y:cardTop-78,size:7,font:boldFont,color:rgb(0.3,0.4,0.5)});
+  }
+  y-=22;
+
+  ip.drawText(N((window._nombre||'').toUpperCase()),{x:40,y,size:10.5,font:boldFont,color:rgb(0.1,0.15,0.2)});
+  y-=15;
+  ip.drawText('Fecha: '+N(tsStr||''),{x:40,y,size:8,font,color:rgb(0.4,0.52,0.6)});
+  y-=13;
+  ip.drawText('Token: '+TOKEN,{x:40,y,size:8,font,color:rgb(0.4,0.52,0.6)});
+  y-=18;
+  ip.drawLine({start:{x:40,y},end:{x:W-40,y},thickness:0.5,color:rgb(0.88,0.92,0.94)});
+  y-=15;
+  ip.drawText('Autenticacion:',{x:40,y,size:8.5,font:boldFont,color:rgb(0.2,0.3,0.4)});
+  y-=13;
+  ip.drawText('Email: '+N(window._email||'--'),{x:40,y,size:7.5,font,color:rgb(0.35,0.45,0.55)});
+  y-=12;
+  ip.drawText('DNI: '+(window._dni||'--'),{x:40,y,size:7.5,font,color:rgb(0.35,0.45,0.55)});
+  y-=12;
+  if(selfieUrl) ip.drawText('Selfie capturada',{x:40,y,size:7.5,font,color:rgb(0.35,0.45,0.55)});
+  if(lat&&lng) ip.drawText('Ubicacion: '+lat.toFixed(5)+', '+lng.toFixed(5),{x:W/2+20,y:cardTop-118,size:7.5,font,color:rgb(0.35,0.45,0.55),maxWidth:W/2-50});
+
+  ip.drawRectangle({x:0,y:0,width:W,height:50,color:rgb(0.968,0.974,0.980)});
+  ip.drawLine({start:{x:0,y:50},end:{x:W,y:50},thickness:0.6,color:rgb(0.82,0.87,0.90)});
+  ip.drawText('Firma Electronica - Ley 25.506 - Argentina',{x:40,y:36,size:8,font:boldFont,color:rgb(0.2,0.3,0.4)});
+  ip.drawText('FirmaYa - London Servicios Inmobiliarios | Token: '+TOKEN,{x:40,y:22,size:7,font,color:rgb(0.5,0.6,0.7)});
+
+  if(selfieImg){
+    const ap=pdfDoc.addPage([W,H]);
+    ap.drawRectangle({x:0,y:H-70,width:W,height:70,color:rgb(0.05,0.38,0.47)});
+    ap.drawText('Anexos - Selfie',{x:40,y:H-32,size:18,font:boldFont,color:rgb(1,1,1)});
+    ap.drawText('FirmaYa  London Servicios Inmobiliarios',{x:40,y:H-50,size:9,font,color:rgb(0.7,0.9,0.95)});
+    let ay=H-100;
+    ap.drawText(N((window._nombre||'').toUpperCase()),{x:40,y:ay,size:11,font:boldFont,color:rgb(0.1,0.15,0.2)});
+    ay-=16;
+    ap.drawText('Token: '+TOKEN,{x:40,y:ay,size:8,font,color:rgb(0.4,0.52,0.6)});
+    ay-=20;
+    const sd2=selfieImg.scaleToFit(240,220);
+    ap.drawImage(selfieImg,{x:(W-sd2.width)/2,y:ay-sd2.height,width:sd2.width,height:sd2.height});
+    ap.drawRectangle({x:0,y:0,width:W,height:50,color:rgb(0.968,0.974,0.980)});
+    ap.drawLine({start:{x:0,y:50},end:{x:W,y:50},thickness:0.6,color:rgb(0.82,0.87,0.90)});
+    ap.drawText('Firma Electronica - Ley 25.506 - Argentina',{x:40,y:36,size:8,font:boldFont,color:rgb(0.2,0.3,0.4)});
+    ap.drawText('FirmaYa - London Servicios Inmobiliarios | Token: '+TOKEN,{x:40,y:22,size:7,font,color:rgb(0.5,0.6,0.7)});
+  }
+
+  const signedBytes = await pdfDoc.save();
+
+  try{
+    const nombre=(DOC_NAME||'documento').replace(/\.[^.]+$/,'')+'-firmado.pdf';
+    await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/upload?token='+encodeURIComponent(TOKEN)+'&mime=application%2Fpdf&nombre='+encodeURIComponent(nombre),
+      {method:'POST',body:signedBytes});
+  }catch(e){}
+
+  return signedBytes;
+}
 // ==================== GUARDAR COMPROBANTE ====================
 async function descargarDocumento(){
   try{
@@ -913,6 +1053,14 @@ async function descargarDocumento(){
 }
 
 function guardarComprobante(){
+  if(window._signedPdfBytes){
+    const blob=new Blob([window._signedPdfBytes],{type:'application/pdf'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=(DOC_NAME||'documento').replace(/\.[^.]+$/,'')+'-firmado.pdf';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    return;
+  }
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprobante FirmaYa</title>
 <style>body{font-family:Arial,sans-serif;max-width:500px;margin:40px auto;padding:20px;color:#1A2B35}
 h1{color:#0D6278;font-size:20px;margin-bottom:20px}
