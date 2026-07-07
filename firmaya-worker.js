@@ -208,40 +208,102 @@ export default {
           }
         }
 
-        // Notificar al agente
+        // Notificar al equipo London con email mejorado + fotos adjuntas
         if(env.RESEND_API_KEY){
           const docNombreFinal = docNombre || token;
+          const fechaLegible   = new Date(firmadoEn).toLocaleString('es-AR');
+
+          // Badges de verificación
+          const v = (flag) => flag === 'sí'
+            ? '<span style="color:#27AE60;font-weight:700">✅ Sí</span>'
+            : '<span style="color:#aaa">—</span>';
+
+          const emailPayload = {
+            from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+            to:   ['londonserviciosinmobiliarios@gmail.com'],
+            subject: '✅ ' + firmante + ' firmó: ' + docNombreFinal,
+            html: `
+<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#F5F8FA;padding:28px">
+  <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0D6278,#1A7A92);padding:24px 28px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:white">FirmaYa</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.65);letter-spacing:2px;text-transform:uppercase">London Servicios Inmobiliarios</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 16px;text-align:center">
+        <div style="font-size:22px">✅</div>
+        <div style="font-size:10px;color:white;font-weight:700;letter-spacing:1px">FIRMADO</div>
+      </div>
+    </div>
+
+    <div style="padding:28px">
+
+      <!-- Título -->
+      <h2 style="font-size:18px;color:#1A2B35;margin:0 0 4px">${firmante} firmó un documento</h2>
+      <p style="font-size:13px;color:#8A9BAB;margin:0 0 24px">${fechaLegible}</p>
+
+      <!-- Datos principales -->
+      <table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0E8EC;border-radius:8px;overflow:hidden;margin-bottom:20px">
+        <tr><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;width:38%;font-weight:600">Firmante</td><td style="padding:10px 14px;font-weight:700;color:#1A2B35">${firmante}</td></tr>
+        <tr style="background:#F5F8FA"><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">DNI</td><td style="padding:10px 14px;font-weight:700;color:#1A2B35">${dni||'—'}</td></tr>
+        <tr><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Email</td><td style="padding:10px 14px;font-weight:700;color:#1A2B35">${email}</td></tr>
+        <tr style="background:#F5F8FA"><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Documento</td><td style="padding:10px 14px;font-weight:700;color:#1A2B35">${docNombreFinal}</td></tr>
+        <tr><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Fecha y hora</td><td style="padding:10px 14px;font-weight:700;color:#1A2B35">${fechaLegible}</td></tr>
+        <tr style="background:#F5F8FA"><td style="padding:10px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Token</td><td style="padding:10px 14px;font-weight:600;color:#1A2B35;font-size:11px;font-family:monospace">${token}</td></tr>
+      </table>
+
+      <!-- Verificaciones de identidad -->
+      <div style="font-size:11px;font-weight:700;color:#8A9BAB;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">🔐 Verificaciones de identidad</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E0E8EC;border-radius:8px;overflow:hidden;margin-bottom:20px">
+        <tr><td style="padding:9px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;width:55%">Código OTP por email</td><td style="padding:9px 14px">${v(body.otpEmail)}</td></tr>
+        <tr style="background:#F5F8FA"><td style="padding:9px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Prueba de vida</td><td style="padding:9px 14px">${v(body.liveness)}</td></tr>
+        <tr><td style="padding:9px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Selfie</td><td style="padding:9px 14px">${v(body.selfie)}</td></tr>
+        <tr style="background:#F5F8FA"><td style="padding:9px 14px;color:#8A9BAB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Foto del DNI</td><td style="padding:9px 14px">${v(body.dniFoto)}</td></tr>
+      </table>
+
+      ${(body.selfieImg || body.dniFotoImg) ? `
+      <div style="background:#EBF4F7;border-radius:10px;padding:14px 16px;font-size:13px;color:#4A6070;margin-bottom:20px">
+        📎 Las fotos (selfie${body.dniFotoImg ? ' y DNI' : ''}) van adjuntas a este email.
+      </div>` : ''}
+
+      <!-- Footer email -->
+      <p style="font-size:11px;color:#8A9BAB;text-align:center;border-top:1px solid #E0E8EC;padding-top:16px;margin:0">
+        FirmaYa · London Servicios Inmobiliarios · Caseros 992 Of. B PB, Córdoba
+      </p>
+    </div>
+  </div>
+</div>`,
+            attachments: []
+          };
+
+          // Adjuntar selfie si existe
+          if(body.selfieImg){
+            const b64 = body.selfieImg.replace(/^data:image\/\w+;base64,/, '');
+            emailPayload.attachments.push({
+              filename: 'selfie-' + (firmante||'firmante').replace(/\s+/g,'-').toLowerCase() + '.jpg',
+              content:  b64,
+              content_type: 'image/jpeg'
+            });
+          }
+          // Adjuntar foto DNI si existe
+          if(body.dniFotoImg){
+            const b64 = body.dniFotoImg.replace(/^data:image\/\w+;base64,/, '');
+            emailPayload.attachments.push({
+              filename: 'dni-' + (firmante||'firmante').replace(/\s+/g,'-').toLowerCase() + '.jpg',
+              content:  b64,
+              content_type: 'image/jpeg'
+            });
+          }
+
           fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               'Authorization': 'Bearer ' + env.RESEND_API_KEY,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
-              to: ['londonserviciosinmobiliarios@gmail.com'],
-              subject: '✅ Documento firmado: ' + docNombreFinal,
-              html: `
-<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px">
-  <div style="background:white;border-radius:16px;padding:32px">
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:48px">✅</div>
-      <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#0D6278">Documento Firmado</div>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:14px">
-      <tr><td style="padding:8px;color:#8A9BAB;width:40%">Firmante</td><td style="padding:8px;font-weight:600">${firmante}</td></tr>
-      <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">DNI</td><td style="padding:8px;font-weight:600">${dni||'—'}</td></tr>
-      <tr><td style="padding:8px;color:#8A9BAB">Email</td><td style="padding:8px;font-weight:600">${email}</td></tr>
-      <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">Documento</td><td style="padding:8px;font-weight:600">${docNombreFinal}</td></tr>
-      <tr><td style="padding:8px;color:#8A9BAB">Fecha y hora</td><td style="padding:8px;font-weight:600">${new Date(firmadoEn).toLocaleString('es-AR')}</td></tr>
-      <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">Token</td><td style="padding:8px;font-weight:600;font-size:12px">${token}</td></tr>
-    </table>
-    <p style="color:#8A9BAB;font-size:12px;text-align:center;margin-top:20px">
-      Ingresá al panel FirmaYa para ver el documento y el comprobante de firma.
-    </p>
-  </div>
-</div>`
-            })
+            body: JSON.stringify(emailPayload)
           }).catch(()=>{});
         }
 
