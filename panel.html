@@ -1473,7 +1473,12 @@ async function renderPDFPreview(file, signerName){
       container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light)"><p style="font-size:13px">PDF.js no disponible â hacÃ© click en Siguiente</p></div>';
       return;
     }
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    // Fix CSP: crear blob worker que hace importScripts desde CDN (same-origin workaround)
+    if(!window._pdfWorkerBlobUrl){
+      const _wb = new Blob(['importScripts("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js")'],{type:'application/javascript'});
+      window._pdfWorkerBlobUrl = URL.createObjectURL(_wb);
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window._pdfWorkerBlobUrl;
     const pdf = await pdfjsLib.getDocument({data: buf}).promise;
     const page = await pdf.getPage(1);
     const containerW = container.offsetWidth || 400;
