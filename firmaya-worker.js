@@ -1,17 +1,17 @@
-// FirmaYa Worker — Cloudflare Worker
+// FirmaYa Worker â Cloudflare Worker
 // Endpoints:
-//   POST /api/send    → registra doc en KV y envía email al firmante (opcional)
-//   POST /api/upload  → sube archivo del doc a KV para que el cliente lo vea
-//   GET  /api/file    → sirve el archivo del doc desde KV
-//   POST /api/sign    → registra la firma (guarda en KV)
-//   GET  /api/check   → consulta si un token fue firmado
+//   POST /api/send    â registra doc en KV y envÃ­a email al firmante (opcional)
+//   POST /api/upload  â sube archivo del doc a KV para que el cliente lo vea
+//   GET  /api/file    â sirve el archivo del doc desde KV
+//   POST /api/sign    â registra la firma (guarda en KV)
+//   GET  /api/check   â consulta si un token fue firmado
 //
 // KV Binding requerido: FIRMAYA_KV
 // Secret requerido:     RESEND_API_KEY
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
@@ -30,8 +30,8 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
-    // ── POST /api/send ────────────────────────────────────────────────────────
-    // Registra el documento en KV y OPCIONALMENTE envía email
+    // ââ POST /api/send ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    // Registra el documento en KV y OPCIONALMENTE envÃ­a email
     if(url.pathname === '/api/send' && request.method === 'POST'){
       try{
         const body = await request.json();
@@ -58,21 +58,21 @@ export default {
             body: JSON.stringify({
               from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: [emailFirmante],
-              subject: 'Tenés un documento para firmar: ' + docNombre,
+              subject: 'TenÃ©s un documento para firmar: ' + docNombre,
               html: `
 <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px">
   <div style="background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#0D6278">FirmaYa</div>
-      <div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Firma Electrónica Digital</div>
+      <div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Firma ElectrÃ³nica Digital</div>
     </div>
     <h2 style="font-size:20px;color:#1A2B35;margin-bottom:12px">Hola ${firmante},</h2>
     <p style="color:#4A6070;font-size:15px;line-height:1.6;margin-bottom:20px">
-      <strong>London Servicios Inmobiliarios</strong> te envió el documento <strong>"${docNombre}"</strong> para tu firma electrónica.
+      <strong>London Servicios Inmobiliarios</strong> te enviÃ³ el documento <strong>"${docNombre}"</strong> para tu firma electrÃ³nica.
     </p>
     <div style="text-align:center;margin:28px 0">
       <a href="${firmarUrl}" style="background:#0D6278;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
-        ✍️ Firmar documento →
+        âï¸ Firmar documento â
       </a>
     </div>
     <p style="color:#8A9BAB;font-size:12px;text-align:center;margin-top:20px">
@@ -80,7 +80,7 @@ export default {
     </p>
     <hr style="border:none;border-top:1px solid #D0DDE5;margin:20px 0">
     <p style="color:#8A9BAB;font-size:11px;text-align:center">
-      London Servicios Inmobiliarios · Caseros 992 Of. B PB, Córdoba<br>
+      London Servicios Inmobiliarios Â· Caseros 992 Of. B PB, CÃ³rdoba<br>
       Powered by FirmaYa
     </p>
   </div>
@@ -98,7 +98,7 @@ export default {
       }
     }
 
-    // ── POST /api/upload ─────────────────────────────────────────────────────
+    // ââ POST /api/upload âââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Sube el archivo del doc a KV para que el cliente pueda verlo
     if(url.pathname === '/api/upload' && request.method === 'POST'){
       try{
@@ -108,7 +108,7 @@ export default {
         if(!token) return json({ok:false, error:'Token requerido'}, 400);
 
         const buf = await request.arrayBuffer();
-        if(!buf || buf.byteLength === 0) return json({ok:false, error:'Archivo vacío'}, 400);
+        if(!buf || buf.byteLength === 0) return json({ok:false, error:'Archivo vacÃ­o'}, 400);
 
         if(env.FIRMAYA_KV){
           // Guardar bytes del archivo
@@ -126,7 +126,7 @@ export default {
       }
     }
 
-    // ── GET /api/file ─────────────────────────────────────────────────────────
+    // ââ GET /api/file âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Sirve el archivo del doc para que el cliente lo vea antes de firmar
     if(url.pathname === '/api/file'){
       const token = url.searchParams.get('token');
@@ -155,14 +155,14 @@ export default {
       }
     }
 
-    // ── POST /api/sign ───────────────────────────────────────────────────────
+    // ââ POST /api/sign âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     if(url.pathname === '/api/sign' && request.method === 'POST'){
       try{
         const body = await request.json();
         const { token, firmante, email, dni, lat, lng, ip, device, docNombre, sigPos } = body;
         if(!token) return json({ok:false, error:'Token requerido'}, 400);
 
-        // Capturar IP real desde Cloudflare si el cliente no la envió
+        // Capturar IP real desde Cloudflare si el cliente no la enviÃ³
         const clientIp = ip || request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'desconocida';
 
         const firmadoEn = new Date().toISOString();
@@ -195,24 +195,24 @@ export default {
             body: JSON.stringify({
               from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: ['londonserviciosinmobiliarios@gmail.com'],
-              subject: '✅ Documento firmado: ' + docNombreFinal,
+              subject: 'â Documento firmado: ' + docNombreFinal,
               html: `
 <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px">
   <div style="background:white;border-radius:16px;padding:32px">
     <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:48px">✅</div>
+      <div style="font-size:48px">â</div>
       <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#0D6278">Documento Firmado</div>
     </div>
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       <tr><td style="padding:8px;color:#8A9BAB;width:40%">Firmante</td><td style="padding:8px;font-weight:600">${firmante}</td></tr>
-      <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">DNI</td><td style="padding:8px;font-weight:600">${dni||'—'}</td></tr>
+      <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">DNI</td><td style="padding:8px;font-weight:600">${dni||'â'}</td></tr>
       <tr><td style="padding:8px;color:#8A9BAB">Email</td><td style="padding:8px;font-weight:600">${email}</td></tr>
       <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">Documento</td><td style="padding:8px;font-weight:600">${docNombreFinal}</td></tr>
       <tr><td style="padding:8px;color:#8A9BAB">Fecha y hora</td><td style="padding:8px;font-weight:600">${new Date(firmadoEn).toLocaleString('es-AR')}</td></tr>
       <tr style="background:#f5f8fa"><td style="padding:8px;color:#8A9BAB">Token</td><td style="padding:8px;font-weight:600;font-size:12px">${token}</td></tr>
     </table>
     <p style="color:#8A9BAB;font-size:12px;text-align:center;margin-top:20px">
-      Ingresá al panel FirmaYa para ver el documento y el comprobante de firma.
+      IngresÃ¡ al panel FirmaYa para ver el documento y el comprobante de firma.
     </p>
   </div>
 </div>`
@@ -227,7 +227,7 @@ export default {
       }
     }
 
-    // ── GET /api/check ───────────────────────────────────────────────────────
+    // ââ GET /api/check âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     if(url.pathname === '/api/check'){
       const token = url.searchParams.get('token');
       if(!token) return json({ firmado: false, error: 'Token requerido' }, 400);
@@ -252,7 +252,7 @@ export default {
       }
     }
 
-    // ── GET /api/doc ─────────────────────────────────────────────────────────
+    // ââ GET /api/doc âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Devuelve todos los metadatos del doc (incluyendo evidencia de firma)
     if(url.pathname === '/api/doc'){
       const token = url.searchParams.get('token');
@@ -283,7 +283,7 @@ export default {
       }
     }
 
-    // ── POST /api/signed-pdf ──────────────────────────────────────────────────
+    // ââ POST /api/signed-pdf ââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Recibe el PDF firmado y lo envia por email al cliente
     if(url.pathname === '/api/signed-pdf' && request.method === 'POST'){
       try{
@@ -315,7 +315,7 @@ export default {
             from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
             to: [email],
             subject: 'Tu documento firmado: ' + docTitle,
-            html: '<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px"><div style="background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)"><div style="text-align:center;margin-bottom:24px"><div style="font-size:48px">&#x2705;</div><div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#0D6278">FirmaYa</div><div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Firma Electronica Digital</div></div><h2 style="font-size:18px;color:#1A2B35;margin-bottom:12px">Hola ' + firmante + ',</h2><p style="color:#4A6070;font-size:15px;line-height:1.6;margin-bottom:20px">Adjunto encontras el documento <strong>' + docTitle + '</strong> firmado digitalmente via <strong>FirmaYa</strong> de London Servicios Inmobiliarios.</p><p style="color:#4A6070;font-size:14px;line-height:1.6">Este PDF es el comprobante oficial de tu firma electronica. Conservalo para tus registros.</p><hr style="border:none;border-top:1px solid #D0DDE5;margin:24px 0"><p style="color:#8A9BAB;font-size:11px;text-align:center">London Servicios Inmobiliarios · Caseros 992 Of. B PB, Cordoba<br>Powered by FirmaYa · Token: ' + token + '</p></div></div>',
+            html: '<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px"><div style="background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)"><div style="text-align:center;margin-bottom:24px"><div style="font-size:48px">&#x2705;</div><div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#0D6278">FirmaYa</div><div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Firma Electronica Digital</div></div><h2 style="font-size:18px;color:#1A2B35;margin-bottom:12px">Hola ' + firmante + ',</h2><p style="color:#4A6070;font-size:15px;line-height:1.6;margin-bottom:20px">Adjunto encontras el documento <strong>' + docTitle + '</strong> firmado digitalmente via <strong>FirmaYa</strong> de London Servicios Inmobiliarios.</p><p style="color:#4A6070;font-size:14px;line-height:1.6">Este PDF es el comprobante oficial de tu firma electronica. Conservalo para tus registros.</p><hr style="border:none;border-top:1px solid #D0DDE5;margin:24px 0"><p style="color:#8A9BAB;font-size:11px;text-align:center">London Servicios Inmobiliarios Â· Caseros 992 Of. B PB, Cordoba<br>Powered by FirmaYa Â· Token: ' + token + '</p></div></div>',
             attachments: [{ filename: docNombre, content: pdfBase64 }]
           })
         });
@@ -328,7 +328,7 @@ export default {
       }
     }
 
-    // ── GET /api/list ─────────────────────────────────────────────────────────
+    // ââ GET /api/list âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Lista todos los documentos guardados en KV
     if(url.pathname === '/api/list'){
       if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' });
@@ -337,7 +337,7 @@ export default {
         const docs = await Promise.all(
           list.keys.map(k => env.FIRMAYA_KV.get(k.name, 'json'))
         );
-        // Ordenar por fecha de creación (más reciente primero)
+        // Ordenar por fecha de creaciÃ³n (mÃ¡s reciente primero)
         const sorted = docs.filter(Boolean).sort((a, b) => {
           const ta = a.creadoEn ? new Date(a.creadoEn).getTime() : 0;
           const tb = b.creadoEn ? new Date(b.creadoEn).getTime() : 0;
@@ -347,7 +347,7 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    // ── POST /api/acm-save ────────────────────────────────────────────────────
+    // ââ POST /api/acm-save ââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Guarda un ACM en KV (accesible por todos los agentes)
     if(url.pathname === '/api/acm-save' && request.method === 'POST'){
       try{
@@ -365,7 +365,7 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    // ── GET /api/acm-list ─────────────────────────────────────────────────────
+    // ââ GET /api/acm-list âââââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Lista todos los ACMs guardados (de todos los agentes)
     if(url.pathname === '/api/acm-list'){
       if(!env.FIRMAYA_KV) return json({ok:false, error:'KV no configurado'}, 500);
@@ -383,8 +383,8 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    // ── GET /api/acm-load ─────────────────────────────────────────────────────
-    // Carga un ACM específico por slug y agente
+    // ââ GET /api/acm-load âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    // Carga un ACM especÃ­fico por slug y agente
     if(url.pathname === '/api/acm-load'){
       const slug   = url.searchParams.get('slug');
       const agente = url.searchParams.get('agente');
@@ -398,7 +398,7 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    // ── POST /api/acm-delete ──────────────────────────────────────────────────
+    // ââ POST /api/acm-delete ââââââââââââââââââââââââââââââââââââââââââââââââââ
     // Elimina un ACM del KV
     if(url.pathname === '/api/acm-delete' && request.method === 'POST'){
       try{
@@ -412,6 +412,48 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-    return new Response('', { status: 200, headers: CORS });
+
+    // ── GET /api/acms?agent=slug ─────────────────────────────────────────────
+    if(url.pathname === '/api/acms' && request.method === 'GET'){
+      const agent = url.searchParams.get('agent');
+      if(!agent) return json({ error: 'agent requerido' }, 400);
+      if(!env.FIRMAYA_KV) return json({ acms: [] });
+      try {
+        const data = await env.FIRMAYA_KV.get('acms__' + agent, 'json');
+        return json({ acms: data || [] });
+      } catch(e) { return json({ acms: [], error: e.message }); }
+    }
+
+    // ── POST /api/acms ────────────────────────────────────────────────────────
+    if(url.pathname === '/api/acms' && request.method === 'POST'){
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' });
+      try {
+        const body = await request.json();
+        const agent = body.agent; const entry = body.entry;
+        if(!agent || !entry) return json({ ok: false, error: 'faltan datos' }, 400);
+        let list = await env.FIRMAYA_KV.get('acms__' + agent, 'json') || [];
+        list = list.filter(e => e.id !== entry.id);
+        list.unshift(entry);
+        if(list.length > 50) list = list.slice(0, 50);
+        await env.FIRMAYA_KV.put('acms__' + agent, JSON.stringify(list));
+        return json({ ok: true, count: list.length });
+      } catch(e) { return json({ ok: false, error: e.message }, 500); }
+    }
+
+    // ── DELETE /api/acms?agent=slug&id=id ────────────────────────────────────
+    if(url.pathname === '/api/acms' && request.method === 'DELETE'){
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' });
+      try {
+        const agent = url.searchParams.get('agent');
+        const id = parseInt(url.searchParams.get('id'), 10);
+        if(!agent || !id) return json({ ok: false, error: 'faltan datos' }, 400);
+        let list = await env.FIRMAYA_KV.get('acms__' + agent, 'json') || [];
+        list = list.filter(e => e.id !== id);
+        await env.FIRMAYA_KV.put('acms__' + agent, JSON.stringify(list));
+        return json({ ok: true });
+      } catch(e) { return json({ ok: false, error: e.message }, 500); }
+    }
+
+        return new Response('', { status: 200, headers: CORS });
   }
 };
