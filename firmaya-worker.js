@@ -15,6 +15,7 @@
 //   POST /api/registro   → guarda el registro de ventas completo
 //   POST /api/otp/send   → genera y envía código OTP por email al firmante
 //   POST /api/otp/verify → verifica el código OTP ingresado por el firmante
+//   GET  /api/photos     → obtiene selfie + foto DNI guardadas al firmar
 //
 // KV Binding requerido: FIRMAYA_KV
 // Secret requerido:     RESEND_API_KEY
@@ -177,16 +178,34 @@ export default {
         if(env.FIRMAYA_KV){
           const existing = await env.FIRMAYA_KV.get('doc:' + token, 'json');
           const docData = existing || { token, docNombre };
-          docData.estado = 'Firmado';
-          docData.firmante = firmante;
-          docData.email = email;
-          docData.dni = dni;
+          docData.estado    = 'Firmado';
+          docData.firmante  = firmante;
+          docData.email     = email;
+          docData.dni       = dni;
           docData.firmadoEn = firmadoEn;
-          docData.lat = lat;
-          docData.lng = lng;
-          docData.ip = ip;
-          docData.device = device;
+          docData.lat       = lat;
+          docData.lng       = lng;
+          docData.ip        = ip;
+          docData.device    = device;
+          // Flags de verificación (sin los datos de foto — esos van en photos:TOKEN)
+          docData.otpEmail  = body.otpEmail  || 'no';
+          docData.selfie    = body.selfie    || 'no';
+          docData.dniFoto   = body.dniFoto   || 'no';
+          docData.liveness  = body.liveness  || 'no';
+          docData.tieneFotos = (body.selfieImg || body.dniFotoImg) ? 'sí' : 'no';
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify(docData), { expirationTtl: 60 * 60 * 24 * 365 });
+
+          // Guardar fotos en clave separada para no inflar el registro principal
+          if(body.selfieImg || body.dniFotoImg){
+            const photos = {
+              selfie:     body.selfieImg  || null,
+              dniFoto:    body.dniFotoImg || null,
+              firmante,
+              token,
+              guardadoEn: firmadoEn
+            };
+            await env.FIRMAYA_KV.put('photos:' + token, JSON.stringify(photos), { expirationTtl: 60 * 60 * 24 * 365 });
+          }
         }
 
         // Notificar al agente
@@ -363,6 +382,19 @@ export default {
         await env.FIRMAYA_KV.put('registro_ventas', JSON.stringify(limited));
         return json({ ok: true, count: limited.length });
       } catch(e) { return json({ ok: false, error: e.message }, 500); }
+    }
+
+    // ── GET /api/photos?token=xxx ─────────────────────────────────────────────
+    // Devuelve las fotos (selfie + DNI) guardadas al firmar
+    if(url.pathname === '/api/photos' && request.method === 'GET'){
+      const token = url.searchParams.get('token');
+      if(!token) return json({ ok: false, error: 'token requerido' }, 400);
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
+      try{
+        const data = await env.FIRMAYA_KV.get('photos:' + token, 'json');
+        if(!data) return json({ ok: false, error: 'Fotos no encontradas para este token' }, 404);
+        return json({ ok: true, selfie: data.selfie, dniFoto: data.dniFoto, firmante: data.firmante, guardadoEn: data.guardadoEn });
+      }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
     // ── POST /api/otp/send ─────────────────────────────────────────────────────
