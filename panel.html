@@ -1213,7 +1213,7 @@ function showDashboard(){
   loadDocsFromAPI(); // Cargar documentos reales desde el servidor
 }
 
-async async function loadDocsFromAPI(){
+async function loadDocsFromAPI(){
   try{
     const resp = await fetch(WORKER + '/api/list');
     if(resp.ok){
