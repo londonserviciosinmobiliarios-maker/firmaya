@@ -56,7 +56,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: [emailFirmante],
               subject: 'Tenés un documento para firmar: ' + docNombre,
               html: `
@@ -193,7 +193,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: ['londonserviciosinmobiliarios@gmail.com'],
               subject: '✅ Documento firmado: ' + docNombreFinal,
               html: `
@@ -312,7 +312,7 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+            from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
             to: [email],
             subject: 'Tu documento firmado: ' + docTitle,
             html: '<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px"><div style="background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)"><div style="text-align:center;margin-bottom:24px"><div style="font-size:48px">&#x2705;</div><div style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#0D6278">FirmaYa</div><div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Firma Electronica Digital</div></div><h2 style="font-size:18px;color:#1A2B35;margin-bottom:12px">Hola ' + firmante + ',</h2><p style="color:#4A6070;font-size:15px;line-height:1.6;margin-bottom:20px">Adjunto encontras el documento <strong>' + docTitle + '</strong> firmado digitalmente via <strong>FirmaYa</strong> de London Servicios Inmobiliarios.</p><p style="color:#4A6070;font-size:14px;line-height:1.6">Este PDF es el comprobante oficial de tu firma electronica. Conservalo para tus registros.</p><hr style="border:none;border-top:1px solid #D0DDE5;margin:24px 0"><p style="color:#8A9BAB;font-size:11px;text-align:center">London Servicios Inmobiliarios · Caseros 992 Of. B PB, Cordoba<br>Powered by FirmaYa · Token: ' + token + '</p></div></div>',
