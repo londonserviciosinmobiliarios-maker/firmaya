@@ -823,7 +823,12 @@ async function loadDocumentPreview(token){
 
     if(mime.includes('pdf')){
       // Renderizar PDF con PDF.js
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      // Fix CSP: blob worker para bypass same-origin restriction
+      if(!window._pdfWorkerBlobUrl){
+        const _wb = new Blob(['importScripts("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js")'],{type:'application/javascript'});
+        window._pdfWorkerBlobUrl = URL.createObjectURL(_wb);
+      }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = window._pdfWorkerBlobUrl;
       const pdf = await pdfjsLib.getDocument({data: buf}).promise;
       content.style.display = 'block';
       content.style.background = '#555';
