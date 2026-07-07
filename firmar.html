@@ -439,7 +439,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 <div id="page4" style="display:none">
   <div class="success-wrap">
     <div class="success-icon">â</div>
-    <div class="success-title">Â¡Firmaste exitosamente!</div>
+    <div class="success-title">¡Firmaste exitosamente!</div>
     <div class="success-subtitle">Tu firma fue registrada y el documento<br>quedó firmado electrónicamente.</div>
 
     <div class="cert-card">
@@ -464,7 +464,7 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
     
 
     <div style="margin-top:20px;font-size:12px;color:var(--text-light);text-align:center">
-      Powered by <strong>FirmaYa</strong> Â· London Servicios Inmobiliarios
+      Powered by <strong>FirmaYa</strong> · London Servicios Inmobiliarios
     </div>
   </div>
 </div>
@@ -856,6 +856,8 @@ async function confirmarFirma(){
         firmante: window._nombre,
         email:    window._email,
         dni:      window._dni,
+        lat:      window._gpsLat,
+        lng:      window._gpsLng,
         device:   navigator.userAgent.substring(0,100)
       })
     });
