@@ -862,7 +862,28 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
 <script>
 // ---- DOCS DATA ----
-const docs = [];
+const DOCS_KEY = 'london_docs_v4';
+let docs = [];
+try { const _s = localStorage.getItem(DOCS_KEY); if(_s) docs = JSON.parse(_s); } catch(e){ docs = []; }
+
+function saveDocs(){
+  try { localStorage.setItem(DOCS_KEY, JSON.stringify(docs)); } catch(e){}
+}
+
+function renderStats(){
+  const total = docs.length;
+  const firmados = docs.filter(d=>d.estado==='Firmado').length;
+  const pendientes = docs.filter(d=>d.estado==='Pendiente').length;
+  const set = (id,v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('statTotal', total);
+  set('statFirmados', firmados);
+  set('statPendientes', pendientes);
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = total + ' documento' + (total===1?'':'s');
+  const pc = document.getElementById('planCounter');
+  if(pc) pc.textContent = 'Plan Pro · ' + total + '/50 docs';
+}
+
 let _sigPos = null; // posición de firma: { page, xPct, yPct }
 
 function statusBadge(s){
@@ -1187,43 +1208,65 @@ function showDashboard(){
   document.getElementById('appScreen').style.display='block';
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  loadDocsFromAPI(); // Cargar documentos reales desde el servidor
+  renderStats();
+  loadDocsFromAPI();
 }
 
 async function loadDocsFromAPI(){
   try{
     const resp = await fetch(WORKER + '/api/list');
-    if(!resp.ok) return;
-    const data = await resp.json();
-    if(!data.ok || !Array.isArray(data.docs)) return;
-    docs.length = 0;
-    data.docs.forEach(d => {
-      const creadoEn = d.creadoEn ? new Date(d.creadoEn) : new Date();
-      const fecha = creadoEn.getDate().toString().padStart(2,'0') + '/' +
-                   (creadoEn.getMonth()+1).toString().padStart(2,'0') + '/' +
-                   creadoEn.getFullYear();
-      docs.push({
-        id: d.token,
-        nombre: (d.docNombre || d.fileNombre || d.nombre || 'Documento').toUpperCase(),
-        firmante: d.firmante || '—',
-        email: d.email || d.emailFirmante || '—',
-        token: d.token,
-        enviado: fecha,
-        estado: d.estado || 'Pendiente'
-      });
-    });
+    if(resp.ok){
+      const data = await resp.json();
+      if(data.ok && Array.isArray(data.docs) && data.docs.length > 0){
+        docs.length = 0;
+        data.docs.forEach(d => {
+          const creadoEn = d.creadoEn ? new Date(d.creadoEn) : new Date();
+          const fecha = creadoEn.getDate().toString().padStart(2,'0') + '/' +
+                       (creadoEn.getMonth()+1).toString().padStart(2,'0') + '/' +
+                       creadoEn.getFullYear();
+          docs.push({
+            id: d.token,
+            nombre: (d.docNombre || d.fileNombre || d.nombre || 'Documento').toUpperCase(),
+            firmante: d.firmante || '—',
+            email: d.email || d.emailFirmante || '—',
+            token: d.token,
+            enviado: fecha,
+            estado: d.estado || 'Pendiente'
+          });
+        });
+        saveDocs();
+        renderDocs(docs.slice(0,5), 'docsBody');
+        renderDocs(docs, 'docsBody2');
+        renderStats();
+        return;
+      }
+    }
+  }catch(e){ console.warn('API /api/list no disponible:', e.message); }
+  syncPendientes();
+}
+
+async function syncPendientes(){
+  const pendientes = docs.filter(d => d.estado === 'Pendiente' && d.token);
+  if(!pendientes.length) return;
+  let huboActualizacion = false;
+  for(const doc of pendientes){
+    try{
+      const r = await fetch(WORKER + '/api/check?token=' + encodeURIComponent(doc.token));
+      if(!r.ok) continue;
+      const data = await r.json();
+      if(data.firmado){
+        doc.estado = 'Firmado';
+        if(data.firmadoEn) doc.firmadoEn = data.firmadoEn;
+        huboActualizacion = true;
+      }
+    }catch(e){}
+  }
+  if(huboActualizacion){
+    saveDocs();
     renderDocs(docs.slice(0,5), 'docsBody');
     renderDocs(docs, 'docsBody2');
-    const cnt = document.getElementById('docsCount');
-    if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
-    // Métricas del dashboard
-    const firmados = docs.filter(d=>d.estado==='Firmado').length;
-    const pendientes = docs.filter(d=>d.estado==='Pendiente').length;
-    ['statTotal','statFirmados','statPendientes'].forEach((id,i)=>{
-      const el = document.getElementById(id);
-      if(el) el.textContent = [docs.length, firmados, pendientes][i];
-    });
-  }catch(e){ console.warn('Error cargando docs desde API:', e.message); }
+    renderStats();
+  }
 }
 
 function logout(){
@@ -1359,7 +1402,7 @@ async function sendDoc(method){
     }catch(e){ console.warn('Error subiendo archivo:', e.message); }
   }
 
-  // 3. Agregar al array local
+  // 3. Agregar al array local y guardar
   docs.unshift({
     id: token,
     nombre: docNombre.toUpperCase(),
@@ -1369,18 +1412,10 @@ async function sendDoc(method){
     enviado: fecha,
     estado: 'Pendiente'
   });
+  saveDocs();
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  const cnt = document.getElementById('docsCount');
-  if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
-
-  document.getElementById('sendForm').style.display='none';
-  document.getElementById('sentSuccess').style.display='block';
-  document.getElementById('sentMsg').textContent = msgs[method];
-  document.getElementById('flowFooter4').style.display='none';
-  const sentLinkEl = document.getElementById('sentLink');
-  if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
-  try{ navigator.clipboard.writeText((document.getElementById('sentMsg').innerText||'').trim() + '\n' + firmarUrl); } catch(e){}
+  renderStats(); catch(e){}
 }
 
 // ---- COPIAR WHATSAPP ----
