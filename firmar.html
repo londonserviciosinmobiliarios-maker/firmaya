@@ -1089,7 +1089,9 @@ async function confirmarFirma(){
         otpEmail:   otpVerified       ? 'sí' : 'no',
         selfie:     selfieData        ? 'sí' : 'no',
         dniFoto:    dniData           ? 'sí' : 'no',
-        liveness:   livenessConfirmed ? 'sí' : 'no'
+        liveness:   livenessConfirmed ? 'sí' : 'no',
+        selfieImg:  selfieData  || null,
+        dniFotoImg: dniData     || null
       })
     });
   } catch(e){ /* silencioso — no bloquear la firma */ }
