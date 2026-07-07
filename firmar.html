@@ -1402,3 +1402,15 @@ window.addEventListener('resize', ()=>{
 </script>
 </body>
 </html>
+================ RESIZE CANVAS ====================
+window.addEventListener('resize', ()=>{
+  if(!canvas) return;
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const wrap = document.getElementById('canvasWrap');
+  canvas.width = wrap.offsetWidth || 480;
+  ctx.putImageData(data,0,0);
+  ctx.strokeStyle='#0A4E62'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+});
+</script>
+</body>
+</html>
