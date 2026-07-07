@@ -1,18 +1,20 @@
 // FirmaYa Worker — Cloudflare Worker
 // Endpoints:
-//   POST /api/send    → registra doc en KV y envía email al firmante (opcional)
-//   POST /api/upload  → sube archivo del doc a KV para que el cliente lo vea
-//   GET  /api/file    → sirve el archivo del doc desde KV
-//   POST /api/sign    → registra la firma (guarda en KV)
-//   GET  /api/check   → consulta si un token fue firmado
-//   GET  /api/acms     → obtiene lista de ACMs guardados por agente
-//   POST /api/acms     → guarda un ACM en la nube
-//   DELETE /api/acms   → elimina un ACM por id
-//   GET  /api/borrador → obtiene el borrador guardado por agente
-//   POST /api/borrador → guarda el borrador del agente
+//   POST /api/send       → registra doc en KV y envía email al firmante (opcional)
+//   POST /api/upload     → sube archivo del doc a KV para que el cliente lo vea
+//   GET  /api/file       → sirve el archivo del doc desde KV
+//   POST /api/sign       → registra la firma (guarda en KV)
+//   GET  /api/check      → consulta si un token fue firmado
+//   GET  /api/acms       → obtiene lista de ACMs guardados por agente
+//   POST /api/acms       → guarda un ACM en la nube
+//   DELETE /api/acms     → elimina un ACM por id
+//   GET  /api/borrador   → obtiene el borrador guardado por agente
+//   POST /api/borrador   → guarda el borrador del agente
 //   DELETE /api/borrador → elimina el borrador del agente
-//   GET  /api/registro → obtiene el registro de ventas del equipo
-//   POST /api/registro → guarda el registro de ventas completo
+//   GET  /api/registro   → obtiene el registro de ventas del equipo
+//   POST /api/registro   → guarda el registro de ventas completo
+//   POST /api/otp/send   → genera y envía código OTP por email al firmante
+//   POST /api/otp/verify → verifica el código OTP ingresado por el firmante
 //
 // KV Binding requerido: FIRMAYA_KV
 // Secret requerido:     RESEND_API_KEY
@@ -361,6 +363,93 @@ export default {
         await env.FIRMAYA_KV.put('registro_ventas', JSON.stringify(limited));
         return json({ ok: true, count: limited.length });
       } catch(e) { return json({ ok: false, error: e.message }, 500); }
+    }
+
+    // ── POST /api/otp/send ─────────────────────────────────────────────────────
+    // body: { token, email, nombre }
+    // Genera código OTP de 6 dígitos, lo guarda en KV (10 min), lo envía por email
+    if(url.pathname === '/api/otp/send' && request.method === 'POST'){
+      try{
+        const body = await request.json();
+        const { token, email, nombre } = body;
+        if(!token || !email) return json({ ok: false, error: 'token y email requeridos' }, 400);
+
+        // Generar código de 6 dígitos
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Guardar en KV con TTL de 10 minutos
+        if(env.FIRMAYA_KV){
+          await env.FIRMAYA_KV.put('otp__' + token + '__' + email.toLowerCase(), otp, { expirationTtl: 600 });
+        }
+
+        // Enviar por email con Resend
+        if(env.RESEND_API_KEY){
+          const r = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + env.RESEND_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+              to: [email],
+              subject: 'Tu código de verificación es: ' + otp,
+              html: `
+<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f5f8fa;padding:32px">
+  <div style="background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#0D6278">FirmaYa</div>
+      <div style="font-size:11px;letter-spacing:2px;color:#8A9BAB;text-transform:uppercase">Verificación de identidad</div>
+    </div>
+    <h2 style="font-size:18px;color:#1A2B35;margin-bottom:12px">Hola ${nombre || 'firmante'},</h2>
+    <p style="color:#4A6070;font-size:14px;line-height:1.6;margin-bottom:24px">
+      Recibiste este código porque estás firmando un documento con <strong>London Servicios Inmobiliarios</strong>.
+      Ingresalo en la página de firma para verificar tu identidad.
+    </p>
+    <div style="text-align:center;margin:28px 0">
+      <div style="display:inline-block;background:#EBF4F7;border:2px solid #0D6278;border-radius:16px;padding:20px 48px">
+        <div style="font-size:40px;font-weight:700;letter-spacing:10px;color:#0D6278;font-family:monospace">${otp}</div>
+      </div>
+    </div>
+    <p style="color:#8A9BAB;font-size:12px;text-align:center;margin-top:16px">
+      ⏱️ Este código expira en 10 minutos.<br>
+      Si no solicitaste este código, ignorá este email.
+    </p>
+    <hr style="border:none;border-top:1px solid #D0DDE5;margin:20px 0">
+    <p style="color:#8A9BAB;font-size:11px;text-align:center">
+      London Servicios Inmobiliarios · Caseros 992 Of. B PB, Córdoba<br>
+      Powered by FirmaYa
+    </p>
+  </div>
+</div>`
+            })
+          });
+          if(!r.ok){ return json({ ok: false, error: 'Error al enviar email de verificación' }, 500); }
+        }
+
+        return json({ ok: true });
+      }catch(e){ return json({ ok: false, error: e.message }, 500); }
+    }
+
+    // ── POST /api/otp/verify ──────────────────────────────────────────────────
+    // body: { token, email, code }
+    // Verifica el código OTP; si es correcto lo elimina (uso único)
+    if(url.pathname === '/api/otp/verify' && request.method === 'POST'){
+      try{
+        const body = await request.json();
+        const { token, email, code } = body;
+        if(!token || !email || !code) return json({ ok: false, error: 'faltan datos' }, 400);
+        if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
+
+        const stored = await env.FIRMAYA_KV.get('otp__' + token + '__' + email.toLowerCase());
+        if(!stored) return json({ ok: false, error: 'Código expirado. Solicitá uno nuevo.' });
+        if(stored !== code.toString().trim()) return json({ ok: false, error: 'Código incorrecto. Revisá e intentá de nuevo.' });
+
+        // Eliminar OTP luego de verificación exitosa (uso único)
+        await env.FIRMAYA_KV.delete('otp__' + token + '__' + email.toLowerCase());
+
+        return json({ ok: true });
+      }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
         return new Response('', { status: 200, headers: CORS });
