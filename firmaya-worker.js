@@ -11,6 +11,8 @@
 //   GET  /api/borrador → obtiene el borrador guardado por agente
 //   POST /api/borrador → guarda el borrador del agente
 //   DELETE /api/borrador → elimina el borrador del agente
+//   GET  /api/registro → obtiene el registro de ventas del equipo
+//   POST /api/registro → guarda el registro de ventas completo
 //
 // KV Binding requerido: FIRMAYA_KV
 // Secret requerido:     RESEND_API_KEY
@@ -335,6 +337,29 @@ export default {
         if(!agent) return json({ ok: false, error: 'agent requerido' }, 400);
         await env.FIRMAYA_KV.delete('borrador__' + agent);
         return json({ ok: true });
+      } catch(e) { return json({ ok: false, error: e.message }, 500); }
+    }
+
+    // ── GET /api/registro ─────────────────────────────────────────────────────
+    if(url.pathname === '/api/registro' && request.method === 'GET'){
+      if(!env.FIRMAYA_KV) return json({ registro: [] });
+      try {
+        const data = await env.FIRMAYA_KV.get('registro_ventas', 'json');
+        return json({ registro: data || [] });
+      } catch(e) { return json({ registro: [], error: e.message }); }
+    }
+
+    // ── POST /api/registro ────────────────────────────────────────────────────
+    if(url.pathname === '/api/registro' && request.method === 'POST'){
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' });
+      try {
+        const body = await request.json();
+        const arr  = body.registro;
+        if(!Array.isArray(arr)) return json({ ok: false, error: 'registro debe ser array' }, 400);
+        // Limitar a 500 registros para no crecer infinito
+        const limited = arr.slice(0, 500);
+        await env.FIRMAYA_KV.put('registro_ventas', JSON.stringify(limited));
+        return json({ ok: true, count: limited.length });
       } catch(e) { return json({ ok: false, error: e.message }, 500); }
     }
 
