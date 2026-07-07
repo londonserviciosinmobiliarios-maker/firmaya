@@ -406,9 +406,9 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
     </div>
   </div>
 
-  <!-- Selfie (opcional) -->
+  <!-- Selfie (obligatoria) -->
   <div class="card">
-    <div class="card-title">🤳 Foto de identidad <span class="optional-label">Opcional</span></div>
+    <div class="card-title">🤳 Foto de identidad <span style="color:#e74c3c;font-weight:600;font-size:0.82em"> · Obligatoria</span></div>
     <div class="card-subtitle" style="margin-bottom:14px">Tomá una selfie para reforzar la validez legal de la firma.</div>
 
     <div id="selfieArea">
@@ -457,9 +457,6 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
       ⚖️ Esta firma electrónica tiene validez legal bajo la <strong>Ley 25.506</strong> de Firma Digital de la República Argentina. Se registró la identidad del firmante, fecha, hora, dirección IP y firma biométrica.
     </div>
 
-    <button class="save-btn" onclick="descargarDocumento()" type="button" style="background:#0A4E62;margin-bottom:10px">
-      📄 Descargar documento
-    </button>
 
     
 
@@ -815,6 +812,10 @@ function cancelSelfie(){
 
 // ==================== CONFIRMAR FIRMA ====================
 async function confirmarFirma(){
+  if(!selfieData){
+    alert('La foto de identidad es obligatoria. Por favor sacate una selfie antes de firmar.');
+    return;
+  }
   if(!hasSig){
     alert('Por favor dibujá tu firma antes de continuar.');
     return;
