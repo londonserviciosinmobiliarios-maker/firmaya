@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FirmaYa — Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -377,7 +375,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
       </div>
       <div class="form-group">
         <label class="form-label">Contraseña</label>
-        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña" name="password" autocomplete="current-password">
+        <input class="form-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="new-password">
       </div>
       <div id="loginError" style="display:none;background:#FDEDEC;color:#922B21;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px">Usuario o contraseña incorrectos.</div>
       <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;margin-top:8px" onclick="doLogin()">
@@ -395,7 +393,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo" style="cursor:pointer" onclick="goHome()" title="Volver al inicio">
+      <div class="sidebar-logo">
         FirmaYa
         <span>Panel de gestión</span>
       </div>
@@ -461,22 +459,22 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
           <div class="stats-row">
             <div class="stat-card">
-              <div class="stat-num" id="statTotal">0</div>
+              <div class="stat-num">26</div>
               <div class="stat-lbl">Total enviados</div>
               <div class="stat-icon">📤</div>
             </div>
             <div class="stat-card green">
-              <div class="stat-num" id="statFirmados">0</div>
+              <div class="stat-num">25</div>
               <div class="stat-lbl">Firmados</div>
               <div class="stat-icon">✅</div>
             </div>
             <div class="stat-card orange">
-              <div class="stat-num" id="statPendientes">0</div>
+              <div class="stat-num">1</div>
               <div class="stat-lbl">Pendientes</div>
               <div class="stat-icon">⏳</div>
             </div>
             <div class="stat-card red">
-              <div class="stat-num" id="statRechazados">0</div>
+              <div class="stat-num">0</div>
               <div class="stat-lbl">Rechazados</div>
               <div class="stat-icon">❌</div>
             </div>
@@ -629,12 +627,6 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <div class="check-item checked" onclick="toggleCheck(this)">
                     <input type="checkbox" checked> Código por e-mail
                   </div>
-                  <div class="check-item" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Código por SMS
-                  </div>
-                  <div class="check-item" onclick="toggleCheck(this)">
-                    <input type="checkbox"> Código por WhatsApp
-                  </div>
                 </div>
 
                 <div class="section-label">🟣 Autenticación Avanzada</div>
@@ -663,17 +655,19 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
             <!-- Step 3: Position signature -->
             <div class="flow-body" id="flowStep3" style="display:none">
-              <p style="font-size:13px;color:var(--text-medium);margin-bottom:10px">Hacé <strong>click en el documento</strong> donde querés que aparezca la firma del cliente en el PDF final.</p>
-              <div id="pdfPreviewContainer" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:480px;overflow-y:auto;margin-bottom:10px;background:var(--bg)">
-                <div style="text-align:center;padding:32px 0;color:var(--text-light)">
-                  <div style="font-size:40px;margin-bottom:8px">📄</div>
-                  <p style="font-size:13px">Cargando vista previa…</p>
+              <p style="font-size:13px;color:var(--text-medium);margin-bottom:16px">Marcá dónde va la firma en el documento. Podés moverla arrastrándola.</p>
+              <div class="doc-preview">
+                <strong id="previewDocName" style="display:block;text-align:center;font-size:13px;color:var(--text-dark);margin-bottom:12px">📄 Documento cargado</strong>
+                <div style="text-align:center;padding:28px 0 20px;color:var(--text-light)">
+                  <div style="font-size:48px;margin-bottom:10px">📄</div>
+                  <p style="font-size:13px;line-height:1.6">El documento fue cargado correctamente.<br>Arrastrá el bloque de firma a la posición donde debe ir la rúbrica.</p>
+                </div>
+                <div class="sig-placeholder" id="sigPlaceholder" draggable="true">
+                  <span id="sigPlaceholderName">✍️ Firma del firmante</span>
+                  <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
                 </div>
               </div>
-              <div id="sigPosInfo" style="display:none;font-size:12px;color:var(--success);text-align:center;padding:6px;background:var(--success-pale,#d5f5e3);border-radius:8px;margin-bottom:4px">
-                ✅ Posición de firma marcada — podés hacer click en otro lugar para cambiarla
-              </div>
-              <p style="font-size:11px;color:var(--text-light);text-align:center">💡 Si no marcás posición, la firma se agrega como página de certificado al final del PDF</p>
+              <p style="font-size:11px;color:var(--text-light);margin-top:10px;text-align:center">💡 Podés agregar más campos de firma haciendo clic en el documento</p>
             </div>
             <div class="flow-footer" id="flowFooter3" style="display:none">
               <button class="btn btn-ghost" onclick="flowGo(2)">← Atrás</button>
@@ -717,7 +711,6 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                     <div style="font-size:11px;color:var(--text-light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Link de firma (para compartir)</div>
                     <div id="sentLink" style="font-size:13px;font-weight:600;color:var(--primary);word-break:break-all">—</div>
                   </div>
-                  <button class="btn btn-secondary btn-lg" style="margin-bottom:12px;width:100%" onclick="_copyWALink(this)">Copiar para WhatsApp</button>
                   <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Ir al dashboard →</button>
                 </div>
               </div>
@@ -808,29 +801,29 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <div class="evidence-value" id="detailEmailEvid">— ✓</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">📅</div>
-                  <div class="evidence-label">Firmado el</div>
-                  <div class="evidence-value" id="detailFirmadoEn">—</div>
+                  <div class="evidence-icon">🤳</div>
+                  <div class="evidence-label">Selfie</div>
+                  <div class="evidence-value">Capturada 20:46:27 ✓</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🌍</div>
                   <div class="evidence-label">Ubicación GPS</div>
-                  <div class="evidence-value" id="detailGps">—</div>
+                  <div class="evidence-value">-35.666012, -63.747082</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🖥</div>
                   <div class="evidence-label">IP</div>
-                  <div class="evidence-value" id="detailIp">—</div>
+                  <div class="evidence-value">190.105.160.18</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">📱</div>
                   <div class="evidence-label">Dispositivo</div>
-                  <div class="evidence-value" id="detailDevice">—</div>
+                  <div class="evidence-value">Android · Chrome 149</div>
                 </div>
                 <div class="evidence-item">
-                  <div class="evidence-icon">🆔</div>
-                  <div class="evidence-label">DNI</div>
-                  <div class="evidence-value" id="detailDni">—</div>
+                  <div class="evidence-icon">🔐</div>
+                  <div class="evidence-label">Hash SHA-256</div>
+                  <div class="evidence-value">2105b99a9e...</div>
                 </div>
               </div>
             </div>
@@ -862,30 +855,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
 <script>
 // ---- DOCS DATA ----
-const DOCS_KEY = 'london_docs_v4';
-let docs = [];
-try { const _s = localStorage.getItem(DOCS_KEY); if(_s) docs = JSON.parse(_s); } catch(e){ docs = []; }
-
-function saveDocs(){
-  try { localStorage.setItem(DOCS_KEY, JSON.stringify(docs)); } catch(e){}
-}
-
-function renderStats(){
-  const total = docs.length;
-  const firmados = docs.filter(d=>d.estado==='Firmado').length;
-  const pendientes = docs.filter(d=>d.estado==='Pendiente').length;
-  const rechazados = docs.filter(d=>d.estado==='Rechazado').length;
-  const set = (id,v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  set('statTotal', total);
-  set('statFirmados', firmados);
-  set('statPendientes', pendientes);
-  set('statRechazados', rechazados);
-  const cnt = document.getElementById('docsCount');
-  if(cnt) cnt.textContent = total + ' documento' + (total===1?'':'s');
-  const pc = document.getElementById('planCounter');
-  if(pc) pc.textContent = 'Plan Pro · ' + total + '/50 docs';
-}
-let _sigPos = null; // posición de firma: { page, xPct, yPct }
+const docs = [];
 
 function statusBadge(s){
   if(s==='Firmado') return '<span class="badge badge-success">FIRMADO</span>';
@@ -900,18 +870,18 @@ function renderDocs(data, bodyId){
     body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-light)">No hay documentos</td></tr>';
     return;
   }
-  body.innerHTML = data.map((d,idx)=>`
+  body.innerHTML = data.map(d=>`
     <tr>
-      <td><input type="checkbox" class="doc-check" data-id="${d.token||d.id}"></td>
-      <td style="font-weight:600;color:var(--text-light)">${idx+1}</td>
+      <td><input type="checkbox" class="doc-check" data-id="${d.id}"></td>
+      <td style="font-weight:600;color:var(--text-light)">#${d.id}</td>
       <td class="td-name"><span class="doc-icon">📄</span>${d.nombre}</td>
       <td>${d.firmante}</td>
       <td>${d.enviado}</td>
       <td>${statusBadge(d.estado)}</td>
       <td>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.token==='${d.token}'))">Ver</button>
-          <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.token==='${d.token}'));setTimeout(descargarFirmado,300)">⬇</button>
+          <button class="btn btn-ghost btn-sm" onclick="showDetail(docs.find(x=>x.id===${d.id}))">Ver</button>
+          <button class="btn btn-ghost btn-sm">⬇</button>
         </div>
       </td>
     </tr>
@@ -922,21 +892,17 @@ function toggleAllDocs(cb, bodyId){
   document.querySelectorAll('#'+bodyId+' .doc-check').forEach(c => c.checked = cb.checked);
 }
 
-function deleteSelected(){
-  const boxes = document.querySelectorAll('.doc-check:checked');
-  if(!boxes.length){ alert('Selecciona al menos un documento para eliminar.'); return; }
-  if(!confirm('\u00BFEliminar '+boxes.length+' documento(s)?')) return;
-  const tokens = Array.from(boxes).map(b => b.dataset.token).filter(Boolean);
-  Promise.all(tokens.map(t =>
-    fetch('https://api.londonserviciosinmobiliarios.com.ar/api/delete?token='+encodeURIComponent(t),{method:'POST'}).catch(()=>{})
-  )).then(() => {
-    docs = docs.filter(d => !tokens.includes(d.token));
-    saveDocs();
-    renderDocs(docs.slice(0,5), 'docsBody');
-    renderDocs(docs, 'docsBody2');
-    renderStats();
-  });
+function deleteSelected(bodyId){
+  const checked = [...document.querySelectorAll('#'+bodyId+' .doc-check:checked')].map(c => parseInt(c.dataset.id));
+  if(!checked.length){ alert('Seleccioná al menos un documento para borrar.'); return; }
+  if(!confirm('¿Borrar '+checked.length+' documento(s) seleccionado(s)?')) return;
+  checked.forEach(id => { const idx = docs.findIndex(d=>d.id===id); if(idx>-1) docs.splice(idx,1); });
+  renderDocs(docs.slice(0,5), 'docsBody');
+  renderDocs(docs, 'docsBody2');
+  const cnt = document.getElementById('docsCount');
+  if(cnt) cnt.textContent = docs.length + ' documentos';
 }
+
 function filterDocs(el, estado){
   document.querySelectorAll('.tag-filter').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -958,14 +924,11 @@ function showView(name){
   closeSidebarOnMobile();
 }
 
-const WORKER = 'https://api.londonserviciosinmobiliarios.com.ar';
 let currentDoc = null;
-let currentDocMeta = null; // datos completos desde /api/doc
 
 function showDetail(doc){
   if(doc){
     currentDoc = doc;
-    currentDocMeta = null;
     const g = id => document.getElementById(id);
     const firmado = doc.estado === 'Firmado';
     if(g('detailDocName')) g('detailDocName').textContent = '📄 ' + doc.nombre;
@@ -981,31 +944,6 @@ function showDetail(doc){
     if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
     if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
     if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
-    // Limpiar evidencia mientras carga
-    ['detailFirmadoEn','detailGps','detailIp','detailDevice','detailDni'].forEach(id=>{ if(g(id)) g(id).textContent='—'; });
-    // Cargar evidencia real desde API
-    if(doc.token && firmado){
-      fetch(WORKER + '/api/doc?token=' + encodeURIComponent(doc.token))
-        .then(r=>r.json())
-        .then(meta=>{
-          if(!meta.ok) return;
-          currentDocMeta = meta;
-          if(g('detailFirmadoEn')) g('detailFirmadoEn').textContent = meta.firmadoEn ? new Date(meta.firmadoEn).toLocaleString('es-AR') : '—';
-          if(g('detailGps')) g('detailGps').textContent = (meta.lat && meta.lng) ? meta.lat.toFixed(6)+', '+meta.lng.toFixed(6) : '—';
-          if(g('detailIp')) g('detailIp').textContent = meta.ip || '—';
-          if(g('detailDevice')){
-            const ua = meta.device || '—';
-            // resumir user agent
-            let disp = ua;
-            if(ua.includes('Android')) disp = 'Android · ' + (ua.match(/Chrome\/(\d+)/)?.[0] || 'Chrome');
-            else if(ua.includes('iPhone')||ua.includes('iPad')) disp = 'iOS · ' + (ua.match(/Version\/[\d.]+/)?.[0]||'Safari');
-            else if(ua.includes('Windows')) disp = 'Windows · ' + (ua.match(/Chrome\/(\d+)/)?.[0] || ua.match(/Firefox\/(\d+)/)?.[0] || 'Browser');
-            g('detailDevice').textContent = disp;
-          }
-          if(g('detailDni')) g('detailDni').textContent = meta.dni || '—';
-        })
-        .catch(()=>{});
-    }
   }
   showView('detalle');
 }
@@ -1015,164 +953,24 @@ async function descargarFirmado(){
     alert('No hay token de documento disponible.');
     return;
   }
-  const btn = document.querySelector('[onclick="descargarFirmado()"]');
-  const origText = btn ? btn.textContent : '';
-  if(btn){ btn.disabled=true; btn.textContent='⏳ Generando...'; }
-
   try{
-    // 1. Obtener archivo original y metadatos de firma en paralelo
-    const [fileResp, metaResp] = await Promise.all([
-      fetch(WORKER + '/api/file?token=' + encodeURIComponent(currentDoc.token)),
-      fetch(WORKER + '/api/doc?token='  + encodeURIComponent(currentDoc.token))
-    ]);
-
-    if(!fileResp.ok){ alert('No se encontró el archivo. Puede que el documento no haya sido firmado aún.'); return; }
-    const buf = await fileResp.arrayBuffer();
-    const meta = metaResp.ok ? await metaResp.json() : {};
-
-    // 2. Detectar MIME por magic bytes
-    let mime = fileResp.headers.get('content-type') || '';
+    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(currentDoc.token));
+    if(!r.ok){ alert('No se encontró el archivo firmado. El documento aún puede no haber sido firmado o el archivo fue eliminado.'); return; }
+    const buf = await r.arrayBuffer();
+    let mime = r.headers.get('content-type') || '';
     if(!mime || mime.includes('octet-stream')){
       const p = new Uint8Array(buf, 0, 8);
       if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
       else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
-
-    const nombre = (currentDoc.nombre || meta.nombre || 'documento').replace(/\.[^.]+$/,'');
-
-    // 3. Si es PDF, agregar página de certificado con pdf-lib
-    if(mime.includes('pdf') && typeof PDFLib !== 'undefined'){
-      try{
-        const { PDFDocument, rgb, StandardFonts, degrees } = PDFLib;
-
-        // Calcular SHA-256 del archivo original
-        const hashBuf = await crypto.subtle.digest('SHA-256', buf);
-        const hashHex = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-
-        // Cargar PDF original
-        const pdfDoc = await PDFDocument.load(buf);
-        const helvetica     = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-        // ── Sello de firma en posición elegida ─────────────────────────────
-        const sigPos = meta.sigPos;
-        if(sigPos && typeof sigPos.xPct === 'number' && typeof sigPos.yPct === 'number'){
-          try{
-            const pageIdx = sigPos.page || 0;
-            const pages   = pdfDoc.getPages();
-            const tgtPage = pages[Math.min(pageIdx, pages.length-1)];
-            const { width: pw, height: ph } = tgtPage.getSize();
-
-            // Convertir xPct/yPct (relativo al canvas PDF.js) a coordenadas PDF
-            // PDF.js: y=0 en arriba → pdf-lib: y=0 en abajo → flip
-            const cx = sigPos.xPct * pw;
-            const cy = (1 - sigPos.yPct) * ph;
-
-            // Caja del sello: 190 x 56 pts, centrada en (cx, cy)
-            const bw = 190, bh = 56;
-            const bx = Math.max(10, Math.min(pw - bw - 10, cx - bw / 2));
-            const by = Math.max(10, Math.min(ph - bh - 10, cy - bh / 2));
-
-            // Fondo y borde
-            tgtPage.drawRectangle({ x:bx, y:by, width:bw, height:bh, color:rgb(0.94,0.98,0.99) });
-            tgtPage.drawRectangle({ x:bx, y:by, width:bw, height:bh, borderColor:rgb(0.051,0.384,0.471), borderWidth:1.2 });
-
-            // Barra teal arriba del sello
-            tgtPage.drawRectangle({ x:bx, y:by+bh-14, width:bw, height:14, color:rgb(0.051,0.384,0.471) });
-            tgtPage.drawText('✍ Firma Electrónica — FirmaYa', { x:bx+6, y:by+bh-10, size:7, font:helveticaBold, color:rgb(1,1,1) });
-
-            // Datos dentro del sello
-            const firmante = meta.firmante || currentDoc.firmante || '—';
-            const fechaStr = meta.firmadoEn ? new Date(meta.firmadoEn).toLocaleString('es-AR') : '—';
-            const dniStr   = meta.dni || '—';
-            tgtPage.drawText(firmante.substring(0,35),        { x:bx+6, y:by+bh-26, size:9,  font:helveticaBold, color:rgb(0.051,0.384,0.471) });
-            tgtPage.drawText('DNI ' + dniStr,                 { x:bx+6, y:by+bh-37, size:7,  font:helvetica,     color:rgb(0.10,0.17,0.21) });
-            tgtPage.drawText(fechaStr,                        { x:bx+6, y:by+bh-47, size:6.5, font:helvetica,    color:rgb(0.54,0.60,0.66) });
-          }catch(stampErr){
-            console.warn('No se pudo estampar sello de firma:', stampErr);
-          }
-        }
-        // ──────────────────────────────────────────────────────────────────
-
-        // Agregar página de certificado al final
-        const certPage = pdfDoc.addPage([595.28, 841.89]); // A4
-        const { width, height } = certPage.getSize();
-        const margin = 50;
-
-        // Encabezado teal
-        certPage.drawRectangle({ x:0, y:height-80, width, height:80, color:rgb(0.051,0.384,0.471) });
-        certPage.drawText('FirmaYa', { x:margin, y:height-38, size:26, font:helveticaBold, color:rgb(1,1,1) });
-        certPage.drawText('Certificado de Firma Electrónica', { x:margin, y:height-58, size:11, font:helvetica, color:rgb(0.8,0.93,0.97) });
-
-        // Título cuerpo
-        let y = height - 110;
-        certPage.drawText('DOCUMENTO FIRMADO ELECTRÓNICAMENTE', { x:margin, y, size:13, font:helveticaBold, color:rgb(0.051,0.384,0.471) });
-        y -= 6;
-        certPage.drawLine({ start:{x:margin,y}, end:{x:width-margin,y}, thickness:1.5, color:rgb(0.051,0.384,0.471) });
-        y -= 22;
-
-        // Función para dibujar fila de tabla
-        const fila = (label, value, bgGris=false) => {
-          if(bgGris) certPage.drawRectangle({ x:margin, y:y-4, width:width-margin*2, height:20, color:rgb(0.96,0.97,0.98) });
-          certPage.drawText(label.toUpperCase(), { x:margin+6, y:y, size:8, font:helvetica, color:rgb(0.54,0.60,0.66) });
-          certPage.drawText(String(value||'—'), { x:margin+160, y:y, size:9, font:helveticaBold, color:rgb(0.10,0.17,0.21), maxWidth:width-margin-160-10 });
-          y -= 22;
-        };
-
-        fila('Firmante',       meta.firmante || currentDoc.firmante);
-        fila('DNI',            meta.dni || '—', true);
-        fila('Email',          meta.email || currentDoc.email);
-        fila('Documento',      meta.nombre || currentDoc.nombre, true);
-        fila('Token',          meta.token || currentDoc.token);
-        fila('Fecha de firma', meta.firmadoEn ? new Date(meta.firmadoEn).toLocaleString('es-AR') : '—', true);
-        fila('IP',             meta.ip || '—');
-        fila('Ubicación GPS',  (meta.lat && meta.lng) ? meta.lat.toFixed(6)+', '+meta.lng.toFixed(6) : '—', true);
-        fila('Dispositivo',    meta.device ? meta.device.substring(0,80) : '—');
-
-        // Hash en recuadro especial
-        y -= 8;
-        certPage.drawRectangle({ x:margin, y:y-8, width:width-margin*2, height:36, color:rgb(0.94,0.98,0.99), borderColor:rgb(0.051,0.384,0.471), borderWidth:0.5 });
-        certPage.drawText('HASH SHA-256 DEL DOCUMENTO ORIGINAL', { x:margin+8, y:y+16, size:7, font:helveticaBold, color:rgb(0.051,0.384,0.471) });
-        certPage.drawText(hashHex, { x:margin+8, y:y, size:6.5, font:helvetica, color:rgb(0.10,0.17,0.21) });
-        y -= 40;
-
-        // Footer legal
-        y = 60;
-        certPage.drawLine({ start:{x:margin,y:y+20}, end:{x:width-margin,y:y+20}, thickness:0.5, color:rgb(0.80,0.87,0.91) });
-        certPage.drawText('Este documento fue firmado electrónicamente con validez legal bajo la Ley 25.506 de Firma Digital de la República Argentina.', { x:margin, y:y+6, size:7, font:helvetica, color:rgb(0.54,0.60,0.66), maxWidth:width-margin*2 });
-        certPage.drawText('Generado por FirmaYa · London Servicios Inmobiliarios · firmaya.londonserviciosinmobiliarios.com.ar', { x:margin, y:y-6, size:7, font:helvetica, color:rgb(0.54,0.60,0.66) });
-
-        // Guardar y descargar
-        const pdfBytes = await pdfDoc.save();
-        descargarBlob(new Blob([pdfBytes],{type:'application/pdf'}), nombre+'-firmado.pdf');
-        return;
-      }catch(pdfErr){
-        console.warn('pdf-lib error, descargando sin certificado:', pdfErr);
-        // Si falla pdf-lib, caer a descarga simple
-      }
-    }
-
-    // 4. Fallback: DOCX — abrir URL directa (compatible con iOS)
-        // PDF sin lib — descarga como blob
-    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('docx')||mime.includes('officedocument')||mime.includes('word')) ? '.docx' : '.bin';
-    descargarBlob(new Blob([buf],{type:mime||'application/octet-stream'}), nombre+'-firmado'+ext);
-
-  }catch(e){
-    alert('Error al descargar: ' + e.message);
-  }finally{
-    if(btn){ btn.disabled=false; btn.textContent=origText; }
-  }
-}
-
-function descargarBlob(blob, filename){
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
+    const nombre = (currentDoc.nombre || 'documento-firmado').replace(/\.[^.]+$/, '');
+    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre + '-firmado' + ext;
+    a.click();
+  }catch(e){ alert('Error al descargar: ' + e.message); }
 }
 
 // ---- LOGIN / LOGOUT ----
@@ -1182,7 +980,6 @@ function doLogin(){
   const err = document.getElementById('loginError');
   if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
     err.style.display='none';
-    sessionStorage.setItem('firmaya_auth','1');
     showDashboard();
   } else {
     err.style.display='block';
@@ -1190,7 +987,6 @@ function doLogin(){
 }
 // Allow Enter key on password
 document.addEventListener('DOMContentLoaded', ()=>{
-  if(sessionStorage.getItem('firmaya_auth')==='1') showDashboard();
   const p = document.getElementById('loginPass');
   if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 });
@@ -1211,68 +1007,9 @@ function showDashboard(){
   document.getElementById('appScreen').style.display='block';
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  renderStats();
-  loadDocsFromAPI(); // Cargar documentos reales desde el servidor
 }
 
-async function loadDocsFromAPI(){
-  try{
-    const resp = await fetch(WORKER + '/api/list');
-    if(resp.ok){
-      const data = await resp.json();
-      if(data.ok && Array.isArray(data.docs) && data.docs.length > 0){
-        docs.length = 0;
-        data.docs.forEach(d => {
-          const creadoEn = d.creadoEn ? new Date(d.creadoEn) : new Date();
-          const fecha = creadoEn.getDate().toString().padStart(2,'0') + '/' +
-                       (creadoEn.getMonth()+1).toString().padStart(2,'0') + '/' +
-                       creadoEn.getFullYear();
-          docs.push({
-            id: d.token,
-            nombre: (d.docNombre || d.fileNombre || d.nombre || 'Documento').toUpperCase(),
-            firmante: d.firmante || '—',
-            email: d.email || d.emailFirmante || '—',
-            token: d.token,
-            enviado: fecha,
-            estado: d.estado || 'Pendiente'
-          });
-        });
-        saveDocs();
-        renderDocs(docs.slice(0,5), 'docsBody');
-        renderDocs(docs, 'docsBody2');
-        renderStats();
-        return;
-      }
-    }
-  }catch(e){ console.warn('API /api/list:', e.message); }
-  syncPendientes();
-}
-
-async function syncPendientes(){
-  const pendientes = docs.filter(d => d.estado === 'Pendiente' && d.token);
-  if(!pendientes.length) return;
-  let actualizado = false;
-  for(const doc of pendientes){
-    try{
-      const r = await fetch(WORKER + '/api/check?token=' + encodeURIComponent(doc.token));
-      if(!r.ok) continue;
-      const data = await r.json();
-      if(data.firmado){
-        doc.estado = 'Firmado';
-        if(data.firmadoEn) doc.firmadoEn = data.firmadoEn;
-        actualizado = true;
-      }
-    }catch(e){}
-  }
-  if(actualizado){
-    saveDocs();
-    renderDocs(docs.slice(0,5), 'docsBody');
-    renderDocs(docs, 'docsBody2');
-    renderStats();
-  }
-}
 function logout(){
-  sessionStorage.removeItem('firmaya_auth');
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
 }
@@ -1299,8 +1036,6 @@ function showUploadedFile(file){
   document.getElementById('uploadedFileSize').textContent = size+' · '+ext.toUpperCase()+' · Subido correctamente ✓';
   document.getElementById('btnNext1').removeAttribute('disabled');
   window._uploadedFileName = file.name;
-  window._uploadedFile = file; // guardar archivo para subirlo al Worker
-  _sigPos = null; // resetear posición de firma
 }
 function resetUpload(){
   document.getElementById('uploadZone').style.display='block';
@@ -1324,12 +1059,6 @@ function resetFlow(){
   document.getElementById('tab1').classList.add('active');
 }
 
-function goHome(){
-  showView('dashboard');
-  loadDocsFromAPI();
-  closeSidebarOnMobile();
-}
-
 function flowGo(n){
   for(let i=1;i<=4;i++){
     document.getElementById('flowStep'+i).style.display = (i===n)?'block':'none';
@@ -1340,10 +1069,10 @@ function flowGo(n){
     if(i===n) t.classList.add('active');
   }
   if(n===3){
-    _sigPos = null;
-    const infoEl = document.getElementById('sigPosInfo');
-    if(infoEl) infoEl.style.display = 'none';
-    renderPDFPreview(window._uploadedFile, (document.getElementById('firmanteName')||{}).value || 'el firmante');
+    const name = (document.getElementById('firmanteName')||{}).value||'';
+    document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
+    const pn = document.getElementById('previewDocName');
+    if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
   }
   if(n===4){
     const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
@@ -1357,58 +1086,22 @@ function flowGo(n){
 }
 
 // ---- SEND ----
-async function sendDoc(method){
-  const name  = window._signerName  || 'el firmante';
+function sendDoc(method){
+  const name = window._signerName || 'el firmante';
   const email = window._signerEmail || '';
-  const docNombre = (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'');
   const msgs = {
     email:'El link de firma fue enviado automáticamente al email de '+name+'. Te avisaremos cuando firme.',
     wa:'Copiá el link y enviáselo a '+name+' por WhatsApp. Te notificaremos cuando firme.'
   };
-
-  // Generar token único
-  const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
-
-  // Construir URL de firma
-  const docB64      = btoa(unescape(encodeURIComponent(docNombre)));
-  const firmanteB64 = btoa(unescape(encodeURIComponent(name)));
-  const firmarUrl   = 'https://firmaya.londonserviciosinmobiliarios.com.ar/firmar.html?t=' + token + '&d=' + encodeURIComponent(docB64) + '&r=' + encodeURIComponent(firmanteB64);
-
+  // Agregar documento al array
+  const newId = docs.length > 0 ? Math.max(...docs.map(d=>d.id)) + 1 : 1;
   const today = new Date();
   const fecha = today.getDate().toString().padStart(2,'0') + '/' + (today.getMonth()+1).toString().padStart(2,'0') + '/' + today.getFullYear();
-
-  // 1. Registrar en Worker KV
-  try{
-    await fetch(WORKER + '/api/send', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        token, docNombre, firmante: name, emailFirmante: email, firmarUrl,
-        sendEmail: method === 'email',
-        sigPos: _sigPos || null
-      })
-    });
-  }catch(e){ console.warn('Error registrando doc:', e.message); }
-
-  // 2. Subir archivo al Worker KV para que el cliente lo pueda ver
-  if(window._uploadedFile){
-    try{
-      const file = window._uploadedFile;
-      const mime = file.type || (file.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-      await fetch(WORKER + '/api/upload?token=' + encodeURIComponent(token) +
-                  '&mime=' + encodeURIComponent(mime) +
-                  '&nombre=' + encodeURIComponent(file.name), {
-        method: 'POST',
-        body: file
-      });
-    }catch(e){ console.warn('Error subiendo archivo:', e.message); }
-  }
-
-  // 3. Agregar al array local
+  const token = 'tk-' + Math.random().toString(36).substring(2,10) + '-' + Math.random().toString(36).substring(2,6);
   docs.unshift({
-    id: token,
-    nombre: docNombre.toUpperCase(),
-    firmante: name,
+    id: newId,
+    nombre: (window._uploadedFileName||'Documento').replace(/\.[^.]+$/,'').toUpperCase(),
+    firmante: window._signerName || '—',
     email: email,
     token: token,
     enviado: fecha,
@@ -1416,31 +1109,21 @@ async function sendDoc(method){
   });
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
-  saveDocs();
-  renderStats();
   const cnt = document.getElementById('docsCount');
   if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
-
   document.getElementById('sendForm').style.display='none';
   document.getElementById('sentSuccess').style.display='block';
   document.getElementById('sentMsg').textContent = msgs[method];
   document.getElementById('flowFooter4').style.display='none';
+  // Construir URL real con params
+  const docB64      = btoa(unescape(encodeURIComponent((window._uploadedFileName||'Documento').replace(/\.[^.]+$/,''))));
+  const firmanteB64 = btoa(unescape(encodeURIComponent(window._signerName||'')));
+  const firmarUrl   = 'https://firmaya.pages.dev/firmar.html?t=' + token + '&d=' + docB64 + '&r=' + firmanteB64;
+  // Mostrar link en pantalla
   const sentLinkEl = document.getElementById('sentLink');
   if(sentLinkEl) sentLinkEl.textContent = firmarUrl;
-  try{ navigator.clipboard.writeText((document.getElementById('sentMsg').innerText||'').trim() + '\n' + firmarUrl); } catch(e){}
-}
-
-// ---- COPIAR WHATSAPP ----
-function _copyWALink(btn){
-  const _sl=document.getElementById('sentLink');
-  const _sm=document.getElementById('sentMsg');
-  const _txt=(_sm ? _sm.innerText : '')+' '+(_sl ? _sl.textContent : '');
-  navigator.clipboard.writeText(_txt.trim()).then(()=>{
-    btn.textContent='Copiado!';
-    setTimeout(()=>{btn.textContent='Copiar para WhatsApp';},2500);
-  }).catch(()=>{
-    if(_sl){const _r=document.createRange();_r.selectNode(_sl);window.getSelection().removeAllRanges();window.getSelection().addRange(_r);}
-  });
+  // Copiar al portapapeles automáticamente
+  try{ navigator.clipboard.writeText(firmarUrl); } catch(e){}
 }
 
 // ---- CHECKBOXES ----
@@ -1449,77 +1132,15 @@ function toggleCheck(el){
   el.querySelector('input').checked = el.classList.contains('checked');
 }
 
-// ---- RENDER PDF PREVIEW EN STEP 3 ----
-async function renderPDFPreview(file, signerName){
-  const container = document.getElementById('pdfPreviewContainer');
-  if(!container) return;
-
-  // Sin archivo o es DOCX: mostrar placeholder
-  const isPdf = file && (file.type === 'application/pdf' || (file.name||'').toLowerCase().endsWith('.pdf'));
-  if(!isPdf){
-    container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-light)">
-      <div style="font-size:40px;margin-bottom:8px">📄</div>
-      <p style="font-size:13px">Vista previa no disponible para DOCX.<br>La firma se agregará como página de certificado al final.</p>
-    </div>`;
-    return;
-  }
-
-  container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-light)"><div style="font-size:32px">⏳</div><p style="font-size:13px;margin-top:8px">Cargando vista previa…</p></div>';
-
-  try{
-    const buf = await file.arrayBuffer();
-    if(typeof pdfjsLib === 'undefined'){
-      // PDF.js ya está cargado en el head, pero por las dudas
-      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light)"><p style="font-size:13px">PDF.js no disponible — hacé click en Siguiente</p></div>';
-      return;
-    }
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
-    const page = await pdf.getPage(1);
-    const containerW = container.offsetWidth || 400;
-    const vp0   = page.getViewport({scale:1});
-    const scale = Math.min((containerW - 4) / vp0.width, 2.5);
-    const vp    = page.getViewport({scale});
-
-    const canvas = document.createElement('canvas');
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
-    canvas.style.cssText = 'display:block;width:100%;cursor:crosshair';
-
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;display:inline-block;width:100%';
-    wrap.appendChild(canvas);
-
-    container.innerHTML = '';
-    const hint = document.createElement('p');
-    hint.style.cssText = 'font-size:12px;color:var(--text-medium);text-align:center;padding:8px 0 4px';
-    hint.textContent = '✏️ Hacé click en el documento para marcar dónde firma el cliente';
-    container.appendChild(hint);
-    container.appendChild(wrap);
-
-    await page.render({canvasContext: canvas.getContext('2d'), viewport: vp}).promise;
-
-    let marker = null;
-    canvas.addEventListener('click', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const xPct = (e.clientX - rect.left) / rect.width;
-      const yPct = (e.clientY - rect.top)  / rect.height;
-      _sigPos = { page: 0, xPct, yPct, pageW: vp0.width, pageH: vp0.height };
-
-      // Quitar marcador anterior
-      if(marker) marker.remove();
-      marker = document.createElement('div');
-      marker.style.cssText = `position:absolute;left:${(xPct*100).toFixed(1)}%;top:${(yPct*100).toFixed(1)}%;transform:translate(-50%,-50%);background:rgba(13,98,120,0.18);border:2px dashed #0D6278;border-radius:5px;padding:5px 10px;font-size:11px;color:#0D6278;font-weight:700;pointer-events:none;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.15)`;
-      marker.textContent = '✍️ ' + (signerName.trim() || 'Firma');
-      wrap.appendChild(marker);
-
-      const info = document.getElementById('sigPosInfo');
-      if(info) info.style.display = 'block';
-    });
-
-  }catch(e){
-    container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-light)"><p style="font-size:13px">No se pudo generar la vista previa.<br>La firma se agregará como certificado al final del PDF.</p></div>`;
-  }
+// ---- DRAG SIG PLACEHOLDER ----
+const ph = document.getElementById('sigPlaceholder');
+if(ph){
+  let ox=0,oy=0,x=0,y=0;
+  ph.addEventListener('mousedown',e=>{
+    ox=e.clientX-ph.offsetLeft; oy=e.clientY-ph.offsetTop;
+    document.onmousemove=m=>{ ph.style.position='absolute'; ph.style.left=(m.clientX-ox)+'px'; ph.style.top=(m.clientY-oy)+'px'; };
+    document.onmouseup=()=>{ document.onmousemove=null; document.onmouseup=null; };
+  });
 }
 </script>
 </body>
