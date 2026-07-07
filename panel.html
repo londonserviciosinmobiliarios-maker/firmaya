@@ -930,9 +930,11 @@ function deleteSelected(){
   Promise.all(tokens.map(t =>
     fetch('https://api.londonserviciosinmobiliarios.com.ar/api/delete?token='+encodeURIComponent(t),{method:'POST'}).catch(()=>{})
   )).then(() => {
-    allDocs = allDocs.filter(d => !tokens.includes(d.token));
-    renderDocs(allDocs);
-    loadDocsFromAPI();
+    docs = docs.filter(d => !tokens.includes(d.token));
+    saveDocs();
+    renderDocs(docs.slice(0,5), 'docsBody');
+    renderDocs(docs, 'docsBody2');
+    renderStats();
   });
 }
 function filterDocs(el, estado){
@@ -1414,6 +1416,8 @@ async function sendDoc(method){
   });
   renderDocs(docs.slice(0,5), 'docsBody');
   renderDocs(docs, 'docsBody2');
+  saveDocs();
+  renderStats();
   const cnt = document.getElementById('docsCount');
   if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
 
