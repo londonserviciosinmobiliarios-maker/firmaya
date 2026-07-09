@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FirmaYa — Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -204,7 +205,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
   border-radius:8px;background:white;overflow:hidden
 }
 .doc-preview-frame{
-  width:100%;height:520px;border:0;display:block;background:white
+  width:100%;height:520px;border:0;display:block;background:white;pointer-events:none
 }
 .doc-preview-empty{
   text-align:center;padding:70px 18px;color:var(--text-light)
@@ -222,6 +223,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
   position:absolute;left:28px;top:90px;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.12)
 }
 .sig-placeholder-move{font-size:10px;color:#A07800;display:block;margin-top:2px;font-weight:400}
+.doc-preview-help{font-size:11px;color:var(--text-light);margin-top:8px;text-align:center}
 
 /* Send screen */
 .send-summary{background:var(--primary-pale);border:1px solid var(--primary);border-radius:12px;padding:22px;margin-bottom:24px}
@@ -684,7 +686,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                   <span class="sig-placeholder-move">⠿ Arrastrá para mover</span>
                 </div>
               </div>
-              <p style="font-size:11px;color:var(--text-light);margin-top:10px;text-align:center">💡 Podés agregar más campos de firma haciendo clic en el documento</p>
+              <p class="doc-preview-help">💡 Hacé clic sobre el PDF para colocar la firma ahí. También podés arrastrar el recuadro amarillo.</p>
             </div>
             <div class="flow-footer" id="flowFooter3" style="display:none">
               <button class="btn btn-ghost" onclick="flowGo(2)">← Atrás</button>
@@ -759,7 +761,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <span id="detailFirmadoSpan">✅ Firmado: —</span>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px">
-              <button class="btn btn-primary btn-sm" onclick="descargarFirmado()">⬇ Descargar original</button>
+              <button class="btn btn-primary btn-sm" onclick="descargarFirmado()">⬇ Descargar PDF firmado</button>
               <button class="btn btn-ghost btn-sm">📋 Ver informe de firmas</button>
               <button class="btn btn-ghost btn-sm">📄 Duplicar documento</button>
             </div>
@@ -903,7 +905,16 @@ function normalizeDoc(raw, index=0){
     estado: raw.estado || 'Pendiente',
     fileNombre: raw.fileNombre || '',
     fileMime: raw.fileMime || '',
-    dni: raw.dni || ''
+    dni: raw.dni || '',
+    lat: raw.lat || '',
+    lng: raw.lng || '',
+    ip: raw.ip || '',
+    device: raw.device || '',
+    otpEmail: raw.otpEmail || '',
+    selfie: raw.selfie || '',
+    dniFoto: raw.dniFoto || '',
+    liveness: raw.liveness || '',
+    signPosition: raw.signPosition || null
   };
 }
 
@@ -1062,6 +1073,10 @@ async function descargarFirmado(){
     return;
   }
   try{
+    if(!window.PDFLib){
+      alert('No se pudo cargar el generador de PDF firmado. Revisá la conexión e intentá de nuevo.');
+      return;
+    }
     const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/file?token=' + encodeURIComponent(currentDoc.token));
     if(!r.ok){ alert('No se encontró el archivo original. Puede que el upload haya fallado o que el archivo haya sido eliminado.'); return; }
     const buf = await r.arrayBuffer();
@@ -1071,14 +1086,176 @@ async function descargarFirmado(){
       if(p[0]===0x25&&p[1]===0x50&&p[2]===0x44&&p[3]===0x46) mime='application/pdf';
       else if(p[0]===0x50&&p[1]===0x4B) mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
-    const ext = mime.includes('pdf') ? '.pdf' : (mime.includes('word')||mime.includes('officedocument')) ? '.docx' : '';
+    if(!mime.includes('pdf')){
+      alert('Por ahora el PDF firmado profesional solo se genera para documentos PDF. Para DOCX, descargá el original o convertí el archivo a PDF antes de enviarlo.');
+      return;
+    }
+    try{
+      const fresh = await apiJson('/api/doc?token=' + encodeURIComponent(currentDoc.token));
+      if(fresh.doc) currentDoc = normalizeDoc(fresh.doc, Math.max(0, (currentDoc.id || 1) - 1));
+    }catch(e){}
+    const photos = await apiJson('/api/photos?token=' + encodeURIComponent(currentDoc.token)).catch(()=>({}));
+    const signedBytes = await generarPdfFirmado(buf, currentDoc, photos);
     const nombre = (currentDoc.nombre || 'documento-firmado').replace(/\.[^.]+$/, '');
-    const blob = new Blob([buf], {type: mime||'application/octet-stream'});
+    const blob = new Blob([signedBytes], {type: 'application/pdf'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = nombre + '-original' + ext;
+    a.download = nombre + '-firmado-firmaya.pdf';
     a.click();
   }catch(e){ alert('Error al descargar: ' + e.message); }
+}
+
+async function sha256Hex(arrayBuffer){
+  const hash = await crypto.subtle.digest('SHA-256', arrayBuffer);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function dataUrlBytes(dataUrl){
+  if(!dataUrl || !String(dataUrl).includes(',')) return null;
+  const b64 = String(dataUrl).split(',')[1];
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function fmtDateTime(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? value : d.toLocaleString('es-AR');
+}
+
+function wrapPdfText(text, maxChars=92){
+  const words = String(text || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for(const w of words){
+    if((line + ' ' + w).trim().length > maxChars){
+      if(line) lines.push(line);
+      line = w;
+    }else{
+      line = (line + ' ' + w).trim();
+    }
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+
+async function embedDataUrlImage(pdfDoc, dataUrl){
+  const bytes = dataUrlBytes(dataUrl);
+  if(!bytes) return null;
+  const type = String(dataUrl).slice(0,40).toLowerCase();
+  try{
+    if(type.includes('png')) return await pdfDoc.embedPng(bytes);
+    return await pdfDoc.embedJpg(bytes);
+  }catch(e){ return null; }
+}
+
+async function generarPdfFirmado(originalBuffer, doc, photos={}){
+  const { PDFDocument, StandardFonts, rgb } = PDFLib;
+  const pdfDoc = await PDFDocument.load(originalBuffer);
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const hash = await sha256Hex(originalBuffer);
+  const pages = pdfDoc.getPages();
+  const firstPage = pages[0];
+  const pos = doc.signPosition || { leftPct: 0.08, topPct: 0.18 };
+  const firmaImg = await embedDataUrlImage(pdfDoc, photos.firma);
+  const stampW = 190;
+  const stampH = 48;
+  const { width, height } = firstPage.getSize();
+  const stampX = Math.max(24, Math.min(width - stampW - 24, (pos.leftPct || 0.08) * width));
+  const stampY = Math.max(24, Math.min(height - stampH - 24, height - ((pos.topPct || 0.18) * height) - stampH));
+  firstPage.drawRectangle({ x: stampX, y: stampY, width: stampW, height: stampH, color: rgb(1,1,1), opacity: 0.82, borderColor: rgb(0.72,0.72,0.72), borderWidth: 0.6 });
+  if(firmaImg){
+    const dims = firmaImg.scale(1);
+    const imgW = Math.min(76, dims.width);
+    const imgH = Math.min(32, dims.height * (imgW / dims.width));
+    firstPage.drawImage(firmaImg, { x: stampX + 8, y: stampY + 8, width: imgW, height: imgH });
+  }else{
+    firstPage.drawText('Firma registrada', { x: stampX + 10, y: stampY + 28, size: 8, font: bold, color: rgb(0.08,0.08,0.08) });
+  }
+  firstPage.drawText('Firmado electrónicamente en FirmaYa por', { x: stampX + 86, y: stampY + 31, size: 6.5, font, color: rgb(0.28,0.28,0.28) });
+  firstPage.drawText(String(doc.firmante || 'Firmante').slice(0,30), { x: stampX + 86, y: stampY + 21, size: 7.5, font: bold, color: rgb(0.13,0.13,0.13) });
+  firstPage.drawText('Fecha: ' + fmtDateTime(doc.firmadoEn), { x: stampX + 86, y: stampY + 11, size: 6.2, font, color: rgb(0.28,0.28,0.28) });
+  for(const page of pages){
+    const s = page.getSize();
+    page.drawText('FirmaYa', { x: 28, y: 18, size: 7, font: bold, color: rgb(0.42,0.42,0.42) });
+    page.drawText(String(doc.token || '').slice(0,44), { x: 72, y: 18, size: 6.5, font, color: rgb(0.55,0.55,0.55) });
+  }
+
+  const report = pdfDoc.addPage([595,842]);
+  let y = 792;
+  const teal = rgb(0.05,0.38,0.47);
+  report.drawText('Informe de Firma Electronica', { x: 42, y, size: 20, font: bold, color: rgb(0.08,0.08,0.10) });
+  report.drawText('FirmaYa · London Servicios Inmobiliarios', { x: 42, y: y-22, size: 10, font, color: rgb(0.28,0.37,0.44) });
+  report.drawText('Estado: Firmado', { x: 432, y, size: 12, font: bold, color: teal });
+  report.drawLine({ start:{x:42,y:y-44}, end:{x:553,y:y-44}, thickness:1, color: rgb(0.78,0.82,0.85) });
+  y -= 76;
+  const rows = [
+    ['Documento', doc.fileNombre || doc.nombre || 'Documento'],
+    ['Token del documento', doc.token || '—'],
+    ['Fecha de creacion', fmtDateTime(doc.creadoEn)],
+    ['Fecha y hora de firma', fmtDateTime(doc.firmadoEn)],
+    ['Hash SHA256 original', hash],
+    ['Firmante', doc.firmante || '—'],
+    ['Email', doc.email || '—'],
+    ['DNI', doc.dni || '—'],
+    ['Ubicacion aproximada', (doc.lat && doc.lng) ? `${doc.lat}, ${doc.lng}` : '—'],
+    ['IP', doc.ip || '—'],
+    ['Dispositivo', doc.device || '—']
+  ];
+  for(const [k,v] of rows){
+    report.drawText(k + ':', { x: 42, y, size: 9, font: bold, color: rgb(0.08,0.08,0.08) });
+    const lines = wrapPdfText(v, k === 'Hash SHA256 original' ? 76 : 70);
+    lines.slice(0,3).forEach((line,idx)=> report.drawText(line, { x: 175, y: y - idx*11, size: 8.5, font, color: rgb(0.12,0.12,0.12) }));
+    y -= Math.max(18, lines.slice(0,3).length * 11 + 6);
+  }
+  y -= 8;
+  report.drawText('Puntos de autenticacion:', { x: 42, y, size: 12, font: bold, color: rgb(0.08,0.08,0.10) });
+  y -= 20;
+  const checks = [
+    ['Codigo OTP por email', doc.otpEmail === 'sí' ? 'Verificado' : 'No registrado'],
+    ['Selfie - Foto del rostro', doc.selfie === 'sí' ? 'Registrada' : 'No registrada'],
+    ['Foto del DNI', doc.dniFoto === 'sí' ? 'Registrada' : 'No registrada'],
+    ['Prueba de vida', doc.liveness === 'sí' ? 'Confirmada' : 'No registrada']
+  ];
+  for(const [k,v] of checks){
+    report.drawText(k, { x: 60, y, size: 9, font: bold, color: rgb(0.10,0.10,0.10) });
+    report.drawText(v, { x: 260, y, size: 9, font, color: v.includes('No') ? rgb(0.55,0.55,0.55) : teal });
+    y -= 16;
+  }
+  y = 142;
+  report.drawLine({ start:{x:42,y:y+28}, end:{x:553,y:y+28}, thickness:1, color: rgb(0.78,0.82,0.85) });
+  report.drawText('CUMPLIMIENTO LEGAL DE LA FIRMA ELECTRONICA', { x: 42, y, size: 10, font: bold, color: rgb(0.10,0.10,0.10) });
+  const legal = 'Para dar cumplimiento a la legislacion de firma electronica, este informe muestra los datos capturados al momento de la firma para respaldar la autoria, trazabilidad e integridad del documento.';
+  wrapPdfText(legal, 118).forEach((line,idx)=> report.drawText(line, { x: 42, y: y-18-(idx*11), size: 8, font, color: rgb(0.18,0.18,0.18) }));
+  report.drawText('Este registro forma parte del documento firmado electronicamente en FirmaYa.', { x: 42, y: 54, size: 8, font, color: rgb(0.30,0.30,0.30) });
+  report.drawText('FirmaYa · ' + String(doc.token || ''), { x: 42, y: 28, size: 7, font: bold, color: rgb(0.42,0.42,0.42) });
+
+  if(photos.selfie || photos.dniFoto){
+    const annex = pdfDoc.addPage([595,842]);
+    annex.drawText('Anexos de verificacion', { x: 42, y: 792, size: 20, font: bold, color: rgb(0.08,0.08,0.10) });
+    annex.drawText('FirmaYa · London Servicios Inmobiliarios', { x: 42, y: 770, size: 10, font, color: rgb(0.28,0.37,0.44) });
+    annex.drawLine({ start:{x:42,y:746}, end:{x:553,y:746}, thickness:1, color: rgb(0.78,0.82,0.85) });
+    let ax = 72;
+    for(const [label, dataUrl] of [['Selfie - Foto del rostro', photos.selfie], ['Foto del DNI', photos.dniFoto]]){
+      const img = await embedDataUrlImage(pdfDoc, dataUrl);
+      if(!img) continue;
+      annex.drawText(label, { x: ax, y: 710, size: 10, font: bold, color: rgb(0.10,0.10,0.10) });
+      const maxW = 190, maxH = 220;
+      const ratio = Math.min(maxW / img.width, maxH / img.height);
+      const w = img.width * ratio, h = img.height * ratio;
+      annex.drawRectangle({ x: ax, y: 470, width: maxW, height: maxH, borderColor: rgb(0.82,0.82,0.82), borderWidth: 1 });
+      annex.drawImage(img, { x: ax + (maxW-w)/2, y: 470 + (maxH-h)/2, width: w, height: h });
+      annex.drawText('CONFIDENTIAL', { x: ax + 32, y: 575, size: 18, font: bold, color: rgb(0.25,0.25,0.25), opacity: 0.35 });
+      annex.drawText(fmtDateTime(doc.firmadoEn), { x: ax + 42, y: 555, size: 10, font, color: rgb(0.25,0.25,0.25), opacity: 0.45 });
+      ax += 250;
+    }
+    annex.drawText('Token: ' + String(doc.token || ''), { x: 42, y: 56, size: 8, font, color: rgb(0.30,0.30,0.30) });
+    annex.drawText('FirmaYa', { x: 42, y: 28, size: 7, font: bold, color: rgb(0.42,0.42,0.42) });
+  }
+  return await pdfDoc.save();
 }
 
 function descargarDocByToken(token){
@@ -1330,7 +1507,8 @@ async function sendDoc(method){
         firmante: name,
         emailFirmante: email,
         firmarUrl,
-        sendEmail: method === 'email'
+        sendEmail: method === 'email',
+        signPosition: window._signaturePosition || { leftPct: 0.08, topPct: 0.18 }
       })
     });
     document.getElementById('sendForm').style.display='none';
@@ -1358,7 +1536,22 @@ function toggleCheck(el){
 const ph = document.getElementById('sigPlaceholder');
 if(ph){
   let ox=0, oy=0;
+  const moveSignatureTo = (clientX, clientY) => {
+    const parent = ph.parentElement;
+    const parentRect = parent.getBoundingClientRect();
+    const maxLeft = Math.max(0, parent.clientWidth - ph.offsetWidth);
+    const maxTop = Math.max(0, parent.clientHeight - ph.offsetHeight);
+    const left = Math.min(maxLeft, Math.max(0, clientX - parentRect.left - (ph.offsetWidth / 2)));
+    const top = Math.min(maxTop, Math.max(0, clientY - parentRect.top - (ph.offsetHeight / 2)));
+    ph.style.left = left + 'px';
+    ph.style.top = top + 'px';
+    window._signaturePosition = {
+      leftPct: parent.clientWidth ? left / parent.clientWidth : 0.08,
+      topPct: parent.clientHeight ? top / parent.clientHeight : 0.18
+    };
+  };
   ph.addEventListener('mousedown',e=>{
+    e.stopPropagation();
     const parent = ph.parentElement;
     const parentRect = parent.getBoundingClientRect();
     const phRect = ph.getBoundingClientRect();
@@ -1374,6 +1567,18 @@ if(ph){
     };
     document.onmouseup=()=>{ document.onmousemove=null; document.onmouseup=null; };
   });
+  ph.addEventListener('touchstart', e=>{
+    e.stopPropagation();
+    const t = e.touches && e.touches[0];
+    if(t) moveSignatureTo(t.clientX, t.clientY);
+  }, {passive:true});
+  const preview = document.querySelector('.doc-preview');
+  if(preview){
+    preview.addEventListener('click', e=>{
+      if(e.target.closest && e.target.closest('#sigPlaceholder')) return;
+      moveSignatureTo(e.clientX, e.clientY);
+    });
+  }
 }
 </script>
 </body>
