@@ -57,7 +57,9 @@ function publicDoc(data){
     selfie: data.selfie || '',
     dniFoto: data.dniFoto || '',
     liveness: data.liveness || '',
-    tieneFotos: data.tieneFotos || ''
+    tieneFotos: data.tieneFotos || '',
+    tieneFirma: data.tieneFirma || '',
+    signPosition: data.signPosition || null
   };
 }
 
@@ -124,7 +126,7 @@ export default {
     if(url.pathname === '/api/send' && request.method === 'POST'){
       try{
         const body = await request.json();
-        const { token, docNombre, firmante, emailFirmante, firmarUrl, sendEmail } = body;
+        const { token, docNombre, firmante, emailFirmante, firmarUrl, sendEmail, signPosition } = body;
         if(!token || !firmarUrl || !docNombre || !firmante) return json({ok:false, error:'Faltan datos'}, 400);
         if(sendEmail !== false && !emailFirmante) return json({ok:false, error:'Email del firmante requerido'}, 400);
 
@@ -134,6 +136,7 @@ export default {
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify({
             ...existing,
             token, docNombre, firmante, emailFirmante, firmarUrl,
+            signPosition: signPosition || existing.signPosition || null,
             estado: 'Pendiente',
             creadoEn: existing.creadoEn || new Date().toISOString()
           }), { expirationTtl: 60 * 60 * 24 * 90 });
@@ -279,13 +282,15 @@ export default {
           docData.dniFoto   = body.dniFoto   || 'no';
           docData.liveness  = body.liveness  || 'no';
           docData.tieneFotos = (body.selfieImg || body.dniFotoImg) ? 'sí' : 'no';
+          docData.tieneFirma = body.firmaImg ? 'sí' : 'no';
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify(docData), { expirationTtl: 60 * 60 * 24 * 365 });
 
           // Guardar fotos en clave separada para no inflar el registro principal
-          if(body.selfieImg || body.dniFotoImg){
+          if(body.selfieImg || body.dniFotoImg || body.firmaImg){
             const photos = {
               selfie:     body.selfieImg  || null,
               dniFoto:    body.dniFotoImg || null,
+              firma:      body.firmaImg    || null,
               firmante,
               token,
               guardadoEn: firmadoEn
@@ -541,7 +546,7 @@ export default {
       try{
         const data = await env.FIRMAYA_KV.get('photos:' + token, 'json');
         if(!data) return json({ ok: false, error: 'Fotos no encontradas para este token' }, 404);
-        return json({ ok: true, selfie: data.selfie, dniFoto: data.dniFoto, firmante: data.firmante, guardadoEn: data.guardadoEn });
+        return json({ ok: true, selfie: data.selfie, dniFoto: data.dniFoto, firma: data.firma, firmante: data.firmante, guardadoEn: data.guardadoEn });
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
@@ -604,7 +609,15 @@ export default {
 </div>`
             })
           });
-          if(!r.ok){ return json({ ok: false, error: 'Error al enviar email de verificación' }, 500); }
+          let resendData = {};
+          try{ resendData = await r.json(); }catch(_){}
+          if(!r.ok){
+            return json({
+              ok: false,
+              error: resendData.message || resendData.error || 'Error al enviar email de verificación',
+              resendStatus: r.status
+            }, 500);
+          }
         }
 
         return json({ ok: true });
