@@ -240,6 +240,12 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 }
 .sig-placeholder-move{font-size:10px;color:#A07800;display:block;margin-top:2px;font-weight:400}
 .doc-preview-help{font-size:11px;color:var(--text-light);margin-top:8px;text-align:center}
+.sig-size-tools{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.sig-size-tools button{
+  border:1px solid var(--border);background:white;color:var(--text-dark);
+  border-radius:7px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer
+}
+.sig-size-tools button:hover{border-color:var(--primary);color:var(--primary)}
 
 /* Send screen */
 .send-summary{background:var(--primary-pale);border:1px solid var(--primary);border-radius:12px;padding:22px;margin-bottom:24px}
@@ -703,6 +709,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 </div>
               </div>
               <p class="doc-preview-help">💡 Hacé clic sobre el PDF para colocar la firma ahí. También podés arrastrar el recuadro amarillo.</p>
+              <div class="sig-size-tools">
+                <button type="button" onclick="resizeSignatureBox(-0.10)">− Achicar firma</button>
+                <button type="button" onclick="resizeSignatureBox(0.10)">+ Agrandar firma</button>
+                <button type="button" onclick="resizeSignatureBox(0,'reset')">Tamaño normal</button>
+              </div>
             </div>
             <div class="flow-footer" id="flowFooter3" style="display:none">
               <button class="btn btn-ghost" onclick="flowGo(2)">← Atrás</button>
@@ -838,27 +849,27 @@ td.td-name{font-weight:600;color:var(--text-dark)}
                 <div class="evidence-item">
                   <div class="evidence-icon">🤳</div>
                   <div class="evidence-label">Selfie</div>
-                  <div class="evidence-value">Capturada 20:46:27 ✓</div>
+                  <div class="evidence-value" id="detailSelfieEvid">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🌍</div>
-                  <div class="evidence-label">Ubicación GPS</div>
-                  <div class="evidence-value">-35.666012, -63.747082</div>
+                  <div class="evidence-label" id="detailLocationLabel">Ubicación</div>
+                  <div class="evidence-value" id="detailLocationEvid">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🖥</div>
                   <div class="evidence-label">IP</div>
-                  <div class="evidence-value">190.105.160.18</div>
+                  <div class="evidence-value" id="detailIpEvid">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">📱</div>
                   <div class="evidence-label">Dispositivo</div>
-                  <div class="evidence-value">Android · Chrome 149</div>
+                  <div class="evidence-value" id="detailDeviceEvid">—</div>
                 </div>
                 <div class="evidence-item">
                   <div class="evidence-icon">🔐</div>
                   <div class="evidence-label">Hash SHA-256</div>
-                  <div class="evidence-value">2105b99a9e...</div>
+                  <div class="evidence-value" id="detailHashEvid">Se calcula al descargar PDF</div>
                 </div>
               </div>
             </div>
@@ -906,6 +917,40 @@ function formatDate(value){
   return d.toLocaleDateString('es-AR');
 }
 
+function formatDevice(ua){
+  ua = String(ua || '').trim();
+  if(!ua) return '—';
+  const isIphone = /iPhone/i.test(ua);
+  const isIpad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && /Mobile/i.test(ua));
+  const isAndroid = /Android/i.test(ua);
+  const isMac = /Macintosh|Mac OS X/i.test(ua) && !isIphone && !isIpad;
+  const isWindows = /Windows/i.test(ua);
+  const crios = /CriOS\/([\d.]+)/i.exec(ua);
+  const fxios = /FxiOS\/([\d.]+)/i.exec(ua);
+  const edgios = /EdgiOS\/([\d.]+)/i.exec(ua);
+  const chrome = /Chrome\/([\d.]+)/i.exec(ua);
+  const safari = /Version\/([\d.]+).*Safari/i.exec(ua);
+  const platform = isIphone ? 'iPhone' : isIpad ? 'iPad' : isAndroid ? 'Android' : isMac ? 'Mac' : isWindows ? 'Windows' : 'Dispositivo';
+  let browser = 'Navegador';
+  let version = '';
+  if(crios){ browser = 'Chrome iOS'; version = crios[1].split('.')[0]; }
+  else if(fxios){ browser = 'Firefox iOS'; version = fxios[1].split('.')[0]; }
+  else if(edgios){ browser = 'Edge iOS'; version = edgios[1].split('.')[0]; }
+  else if(chrome && !/Chromium/i.test(ua)){ browser = 'Chrome'; version = chrome[1].split('.')[0]; }
+  else if(safari){ browser = 'Safari'; version = safari[1].split('.')[0]; }
+  return platform + ' · ' + browser + (version ? ' ' + version : '');
+}
+
+function formatLocation(doc){
+  if(!doc) return '—';
+  if(doc.lat && doc.lng) return `${doc.lat}, ${doc.lng}`;
+  return doc.location || '—';
+}
+
+function locationLabel(doc){
+  return doc && doc.locationSource === 'gps' ? 'Ubicación GPS' : 'Ubicación aprox.';
+}
+
 function normalizeDoc(raw, index=0){
   const token = raw.token || raw.id || '';
   const nombre = raw.docNombre || raw.fileNombre || raw.nombre || 'Documento';
@@ -925,6 +970,7 @@ function normalizeDoc(raw, index=0){
     lat: raw.lat || '',
     lng: raw.lng || '',
     location: raw.location || '',
+    locationSource: raw.locationSource || '',
     ip: raw.ip || '',
     device: raw.device || '',
     otpEmail: raw.otpEmail || '',
@@ -1080,6 +1126,11 @@ function showDetail(doc){
     if(g('detailFirmante')) g('detailFirmante').textContent = doc.firmante;
     if(g('detailToken')) g('detailToken').textContent = 'Token: ' + (doc.token || '—');
     if(g('detailEmailEvid')) g('detailEmailEvid').textContent = (doc.email || '—') + (firmado ? ' ✓' : '');
+    if(g('detailSelfieEvid')) g('detailSelfieEvid').textContent = doc.selfie === 'sí' ? 'Capturada ✓' : '—';
+    if(g('detailLocationLabel')) g('detailLocationLabel').textContent = locationLabel(doc);
+    if(g('detailLocationEvid')) g('detailLocationEvid').textContent = formatLocation(doc);
+    if(g('detailIpEvid')) g('detailIpEvid').textContent = doc.ip || '—';
+    if(g('detailDeviceEvid')) g('detailDeviceEvid').textContent = formatDevice(doc.device);
   }
   showView('detalle');
 }
@@ -1204,6 +1255,7 @@ async function generarPdfFirmado(originalBuffer, doc, photos={}){
   }
 
   const report = pdfDoc.addPage([595,842]);
+  drawFirmaYaWatermark(report, bold, font, rgb);
   let y = 792;
   const teal = rgb(0.05,0.38,0.47);
   report.drawText('Informe de Firma Electronica', { x: 42, y, size: 20, font: bold, color: rgb(0.08,0.08,0.10) });
@@ -1220,9 +1272,9 @@ async function generarPdfFirmado(originalBuffer, doc, photos={}){
     ['Firmante', doc.firmante || '—'],
     ['Email', doc.email || '—'],
     ['DNI', doc.dni || '—'],
-    ['Ubicacion aproximada', doc.location || ((doc.lat && doc.lng) ? `${doc.lat}, ${doc.lng}` : '—')],
+    [locationLabel(doc), formatLocation(doc)],
     ['IP', doc.ip || '—'],
-    ['Dispositivo', doc.device || '—']
+    ['Dispositivo', formatDevice(doc.device)]
   ];
   for(const [k,v] of rows){
     report.drawText(k + ':', { x: 42, y, size: 9, font: bold, color: rgb(0.08,0.08,0.08) });
@@ -1254,6 +1306,7 @@ async function generarPdfFirmado(originalBuffer, doc, photos={}){
 
   if(photos.selfie || photos.dniFoto){
     const annex = pdfDoc.addPage([595,842]);
+    drawFirmaYaWatermark(annex, bold, font, rgb);
     annex.drawText('Anexos de verificacion', { x: 42, y: 792, size: 20, font: bold, color: rgb(0.08,0.08,0.10) });
     annex.drawText('FirmaYa · London Servicios Inmobiliarios', { x: 42, y: 770, size: 10, font, color: rgb(0.28,0.37,0.44) });
     annex.drawLine({ start:{x:42,y:746}, end:{x:553,y:746}, thickness:1, color: rgb(0.78,0.82,0.85) });
@@ -1275,6 +1328,19 @@ async function generarPdfFirmado(originalBuffer, doc, photos={}){
     annex.drawText('FirmaYa', { x: 42, y: 28, size: 7, font: bold, color: rgb(0.42,0.42,0.42) });
   }
   return await pdfDoc.save();
+}
+
+function drawFirmaYaWatermark(page, bold, font, rgb){
+  page.drawText('FirmaYa', {
+    x: 112, y: 410, size: 74, font: bold,
+    color: rgb(0.05,0.38,0.47), opacity: 0.055,
+    rotate: PDFLib.degrees(-28)
+  });
+  page.drawText('FIRMA ELECTRONICA DIGITAL', {
+    x: 122, y: 380, size: 14, font,
+    color: rgb(0.05,0.38,0.47), opacity: 0.06,
+    rotate: PDFLib.degrees(-28)
+  });
 }
 
 function descargarDocByToken(token){
@@ -1489,6 +1555,25 @@ function placeSignatureByPct(leftPct, topPct){
     widthPct: stage.clientWidth ? ph.offsetWidth / stage.clientWidth : 0.28,
     heightPct: stage.clientHeight ? ph.offsetHeight / stage.clientHeight : 0.10
   };
+}
+
+function resizeSignatureBox(delta, mode){
+  const ph = document.getElementById('sigPlaceholder');
+  const stage = window._signatureStage || (ph && ph.parentElement);
+  if(!ph || !stage) return;
+  if(mode === 'reset'){
+    ph.style.width = '230px';
+    ph.style.height = '76px';
+  }else{
+    const currentW = ph.offsetWidth || 230;
+    const ratio = currentW ? (ph.offsetHeight || 76) / currentW : 0.33;
+    const nextW = Math.min(360, Math.max(130, currentW * (1 + delta)));
+    const nextH = Math.min(120, Math.max(46, nextW * ratio));
+    ph.style.width = nextW + 'px';
+    ph.style.height = nextH + 'px';
+  }
+  const current = window._signaturePosition || { leftPct: 0.08, topPct: 0.18 };
+  placeSignatureByPct(current.leftPct, current.topPct);
 }
 
 // ---- FLOW ----
