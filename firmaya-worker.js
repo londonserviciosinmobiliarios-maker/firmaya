@@ -4,6 +4,10 @@
 //   POST /api/upload     → sube archivo del doc a KV para que el cliente lo vea
 //   GET  /api/file       → sirve el archivo del doc desde KV
 //   POST /api/sign       → registra la firma (guarda en KV)
+//   GET  /api/list       → lista documentos guardados en KV
+//   GET  /api/doc        → obtiene metadata de un documento por token
+//   DELETE /api/doc      → elimina metadata, archivo y fotos por token
+//   DELETE /api/delete   → alias compatible para eliminar por token
 //   GET  /api/check      → consulta si un token fue firmado
 //   GET  /api/acms       → obtiene lista de ACMs guardados por agente
 //   POST /api/acms       → guarda un ACM en la nube
@@ -33,6 +37,30 @@ function json(data, status=200){
   });
 }
 
+function publicDoc(data){
+  if(!data) return null;
+  return {
+    token: data.token || '',
+    docNombre: data.docNombre || data.fileNombre || 'Documento',
+    firmante: data.firmante || data.emailFirmante || '—',
+    emailFirmante: data.emailFirmante || data.email || '',
+    estado: data.estado || 'Pendiente',
+    creadoEn: data.creadoEn || null,
+    firmadoEn: data.firmadoEn || null,
+    fileMime: data.fileMime || '',
+    fileNombre: data.fileNombre || '',
+    dni: data.dni || '',
+    lat: data.lat || '',
+    lng: data.lng || '',
+    ip: data.ip || '',
+    otpEmail: data.otpEmail || '',
+    selfie: data.selfie || '',
+    dniFoto: data.dniFoto || '',
+    liveness: data.liveness || '',
+    tieneFotos: data.tieneFotos || ''
+  };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -41,25 +69,79 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
+    // ── GET /api/list ────────────────────────────────────────────────────────
+    // Lista documentos reales guardados en KV para el panel admin.
+    if(url.pathname === '/api/list' && request.method === 'GET'){
+      if(!env.FIRMAYA_KV) return json({ ok: false, docs: [], error: 'KV no configurado' }, 500);
+      try{
+        const listed = await env.FIRMAYA_KV.list({ prefix: 'doc:', limit: 1000 });
+        const docs = [];
+        for(const key of listed.keys || []){
+          const data = await env.FIRMAYA_KV.get(key.name, 'json');
+          const doc = publicDoc(data);
+          if(doc && doc.token) docs.push(doc);
+        }
+        docs.sort((a,b) => new Date(b.creadoEn || b.firmadoEn || 0) - new Date(a.creadoEn || a.firmadoEn || 0));
+        return json({ ok: true, docs });
+      }catch(e){
+        return json({ ok: false, docs: [], error: e.message }, 500);
+      }
+    }
+
+    // ── GET /api/doc ─────────────────────────────────────────────────────────
+    if(url.pathname === '/api/doc' && request.method === 'GET'){
+      const token = url.searchParams.get('token');
+      if(!token) return json({ ok: false, error: 'Token requerido' }, 400);
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
+      try{
+        const data = await env.FIRMAYA_KV.get('doc:' + token, 'json');
+        if(!data) return json({ ok: false, error: 'Documento no encontrado' }, 404);
+        return json({ ok: true, doc: publicDoc(data) });
+      }catch(e){
+        return json({ ok: false, error: e.message }, 500);
+      }
+    }
+
+    // ── DELETE /api/doc ──────────────────────────────────────────────────────
+    if((url.pathname === '/api/doc' || url.pathname === '/api/delete') && request.method === 'DELETE'){
+      const token = url.searchParams.get('token');
+      if(!token) return json({ ok: false, error: 'Token requerido' }, 400);
+      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
+      try{
+        await Promise.all([
+          env.FIRMAYA_KV.delete('doc:' + token),
+          env.FIRMAYA_KV.delete('file:' + token),
+          env.FIRMAYA_KV.delete('photos:' + token)
+        ]);
+        return json({ ok: true });
+      }catch(e){
+        return json({ ok: false, error: e.message }, 500);
+      }
+    }
+
     // ── POST /api/send ────────────────────────────────────────────────────────
     // Registra el documento en KV y OPCIONALMENTE envía email
     if(url.pathname === '/api/send' && request.method === 'POST'){
       try{
         const body = await request.json();
         const { token, docNombre, firmante, emailFirmante, firmarUrl, sendEmail } = body;
-        if(!token || !firmarUrl) return json({ok:false, error:'Faltan datos'}, 400);
+        if(!token || !firmarUrl || !docNombre || !firmante) return json({ok:false, error:'Faltan datos'}, 400);
+        if(sendEmail !== false && !emailFirmante) return json({ok:false, error:'Email del firmante requerido'}, 400);
 
         // Siempre guardar en KV (funciona para email Y WhatsApp)
         if(env.FIRMAYA_KV){
+          const existing = (await env.FIRMAYA_KV.get('doc:' + token, 'json')) || {};
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify({
+            ...existing,
             token, docNombre, firmante, emailFirmante, firmarUrl,
             estado: 'Pendiente',
-            creadoEn: new Date().toISOString()
+            creadoEn: existing.creadoEn || new Date().toISOString()
           }), { expirationTtl: 60 * 60 * 24 * 90 });
         }
 
         // Solo enviar email si se pide y hay email
-        if(sendEmail !== false && emailFirmante && env.RESEND_API_KEY){
+        if(sendEmail !== false){
+          if(!env.RESEND_API_KEY) return json({ ok: false, error: 'RESEND_API_KEY no configurado' }, 500);
           const emailResp = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -98,7 +180,11 @@ export default {
 </div>`
             })
           });
-          const emailData = await emailResp.json();
+          let emailData = {};
+          try{ emailData = await emailResp.json(); }catch(_){}
+          if(!emailResp.ok){
+            return json({ ok: false, emailEnviado: false, error: emailData.message || emailData.error || 'Error al enviar email' }, 502);
+          }
           return json({ ok: true, emailEnviado: emailResp.ok, emailId: emailData.id });
         }
 
