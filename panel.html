@@ -61,8 +61,11 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg);
 }
 .sidebar-logo{
   padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1);
-  font-family:'Playfair Display',serif;font-size:22px;font-weight:700
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  cursor:pointer;transition:background .2s, opacity .2s
 }
+.sidebar-logo:hover{background:rgba(255,255,255,.08)}
+.sidebar-logo:active{opacity:.82}
 .sidebar-logo span{display:block;font-family:'Inter',sans-serif;font-size:10px;opacity:.6;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
 .sidebar-nav{flex:1;padding:16px 12px}
 .nav-item{
@@ -432,7 +435,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
+      <div class="sidebar-logo" onclick="showView('dashboard')" title="Volver al inicio">
         FirmaYa
         <span>Panel de gestión</span>
       </div>
