@@ -1095,6 +1095,7 @@ async function confirmarFirma(){
         selfie:     selfieData        ? 'sí' : 'no',
         dniFoto:    dniData           ? 'sí' : 'no',
         liveness:   livenessConfirmed ? 'sí' : 'no',
+        firmaImg:   sigImg       || null,
         selfieImg:  selfieData  || null,
         dniFotoImg: dniData     || null
       })
@@ -1305,7 +1306,6 @@ body{font-family:Arial,Helvetica,sans-serif;color:#1A2B35;background:#fff}
   </div>
 
 </div>
-<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),600))<\/script>
 </body>
 </html>`;
 
@@ -1313,6 +1313,7 @@ body{font-family:Arial,Helvetica,sans-serif;color:#1A2B35;background:#fff}
   if(win){
     win.document.write(html);
     win.document.close();
+    setTimeout(()=>{ try{ win.print(); }catch(e){} }, 600);
   } else {
     // Fallback si el popup fue bloqueado: descarga HTML
     const blob = new Blob([html], {type:'text/html'});
@@ -1391,18 +1392,6 @@ function checkFacialMatch(){
 }
 
 // ==================== RESIZE CANVAS ====================
-window.addEventListener('resize', ()=>{
-  if(!canvas) return;
-  const data = ctx.getImageData(0,0,canvas.width,canvas.height);
-  const wrap = document.getElementById('canvasWrap');
-  canvas.width = wrap.offsetWidth || 480;
-  ctx.putImageData(data,0,0);
-  ctx.strokeStyle='#0A4E62'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
-});
-</script>
-</body>
-</html>
-================ RESIZE CANVAS ====================
 window.addEventListener('resize', ()=>{
   if(!canvas) return;
   const data = ctx.getImageData(0,0,canvas.width,canvas.height);
