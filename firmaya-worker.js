@@ -152,7 +152,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: [emailFirmante],
               subject: 'Tenés un documento para firmar: ' + docNombre,
               html: `
@@ -310,7 +310,7 @@ export default {
             : '<span style="color:#aaa">—</span>';
 
           const emailPayload = {
-            from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+            from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
             to:   ['londonserviciosinmobiliarios@gmail.com'],
             subject: '✅ ' + firmante + ' firmó: ' + docNombreFinal,
             html: `
@@ -576,7 +576,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
               to: [email],
               subject: 'Tu código de verificación es: ' + otp,
               html: `
