@@ -196,15 +196,30 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 /* Doc preview with signature area */
 .doc-preview{
   border:1px solid var(--border);border-radius:10px;background:#FAFAFA;
-  padding:24px;font-size:12px;color:var(--text-medium);line-height:1.9;
-  min-height:260px;position:relative
+  padding:14px;font-size:12px;color:var(--text-medium);line-height:1.9;
+  min-height:420px;position:relative;overflow:hidden
+}
+.doc-preview-viewer{
+  position:relative;min-height:360px;border:1px solid var(--border);
+  border-radius:8px;background:white;overflow:hidden
+}
+.doc-preview-frame{
+  width:100%;height:520px;border:0;display:block;background:white
+}
+.doc-preview-empty{
+  text-align:center;padding:70px 18px;color:var(--text-light)
+}
+.doc-preview-empty .big{font-size:48px;margin-bottom:10px}
+.doc-preview-note{
+  background:#FFF9E6;border:1px solid #F0C040;border-radius:8px;
+  padding:14px 16px;color:#856404;font-size:13px;line-height:1.55
 }
 .sig-placeholder{
   display:inline-flex;align-items:center;gap:8px;
   background:#FFF9E6;border:2px dashed #F0C040;
   border-radius:8px;padding:12px 20px;cursor:move;
   font-size:12px;color:#856404;font-weight:600;
-  position:relative;margin-top:16px
+  position:absolute;left:28px;top:90px;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.12)
 }
 .sig-placeholder-move{font-size:10px;color:#A07800;display:block;margin-top:2px;font-weight:400}
 
@@ -459,28 +474,28 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
           <div class="stats-row">
             <div class="stat-card">
-              <div class="stat-num">26</div>
+              <div class="stat-num" id="statTotal">0</div>
               <div class="stat-lbl">Total enviados</div>
               <div class="stat-icon">📤</div>
             </div>
             <div class="stat-card green">
-              <div class="stat-num">25</div>
+              <div class="stat-num" id="statFirmados">0</div>
               <div class="stat-lbl">Firmados</div>
               <div class="stat-icon">✅</div>
             </div>
             <div class="stat-card orange">
-              <div class="stat-num">1</div>
+              <div class="stat-num" id="statPendientes">0</div>
               <div class="stat-lbl">Pendientes</div>
               <div class="stat-icon">⏳</div>
             </div>
             <div class="stat-card red">
-              <div class="stat-num">0</div>
+              <div class="stat-num" id="statRechazados">0</div>
               <div class="stat-lbl">Rechazados</div>
               <div class="stat-icon">❌</div>
             </div>
           </div>
 
-          <div class="alert-info">
+          <div class="alert-info" id="planAlert">
             ⚡ Tenés 12 documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>
           </div>
 
@@ -567,7 +582,7 @@ td.td-name{font-weight:600;color:var(--text-dark)}
 
             <!-- Step 1: Upload -->
             <div class="flow-body" id="flowStep1">
-              <input type="file" id="realFileInput" accept=".pdf,.docx,.doc" style="display:none" onchange="handleFileSelect(this)">
+              <input type="file" id="realFileInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="handleFileSelect(this)">
               <div class="upload-zone" id="uploadZone" onclick="document.getElementById('realFileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
                 <div class="upload-icon">📂</div>
                 <div class="upload-title">Arrastrá el documento aquí</div>
@@ -658,9 +673,11 @@ td.td-name{font-weight:600;color:var(--text-dark)}
               <p style="font-size:13px;color:var(--text-medium);margin-bottom:16px">Marcá dónde va la firma en el documento. Podés moverla arrastrándola.</p>
               <div class="doc-preview">
                 <strong id="previewDocName" style="display:block;text-align:center;font-size:13px;color:var(--text-dark);margin-bottom:12px">📄 Documento cargado</strong>
-                <div style="text-align:center;padding:28px 0 20px;color:var(--text-light)">
-                  <div style="font-size:48px;margin-bottom:10px">📄</div>
-                  <p style="font-size:13px;line-height:1.6">El documento fue cargado correctamente.<br>Arrastrá el bloque de firma a la posición donde debe ir la rúbrica.</p>
+                <div class="doc-preview-viewer" id="docPreviewViewer">
+                  <div class="doc-preview-empty">
+                    <div class="big">📄</div>
+                    <p style="font-size:13px;line-height:1.6">Subí un PDF para ver la vista previa y posicionar la firma.</p>
+                  </div>
                 </div>
                 <div class="sig-placeholder" id="sigPlaceholder" draggable="true">
                   <span id="sigPlaceholderName">✍️ Firma del firmante</span>
@@ -901,8 +918,24 @@ async function apiJson(path, options={}){
 }
 
 function renderStats(){
+  const total = docs.length;
+  const firmados = docs.filter(d => d.estado === 'Firmado').length;
+  const pendientes = docs.filter(d => d.estado === 'Pendiente').length;
+  const rechazados = docs.filter(d => d.estado === 'Rechazado').length;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  };
+  set('statTotal', total);
+  set('statFirmados', firmados);
+  set('statPendientes', pendientes);
+  set('statRechazados', rechazados);
   const cnt = document.getElementById('docsCount');
   if(cnt) cnt.textContent = docs.length + ' documento' + (docs.length===1?'':'s');
+  const plan = document.querySelector('.user-plan');
+  if(plan) plan.textContent = 'Plan Pro · ' + total + '/50 docs';
+  const alert = document.getElementById('planAlert');
+  if(alert) alert.innerHTML = '⚡ Tenés ' + Math.max(0, 50 - total) + ' documentos disponibles en tu plan este mes. <a href="#" style="color:var(--primary);font-weight:700;margin-left:6px">Actualizar plan →</a>';
 }
 
 async function loadDocsFromAPI(){
@@ -1062,6 +1095,7 @@ function doLogin(){
   const err = document.getElementById('loginError');
   if(email.toLowerCase() === 'london@firmaya.com.ar' && pass.trim() === 'London2026'){
     err.style.display='none';
+    try{ localStorage.setItem('firmaya_session','1'); }catch(e){}
     showDashboard();
   } else {
     err.style.display='block';
@@ -1071,6 +1105,7 @@ function doLogin(){
 document.addEventListener('DOMContentLoaded', ()=>{
   const p = document.getElementById('loginPass');
   if(p) p.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  try{ if(localStorage.getItem('firmaya_session') === '1') showDashboard(); }catch(e){}
 });
 
 function toggleSidebar(){
@@ -1091,6 +1126,7 @@ function showDashboard(){
 }
 
 function logout(){
+  try{ localStorage.removeItem('firmaya_session'); }catch(e){}
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
 }
@@ -1106,7 +1142,7 @@ function handleFileDrop(event){
   if(file) showUploadedFile(file);
 }
 function showUploadedFile(file){
-  const allowed = ['pdf','docx','doc'];
+  const allowed = ['pdf','docx'];
   const ext = file.name.split('.').pop().toLowerCase();
   if(!allowed.includes(ext)){ alert('Solo se aceptan archivos PDF o DOCX'); return; }
   const kb = Math.round(file.size/1024);
@@ -1118,6 +1154,7 @@ function showUploadedFile(file){
   document.getElementById('btnNext1').removeAttribute('disabled');
   window._uploadedFile = file;
   window._uploadedFileName = file.name;
+  window._uploadedFileExt = ext;
 }
 function resetUpload(){
   document.getElementById('uploadZone').style.display='block';
@@ -1127,6 +1164,62 @@ function resetUpload(){
   document.getElementById('btnNext1').setAttribute('disabled','');
   window._uploadedFile = null;
   window._uploadedFileName = null;
+  window._uploadedFileExt = null;
+  resetDocumentPreview();
+}
+
+function resetDocumentPreview(){
+  if(window._previewObjectUrl){
+    try{ URL.revokeObjectURL(window._previewObjectUrl); }catch(e){}
+    window._previewObjectUrl = null;
+  }
+  const viewer = document.getElementById('docPreviewViewer');
+  if(viewer){
+    viewer.innerHTML = `
+      <div class="doc-preview-empty">
+        <div class="big">📄</div>
+        <p style="font-size:13px;line-height:1.6">Subí un PDF para ver la vista previa y posicionar la firma.</p>
+      </div>`;
+  }
+  const ph = document.getElementById('sigPlaceholder');
+  if(ph){
+    ph.style.left = '28px';
+    ph.style.top = '90px';
+  }
+}
+
+function renderDocumentPreview(){
+  const viewer = document.getElementById('docPreviewViewer');
+  if(!viewer || !window._uploadedFile) return;
+  if(window._previewObjectUrl){
+    try{ URL.revokeObjectURL(window._previewObjectUrl); }catch(e){}
+    window._previewObjectUrl = null;
+  }
+  const file = window._uploadedFile;
+  const ext = (window._uploadedFileExt || file.name.split('.').pop() || '').toLowerCase();
+  if(ext === 'pdf' || file.type === 'application/pdf'){
+    const url = URL.createObjectURL(file);
+    window._previewObjectUrl = url;
+    viewer.innerHTML = `<iframe class="doc-preview-frame" src="${url}#toolbar=0&navpanes=0&scrollbar=1" title="Vista previa del documento PDF"></iframe>`;
+    return;
+  }
+  if(ext === 'docx'){
+    viewer.innerHTML = `
+      <div class="doc-preview-empty">
+        <div class="big">📝</div>
+        <div class="doc-preview-note">
+          <strong>Vista previa no disponible para DOCX.</strong><br>
+          El archivo se enviará correctamente, pero la firma se agregará como constancia/certificado al final del proceso.
+          Si necesitás ubicar la firma visualmente sobre una página, subí el documento en PDF.
+        </div>
+      </div>`;
+    return;
+  }
+  viewer.innerHTML = `
+    <div class="doc-preview-empty">
+      <div class="big">⚠️</div>
+      <p>No se pudo generar la vista previa de este archivo.</p>
+    </div>`;
 }
 
 // ---- FLOW ----
@@ -1137,6 +1230,7 @@ function resetFlow(){
   document.getElementById('sentSuccess').style.display='none';
   window._uploadedFile = null;
   window._uploadedFileName = null;
+  window._uploadedFileExt = null;
   window._signerName = null;
   window._signerEmail = null;
   ['1','2','3','4'].forEach(n=>{
@@ -1176,6 +1270,7 @@ function flowGo(n){
     document.getElementById('sigPlaceholderName').textContent = '✍️ Firma de '+(name.trim()||'el firmante');
     const pn = document.getElementById('previewDocName');
     if(pn) pn.textContent = '📄 ' + (window._uploadedFileName || 'Documento cargado');
+    renderDocumentPreview();
   }
   if(n===4){
     const name = ((document.getElementById('firmanteName')||{}).value||'').trim();
@@ -1262,10 +1357,21 @@ function toggleCheck(el){
 // ---- DRAG SIG PLACEHOLDER ----
 const ph = document.getElementById('sigPlaceholder');
 if(ph){
-  let ox=0,oy=0,x=0,y=0;
+  let ox=0, oy=0;
   ph.addEventListener('mousedown',e=>{
-    ox=e.clientX-ph.offsetLeft; oy=e.clientY-ph.offsetTop;
-    document.onmousemove=m=>{ ph.style.position='absolute'; ph.style.left=(m.clientX-ox)+'px'; ph.style.top=(m.clientY-oy)+'px'; };
+    const parent = ph.parentElement;
+    const parentRect = parent.getBoundingClientRect();
+    const phRect = ph.getBoundingClientRect();
+    ox = e.clientX - phRect.left;
+    oy = e.clientY - phRect.top;
+    document.onmousemove=m=>{
+      const maxLeft = Math.max(0, parent.clientWidth - ph.offsetWidth);
+      const maxTop = Math.max(0, parent.clientHeight - ph.offsetHeight);
+      const left = Math.min(maxLeft, Math.max(0, m.clientX - parentRect.left - ox));
+      const top = Math.min(maxTop, Math.max(0, m.clientY - parentRect.top - oy));
+      ph.style.left = left + 'px';
+      ph.style.top = top + 'px';
+    };
     document.onmouseup=()=>{ document.onmousemove=null; document.onmouseup=null; };
   });
 }
