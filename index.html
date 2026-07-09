@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FirmaYa — Firma Electrónica Digital</title>
+<title>FirmaYa — Firma Electrónica</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -120,6 +120,43 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--whit
 .feat-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
 .feat-card p{font-size:13px;color:var(--text-medium);line-height:1.65}
 
+/* ---- DEMO / USE CASES ---- */
+.demo-panel{
+  max-width:980px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;
+  gap:28px;align-items:stretch
+}
+.demo-card{
+  background:white;border:1px solid var(--border);border-radius:18px;
+  padding:34px;box-shadow:0 12px 36px rgba(13,98,120,.08)
+}
+.demo-card h3{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:12px}
+.demo-card p{font-size:15px;color:var(--text-medium);line-height:1.75;margin-bottom:20px}
+.demo-flow{display:grid;gap:12px}
+.flow-step{display:flex;gap:13px;align-items:flex-start;background:var(--bg-light);border-radius:12px;padding:14px}
+.flow-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.flow-step strong{display:block;font-size:14px;margin-bottom:3px}
+.flow-step span{font-size:12px;color:var(--text-medium);line-height:1.55}
+.evidence-preview{
+  border-radius:18px;background:linear-gradient(180deg,#fff,#F5F8FA);
+  border:1px solid var(--border);padding:28px;position:relative;overflow:hidden
+}
+.evidence-preview::before{
+  content:'FirmaYa';position:absolute;right:-18px;bottom:12px;font-family:'Playfair Display',serif;
+  font-size:64px;color:rgba(13,98,120,.06);font-weight:700
+}
+.evidence-title{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--primary);margin-bottom:16px}
+.evidence-line{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-medium)}
+.evidence-line:last-child{border-bottom:none}
+.evidence-line strong{color:var(--text-dark)}
+.use-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:980px;margin:0 auto}
+.use-card{background:white;border:1px solid var(--border);border-radius:14px;padding:22px}
+.use-card strong{display:block;font-size:15px;margin-bottom:7px}
+.use-card span{display:block;font-size:13px;color:var(--text-medium);line-height:1.6}
+.note-box{
+  max-width:900px;margin:36px auto 0;background:#FFF9E6;border:1px solid #F0D98A;
+  color:#6B5415;border-radius:14px;padding:18px 22px;font-size:13px;line-height:1.7
+}
+
 /* ---- VALIDATIONS ---- */
 .val-section{background:var(--primary-pale);padding:88px 6%}
 .val-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:800px;margin:0 auto}
@@ -148,13 +185,6 @@ body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--whit
   background:var(--primary);color:white;padding:4px 18px;
   border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase
 }
-.plan-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--primary);margin-bottom:8px}
-.plan-price{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--text-dark)}
-.plan-price span{font-size:16px;color:var(--text-medium);font-family:'Inter',sans-serif;font-weight:400}
-.plan-period{font-size:12px;color:var(--text-light);margin-bottom:26px}
-.plan-divider{height:1px;background:var(--border);margin-bottom:22px}
-.plan-feats{list-style:none;text-align:left;margin-bottom:30px}
-.plan-feats li{padding:7px 0;font-size:13px;color:var(--text-medium);display:flex;align-items:center;gap:9px}
 .check{color:var(--success);font-weight:700;font-size:15px}
 
 /* ---- LEGAL ---- */
@@ -178,107 +208,6 @@ footer p{color:rgba(255,255,255,.45);font-size:13px}
 footer .f-links{display:flex;justify-content:center;gap:24px;margin:16px 0}
 footer .f-links a{color:rgba(255,255,255,.5);font-size:13px;text-decoration:none}
 footer .f-links a:hover{color:white}
-
-/* ---- DEMO OVERLAY ---- */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.72);z-index:300;
-  align-items:center;justify-content:center;backdrop-filter:blur(4px)
-}
-.overlay.open{display:flex}
-.phone{
-  width:390px;background:white;border-radius:28px;overflow:hidden;
-  box-shadow:0 30px 80px rgba(0,0,0,.4);position:relative;max-height:92vh;
-  display:flex;flex-direction:column
-}
-.phone-bar{
-  background:var(--primary);padding:18px 22px;
-  display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0
-}
-.phone-bar-logo{font-family:'Playfair Display',serif;font-size:19px;font-weight:700}
-.phone-bar-sub{font-size:10px;opacity:.7;margin-top:2px}
-.close-btn{
-  background:rgba(255,255,255,.18);border:none;color:white;
-  width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;
-  display:flex;align-items:center;justify-content:center
-}
-.phone-body{padding:26px;overflow-y:auto;flex:1}
-
-/* Progress dots */
-.dots{display:flex;justify-content:center;gap:6px;margin-bottom:22px}
-.dot{width:8px;height:8px;border-radius:4px;background:var(--border);transition:all .3s}
-.dot.active{width:24px;background:var(--primary)}
-.dot.done{background:var(--success)}
-
-/* Screens */
-.screen{display:none}
-.screen.on{display:block}
-
-/* Canvas */
-#sigCanvas{
-  border:2px dashed var(--border);border-radius:10px;
-  background:#FAFAFA;cursor:crosshair;width:100%;touch-action:none
-}
-
-/* Selfie sim */
-.selfie-frame{
-  width:220px;height:220px;border-radius:50%;background:#1A2B35;
-  margin:0 auto;position:relative;overflow:hidden;
-  border:3px solid var(--primary)
-}
-.selfie-frame::after{
-  content:'';position:absolute;inset:0;
-  border-radius:50%;box-shadow:inset 0 0 30px rgba(13,98,120,.5)
-}
-.selfie-overlay{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;color:rgba(255,255,255,.7)
-}
-.selfie-icon{font-size:60px;margin-bottom:8px}
-.selfie-label{font-size:13px;text-align:center}
-
-/* PIN inputs */
-.pin-row{display:flex;gap:10px;justify-content:center}
-.pin-input{
-  width:52px;height:60px;text-align:center;font-size:26px;font-weight:700;
-  border:2px solid var(--border);border-radius:10px;outline:none;
-  transition:border-color .2s;font-family:'Inter',sans-serif
-}
-.pin-input:focus{border-color:var(--primary)}
-
-/* Success */
-.success-circle{
-  width:90px;height:90px;background:var(--success);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 20px;font-size:42px;color:white;
-  box-shadow:0 6px 24px rgba(39,174,96,.35)
-}
-
-/* Nav buttons */
-.d-nav{display:flex;gap:10px;margin-top:20px}
-.d-btn{
-  flex:1;padding:13px;border-radius:10px;font-size:14px;
-  font-weight:600;cursor:pointer;border:none;transition:all .2s
-}
-.d-btn-p{background:var(--primary);color:white}
-.d-btn-p:hover{background:var(--primary-dark)}
-.d-btn-s{background:var(--bg-light);color:var(--text-medium)}
-.d-btn-s:hover{background:var(--border)}
-.d-btn-g{background:var(--success);color:white}
-
-/* Info box */
-.info-box{background:var(--bg-light);border-radius:10px;padding:14px;font-size:12px;color:var(--text-medium);line-height:1.8}
-.info-box p{margin-bottom:4px}
-.info-box p:last-child{margin-bottom:0}
-
-/* ---- TOGGLE BILLING ---- */
-.billing-toggle{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:48px}
-.toggle-label{font-size:14px;font-weight:600;color:var(--text-medium)}
-.toggle-label.active-label{color:var(--text-dark)}
-.toggle-switch{width:52px;height:28px;background:var(--primary);border-radius:20px;position:relative;cursor:pointer;transition:background .3s}
-.toggle-switch::after{content:'';position:absolute;width:22px;height:22px;background:white;border-radius:50%;top:3px;left:3px;transition:left .3s}
-.toggle-switch.annual::after{left:27px}
-.annual-badge{display:inline-block;background:#D5F5E3;color:var(--success);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:6px}
 
 /* ---- COMPARISON TABLE ---- */
 .comp-wrap{overflow-x:auto;max-width:900px;margin:48px auto 0}
@@ -324,22 +253,19 @@ footer .f-links a:hover{color:white}
   .hero-ctas .btn-lg{width:100%;max-width:320px;text-align:center}
   .steps{grid-template-columns:1fr}
   .steps::before{display:none}
-  .features-grid,.val-grid,.price-grid{grid-template-columns:1fr}
+  .features-grid,.val-grid,.price-grid,.demo-panel,.use-grid{grid-template-columns:1fr}
   .stats-bar{gap:28px;flex-wrap:wrap;justify-content:center}
   .stat-number{font-size:24px}
-  .phone{width:300px}
   .section-title h2{font-size:26px}
   .section-title p{font-size:15px}
   .enterprise-banner{flex-direction:column;gap:20px;text-align:center;padding:32px 20px}
   .price-grid{padding:0 4px}
   .faq-list{max-width:100%}
-  .overlay-inner{padding:10px}
 }
 @media(max-width:480px){
   .hero h1{font-size:28px}
   .stats-bar{gap:20px}
   .stat-number{font-size:22px}
-  .phone{width:260px}
   .navbar .btn-primary{font-size:13px;padding:9px 14px}
 }
 </style>
@@ -360,32 +286,32 @@ footer .f-links a:hover{color:white}
     </svg>
     <div class="logo-wordmark">
       <span class="logo-name">FirmaYa</span>
-      <span class="logo-tagline">Firma Electrónica Digital</span>
+      <span class="logo-tagline">Firma Electrónica</span>
     </div>
   </a>
   <div class="nav-links">
     <a href="#como">Cómo funciona</a>
     <a href="#validaciones">Validaciones</a>
-    <a href="#precios">Precios</a>
+    <a href="#demo">Demo</a>
     <a href="#legal">Legal</a>
     <a href="/panel.html" class="btn btn-outline">Ingresar</a>
-    <a href="/panel.html" class="btn btn-primary" style="background:#27AE60;border-color:#27AE60">Empezar gratis</a>
+    <a href="/panel.html" class="btn btn-primary" style="background:#27AE60;border-color:#27AE60">Ingresar al panel</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">✦ Válido bajo Ley 25.506 · República Argentina</div>
+  <div class="hero-badge">✦ Firma electrónica con evidencia · Ley 25.506</div>
   <h1>Firmá documentos desde cualquier celular</h1>
-  <p>La plataforma de firma electrónica más simple para inmobiliarias, estudios jurídicos y empresas. Tus clientes firman en menos de 2 minutos.</p>
+  <p>Una forma simple para que inmobiliarias, estudios y empresas envíen documentos, validen identidad y reciban una copia firmada con respaldo de evidencia.</p>
   <div class="hero-ctas">
-    <a href="/panel.html" class="btn btn-white btn-lg">Empezar gratis →</a>
-    <button class="btn btn-ghost btn-lg" onclick="openDemo()">▶ Ver demo en vivo</button>
+    <a href="/panel.html" class="btn btn-white btn-lg">Ingresar al panel →</a>
+    <a href="#demo" class="btn btn-ghost btn-lg">Ver cómo funciona ↓</a>
   </div>
   <div class="stats-bar">
     <div class="stat-item">
-      <div class="stat-number">100%</div>
-      <div class="stat-label">Validez legal</div>
+      <div class="stat-number">Ley 25.506</div>
+      <div class="stat-label">Firma electrónica</div>
     </div>
     <div class="stat-item">
       <div class="stat-number">&lt; 2 min</div>
@@ -397,7 +323,7 @@ footer .f-links a:hover{color:white}
     </div>
     <div class="stat-item">
       <div class="stat-number">SHA-256</div>
-      <div class="stat-label">Integridad garantizada</div>
+      <div class="stat-label">Huella del documento</div>
     </div>
   </div>
 </section>
@@ -407,13 +333,13 @@ footer .f-links a:hover{color:white}
   <div class="section-title">
     <div class="tag">Proceso</div>
     <h2>Así de simple</h2>
-    <p>En 3 pasos, tu documento está firmado con plena validez jurídica</p>
+    <p>En 3 pasos, tu documento queda firmado y acompañado por un informe de evidencia</p>
   </div>
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
       <h3>Subí el documento</h3>
-      <p>PDF o Word. Arrastrá el archivo o seleccionalo desde tu computadora. Posicionás dónde va la firma.</p>
+      <p>Subís el PDF desde el panel y posicionás dónde va la firma.</p>
     </div>
     <div class="step">
       <div class="step-num">2</div>
@@ -433,7 +359,7 @@ footer .f-links a:hover{color:white}
   <div class="section-title">
     <div class="tag">Herramientas</div>
     <h2>Todo lo que necesitás</h2>
-    <p>Diseñado para que firmar sea simple, seguro y legalmente defendible</p>
+    <p>Diseñado para que firmar sea simple, ordenado y con trazabilidad</p>
   </div>
   <div class="features-grid">
     <div class="feat-card">
@@ -444,7 +370,7 @@ footer .f-links a:hover{color:white}
     <div class="feat-card">
       <span class="feat-icon">📧</span>
       <h3>Verificación múltiple</h3>
-      <p>Código por email, SMS o WhatsApp para confirmar la identidad antes de firmar.</p>
+      <p>Código por email para validar identidad y opción de enviar el link de firma por WhatsApp.</p>
     </div>
     <div class="feat-card">
       <span class="feat-icon">🤳</span>
@@ -464,8 +390,57 @@ footer .f-links a:hover{color:white}
     <div class="feat-card">
       <span class="feat-icon">📋</span>
       <h3>Informe de firmas</h3>
-      <p>PDF con todo el rastro de evidencia: IP, GPS, dispositivo, selfie, email y timestamp.</p>
+      <p>PDF con el rastro de evidencia disponible: IP, ubicación aproximada si el firmante la permite, dispositivo, selfie, email, fecha y hora.</p>
     </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="section" id="demo">
+  <div class="section-title">
+    <div class="tag">Demo</div>
+    <h2>Mirá cómo firma un cliente</h2>
+    <p>La demo muestra el recorrido completo sin enviar datos reales ni crear documentos reales.</p>
+  </div>
+  <div class="demo-panel">
+    <div class="demo-card">
+      <h3>Del documento al PDF firmado</h3>
+      <p>La idea es que cualquier cliente pueda firmar desde el celular, sin instalar aplicaciones y sin tener que crear una cuenta.</p>
+      <div class="demo-flow">
+        <div class="flow-step"><div class="flow-num">1</div><div><strong>Cargás el documento</strong><span>Subís el PDF, ubicás la firma y elegís qué validaciones pedir.</span></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div><strong>Enviás el link</strong><span>Puede salir por email o copiarse para mandarlo por WhatsApp.</span></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div><strong>El firmante valida identidad</strong><span>Firma en pantalla, confirma email y adjunta selfie/DNI si corresponde.</span></div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div><strong>Recibís evidencia</strong><span>Descargás el documento firmado junto con el informe de firma.</span></div></div>
+      </div>
+      <a href="/panel.html" class="btn btn-primary btn-lg" style="margin-top:22px">Ir al panel →</a>
+    </div>
+    <div class="evidence-preview">
+      <div class="evidence-title">Informe de evidencia</div>
+      <div class="evidence-line">✅ <span><strong>Firma:</strong> trazo manuscrito en pantalla</span></div>
+      <div class="evidence-line">📧 <span><strong>Email:</strong> código de verificación</span></div>
+      <div class="evidence-line">🤳 <span><strong>Selfie:</strong> foto del firmante con fecha y hora</span></div>
+      <div class="evidence-line">🪪 <span><strong>DNI:</strong> foto del documento si se solicita</span></div>
+      <div class="evidence-line">🌐 <span><strong>IP/dispositivo:</strong> datos técnicos de la firma</span></div>
+      <div class="evidence-line">📍 <span><strong>Ubicación:</strong> aproximada, solo si el firmante la permite</span></div>
+      <div class="evidence-line">🔐 <span><strong>Hash SHA-256:</strong> huella del documento firmado</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES -->
+<section class="section section-alt">
+  <div class="section-title">
+    <div class="tag">Usos reales</div>
+    <h2>Especialmente útil para inmobiliarias</h2>
+    <p>Firmá documentos simples sin perseguir al cliente ni depender del papel.</p>
+  </div>
+  <div class="use-grid">
+    <div class="use-card"><strong>Autorizaciones</strong><span>Venta, alquiler, publicación, entrega de documentación o autorización de gestión.</span></div>
+    <div class="use-card"><strong>Reservas</strong><span>Constancias, aceptación de condiciones y acuerdos preliminares.</span></div>
+    <div class="use-card"><strong>Conformidades</strong><span>Visitas, entrega de llaves, recepción de documentación y aceptación de estado.</span></div>
+    <div class="use-card"><strong>Recibos</strong><span>Comprobantes internos, recibos de pago, entrega o recepción.</span></div>
+    <div class="use-card"><strong>Gestión remota</strong><span>Clientes que no pueden acercarse a la oficina o están en otra ciudad.</span></div>
+    <div class="use-card"><strong>Archivo ordenado</strong><span>Documentos firmados con evidencia centralizada para consultar después.</span></div>
   </div>
 </section>
 
@@ -481,128 +456,54 @@ footer .f-links a:hover{color:white}
       <div class="val-group-title">🔵 Autenticación Estándar</div>
       <div class="val-item"><div class="val-check">✓</div> Firma manuscrita en pantalla</div>
       <div class="val-item"><div class="val-check">✓</div> Código de verificación por e-mail</div>
-      <div class="val-item"><div class="val-check">✓</div> Código de verificación por SMS</div>
-      <div class="val-item"><div class="val-check">✓</div> Código de verificación por WhatsApp</div>
+      <div class="val-item"><div class="val-check">✓</div> Link de firma para enviar por WhatsApp</div>
+      <div class="val-item"><div class="val-check">✓</div> Registro de IP, fecha y dispositivo</div>
     </div>
     <div class="val-group">
       <div class="val-group-title">🟣 Autenticación Avanzada</div>
       <div class="val-item"><div class="val-check">✓</div> Selfie — foto del rostro con timestamp</div>
       <div class="val-item"><div class="val-check">✓</div> Foto del documento de identidad</div>
-      <div class="val-item"><div class="val-check">✓</div> Reconocimiento facial</div>
-      <div class="val-item"><div class="val-check">✓</div> Biometría facial — prueba de vida</div>
-      <div class="val-item"><div class="val-check">✓</div> Validación de identidad completa</div>
+      <div class="val-item"><div class="val-check">✓</div> Ubicación aproximada si el firmante la permite</div>
+      <div class="val-item"><div class="val-check">✓</div> Informe de evidencia adjunto al PDF</div>
+      <div class="val-item"><div class="val-check">✓</div> Registro de consentimiento del firmante</div>
     </div>
   </div>
 </section>
 
-<!-- PRICING -->
-<section class="section" id="precios">
+<!-- ACTIVE FEATURES -->
+<section class="section" id="activo">
   <div class="section-title">
-    <div class="tag">Precios</div>
-    <h2>Planes sin sorpresas</h2>
-    <p>Sin costos ocultos. Cancelás cuando querés.</p>
-  </div>
-
-  <!-- Billing toggle -->
-  <div class="billing-toggle">
-    <span class="toggle-label active-label" id="lblMensual">Mensual</span>
-    <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
-    <span class="toggle-label" id="lblAnual">Anual <span class="annual-badge">20% OFF</span></span>
-  </div>
-
-  <div class="price-grid">
-    <div class="price-card">
-      <div class="plan-name">Básico</div>
-      <div class="plan-price">$15.000 <span>ARS</span></div>
-      <div class="plan-period">por mes · cobro mensual</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-feats">
-        <li><span class="check">✓</span> 1 usuario</li>
-        <li><span class="check">✓</span> 20 documentos por mes</li>
-        <li><span class="check">✓</span> Firma en pantalla</li>
-        <li><span class="check">✓</span> Código por email</li>
-        <li><span class="check">✓</span> Informe de firmas PDF</li>
-        <li><span class="check">✓</span> Soporte por email</li>
-      </ul>
-      <a href="/panel.html" class="btn btn-outline" style="width:100%;display:flex">Empezar</a>
-    </div>
-    <div class="price-card featured">
-      <div class="popular-tag">MÁS POPULAR</div>
-      <div class="plan-name">Pro</div>
-      <div class="plan-price">$35.000 <span>ARS</span></div>
-      <div class="plan-period">por mes · cobro mensual</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-feats">
-        <li><span class="check">✓</span> 3 usuarios</li>
-        <li><span class="check">✓</span> 50 documentos por mes</li>
-        <li><span class="check">✓</span> Todo lo del Básico</li>
-        <li><span class="check">✓</span> Selfie + Foto del DNI</li>
-        <li><span class="check">✓</span> Código por SMS y WhatsApp</li>
-        <li><span class="check">✓</span> Personalización de marca</li>
-        <li><span class="check">✓</span> Plantillas de documentos</li>
-        <li><span class="check">✓</span> Soporte prioritario</li>
-      </ul>
-      <a href="/panel.html" class="btn btn-primary" style="width:100%;display:flex">Empezar</a>
-    </div>
-    <div class="price-card">
-      <div class="plan-name">Agencia</div>
-      <div class="plan-price">$70.000 <span>ARS</span></div>
-      <div class="plan-period">por mes · cobro mensual</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-feats">
-        <li><span class="check">✓</span> Usuarios ilimitados</li>
-        <li><span class="check">✓</span> Documentos ilimitados</li>
-        <li><span class="check">✓</span> Todo lo del Pro</li>
-        <li><span class="check">✓</span> Reconocimiento facial</li>
-        <li><span class="check">✓</span> Biometría + prueba de vida</li>
-        <li><span class="check">✓</span> API para integrar a tus sistemas</li>
-        <li><span class="check">✓</span> Soporte WhatsApp directo</li>
-      </ul>
-      <a href="/panel.html" class="btn btn-outline" style="width:100%;display:flex">Empezar</a>
-    </div>
-  </div>
-</section>
-
-<!-- COMPARISON TABLE -->
-<section class="section section-alt">
-  <div class="section-title">
-    <div class="tag">Comparación</div>
-    <h2>Compará los planes</h2>
-    <p>Todo lo que incluye cada plan, sin letra chica</p>
+    <div class="tag">Disponible hoy</div>
+    <h2>Lo que FirmaYa ya hace</h2>
+    <p>Solo funciones activas del sistema actual. Sin prometer integraciones o validaciones que todavía no están en uso.</p>
   </div>
   <div class="comp-wrap">
     <table class="comp-table">
       <thead>
         <tr>
-          <th class="th-feat">Funcionalidad</th>
-          <th class="th-plan">Básico</th>
-          <th class="th-plan">Pro</th>
-          <th class="th-plan">Agencia</th>
+          <th class="th-feat">Función activa</th>
+          <th class="th-plan">Estado</th>
+          <th class="th-plan">Uso</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="comp-section"><td colspan="4">📊 Uso</td></tr>
-        <tr><td class="td-feat">Documentos por mes</td><td class="td-val">20</td><td class="td-val">50</td><td class="td-val">Ilimitados</td></tr>
-        <tr><td class="td-feat">Usuarios incluidos</td><td class="td-val">1</td><td class="td-val">3</td><td class="td-val">Ilimitados</td></tr>
-        <tr><td class="td-feat">El firmante necesita cuenta</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td></tr>
-        <tr class="comp-section"><td colspan="4">🔵 Autenticación Estándar</td></tr>
-        <tr><td class="td-feat">Firma en pantalla</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Código por email</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Código por SMS</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Código por WhatsApp</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr class="comp-section"><td colspan="4">🟣 Autenticación Avanzada</td></tr>
-        <tr><td class="td-feat">Selfie con timestamp</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Foto del DNI</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Reconocimiento facial</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Biometría — prueba de vida</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr class="comp-section"><td colspan="4">⚙️ Funcionalidades</td></tr>
-        <tr><td class="td-feat">Informe de firmas PDF</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Recordatorios automáticos</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Personalización de marca</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Plantillas de documentos</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Almacenamiento 5 años</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">API para integración</td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-no">✗</span></td><td class="td-val"><span class="check-yes">✓</span></td></tr>
-        <tr><td class="td-feat">Soporte</td><td class="td-val">Email</td><td class="td-val">Prioritario</td><td class="td-val">WhatsApp directo</td></tr>
+        <tr class="comp-section"><td colspan="3">📄 Gestión del documento</td></tr>
+        <tr><td class="td-feat">Carga de PDF desde el panel</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Crear envío</td></tr>
+        <tr><td class="td-feat">Ubicación manual de la firma</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Elegir dónde firma</td></tr>
+        <tr><td class="td-feat">Link para enviar por WhatsApp</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Envío manual</td></tr>
+        <tr><td class="td-feat">Envío de link por email</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Envío automático</td></tr>
+        <tr class="comp-section"><td colspan="3">🔐 Validación del firmante</td></tr>
+        <tr><td class="td-feat">Firma en pantalla desde celular</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Sin app</td></tr>
+        <tr><td class="td-feat">Código de verificación por email</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Identidad básica</td></tr>
+        <tr><td class="td-feat">Selfie del firmante</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Evidencia visual</td></tr>
+        <tr><td class="td-feat">Foto del DNI</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Evidencia adicional</td></tr>
+        <tr><td class="td-feat">Aceptación expresa antes de firmar</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Consentimiento</td></tr>
+        <tr class="comp-section"><td colspan="3">📋 Evidencia y descarga</td></tr>
+        <tr><td class="td-feat">Documento firmado en PDF</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Descarga final</td></tr>
+        <tr><td class="td-feat">Informe de evidencia</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Adjunto al PDF</td></tr>
+        <tr><td class="td-feat">IP, dispositivo, fecha y hora</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Trazabilidad</td></tr>
+        <tr><td class="td-feat">Ubicación aproximada</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Si el firmante la permite</td></tr>
+        <tr><td class="td-feat">Hash SHA-256</td><td class="td-val"><span class="check-yes">✓</span></td><td class="td-val">Huella del documento</td></tr>
       </tbody>
     </table>
   </div>
@@ -610,10 +511,10 @@ footer .f-links a:hover{color:white}
   <!-- Enterprise banner -->
   <div class="enterprise-banner">
     <div>
-      <h3>¿Necesitás algo a medida?</h3>
-      <p>Para grandes agencias, estudios jurídicos o empresas con alto volumen de documentos. Usuarios ilimitados, integración total y soporte dedicado.</p>
+      <h3>¿Querés usarlo en tu oficina?</h3>
+      <p>Entrás al panel, cargás el documento, enviás el link y descargás el PDF firmado con su informe de evidencia.</p>
     </div>
-    <a href="#" class="btn-white-outline">Hablar con ventas →</a>
+    <a href="/panel.html" class="btn-white-outline">Ingresar al panel →</a>
   </div>
 </section>
 
@@ -636,10 +537,10 @@ footer .f-links a:hover{color:white}
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        ¿Las firmas tienen validez legal en Argentina?
+        ¿Qué tipo de firma genera FirmaYa?
         <span class="faq-icon">+</span>
       </div>
-      <div class="faq-a">Sí. Todas las firmas generadas en FirmaYa son firma electrónica válida bajo la <strong>Ley 25.506</strong> de Firma Electrónica de la República Argentina. Cada documento incluye un informe de evidencia con IP, GPS, dispositivo, timestamp, selfie y hash SHA-256 del documento, lo que lo hace legalmente defendible ante cualquier disputa.</div>
+      <div class="faq-a">FirmaYa genera <strong>firma electrónica</strong> con evidencia de identidad y trazabilidad bajo el marco de la <strong>Ley 25.506</strong> de la República Argentina. No es una firma digital certificada. Cuando una norma o contrato exige específicamente firma digital certificada, conviene usar ese mecanismo o consultar asesoramiento legal.</div>
     </div>
 
     <div class="faq-item">
@@ -652,10 +553,10 @@ footer .f-links a:hover{color:white}
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        ¿Puedo cancelar en cualquier momento?
+        ¿Se puede enviar por WhatsApp?
         <span class="faq-icon">+</span>
       </div>
-      <div class="faq-a">Sí, podés cancelar sin penalización. Todos los planes son prepagos con renovación automática. Si cancelás, seguís teniendo acceso hasta que termine el período ya pagado. No te vamos a cobrar nada más.</div>
+      <div class="faq-a">Sí. Desde el panel se puede copiar el link de firma y enviarlo manualmente por WhatsApp. También se puede enviar el link por email desde el sistema.</div>
     </div>
 
     <div class="faq-item">
@@ -663,7 +564,7 @@ footer .f-links a:hover{color:white}
         ¿Cómo se almacenan los documentos firmados?
         <span class="faq-icon">+</span>
       </div>
-      <div class="faq-a">Guardamos todos tus documentos firmados durante <strong>mínimo 5 años</strong> en servidores seguros. Además, al completarse la firma te enviamos una copia automáticamente por email. También podés descargar todos tus documentos en cualquier momento y guardarlos en tu propio Google Drive, OneDrive o donde quieras.</div>
+      <div class="faq-a">Los documentos quedan disponibles en tu panel para consulta y descarga. También podés descargar el PDF firmado y guardarlo en tu propio Drive, carpeta interna o sistema de gestión.</div>
     </div>
 
     <div class="faq-item">
@@ -676,18 +577,18 @@ footer .f-links a:hover{color:white}
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        ¿Cómo contrato FirmaYa?
+        ¿La ubicación siempre es exacta?
         <span class="faq-icon">+</span>
       </div>
-      <div class="faq-a">Creás una cuenta gratis, elegís el plan que necesitás y pagás con tarjeta de crédito o débito. La activación es inmediata. Te enviamos la factura por email dentro de las 48 horas.</div>
+      <div class="faq-a">No siempre. La ubicación puede ser aproximada y depende de los permisos del navegador, del dispositivo y de la red del firmante. Por eso se muestra como evidencia complementaria, no como domicilio exacto.</div>
     </div>
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        ¿Puedo integrar FirmaYa con mis otros sistemas?
+        ¿Qué recibe la oficina cuando termina la firma?
         <span class="faq-icon">+</span>
       </div>
-      <div class="faq-a">Sí. El Plan Agencia incluye acceso completo a la API de FirmaYa para integrar el proceso de firma en tus propios sistemas (CRM, software de gestión inmobiliaria, etc.). Para integraciones más simples también podés usar Zapier o Make sin escribir código.</div>
+      <div class="faq-a">La oficina puede descargar el documento firmado en PDF junto con el informe de evidencia: firma, email verificado, selfie, DNI si fue solicitado, fecha, hora, IP, dispositivo, ubicación aproximada si fue permitida y hash del documento.</div>
     </div>
 
   </div>
@@ -695,8 +596,8 @@ footer .f-links a:hover{color:white}
 
 <!-- LEGAL -->
 <section class="legal-sec" id="legal">
-  <h2>Cumplimiento legal garantizado</h2>
-  <p>Cada firma generada en FirmaYa cumple con la legislación vigente de firma electrónica de la República Argentina, con evidencia forense completa ante cualquier disputa</p>
+  <h2>Firma electrónica con trazabilidad</h2>
+  <p>FirmaYa ayuda a documentar quién firmó, cuándo firmó y con qué evidencia técnica disponible. Está pensado como respaldo de firma electrónica, no como reemplazo de firma digital certificada cuando esta sea obligatoria.</p>
   <div class="badges">
     <div class="badge">
       <div class="badge-icon">⚖️</div>
@@ -722,8 +623,8 @@ footer .f-links a:hover{color:white}
     <div class="badge">
       <div class="badge-icon">📍</div>
       <div class="badge-text">
-        <strong>IP · GPS · Dispositivo</strong>
-        <small>Evidencia geolocalizada</small>
+        <strong>IP · Ubicación · Dispositivo</strong>
+        <small>Según permisos del firmante</small>
       </div>
     </div>
   </div>
@@ -732,7 +633,7 @@ footer .f-links a:hover{color:white}
 <!-- FOOTER -->
 <footer>
   <div class="f-logo">FirmaYa</div>
-  <p>Firma Electrónica Digital · firmaya.com.ar</p>
+  <p>Firma electrónica con evidencia · firmaya.com.ar</p>
   <div class="f-links">
     <a href="#">Términos y condiciones</a>
     <a href="#">Privacidad</a>
@@ -742,175 +643,7 @@ footer .f-links a:hover{color:white}
   <p style="font-size:12px;margin-top:8px;">© 2026 FirmaYa. Todos los derechos reservados. Desarrollado en Argentina.</p>
 </footer>
 
-<!-- ===== DEMO OVERLAY ===== -->
-<div class="overlay" id="overlay" onclick="closeOutside(event)">
-  <div class="phone" id="phone">
-    <div class="phone-bar">
-      <div>
-        <div class="phone-bar-logo">FirmaYa</div>
-        <div class="phone-bar-sub">Demo interactivo · firma desde tu celular</div>
-      </div>
-      <button class="close-btn" onclick="closeDemo()">✕</button>
-    </div>
-    <div class="phone-body">
-
-      <!-- SCREEN 1: Bienvenida -->
-      <div class="screen on" id="s1">
-        <div class="dots">
-          <div class="dot active"></div><div class="dot"></div>
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div style="text-align:center;padding:12px 0">
-          <div style="width:72px;height:72px;background:var(--primary-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">📄</div>
-          <p style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Inmobiliaria Ejemplo S.A.</p>
-          <h3 style="font-family:'Playfair Display',serif;font-size:19px;margin-bottom:10px">Te invitaron a firmar</h3>
-          <p style="font-size:15px;font-weight:600;color:var(--primary);margin-bottom:20px">RESERVA DPTO 9 DE JULIO 1157 PH 33</p>
-          <p style="font-size:13px;color:var(--text-medium);line-height:1.7;margin-bottom:20px">Este documento tiene validez legal bajo la Ley 25.506 de Firma Electrónica de la República Argentina.</p>
-          <div class="info-box">
-            <p>📎 <strong>1 documento adjunto</strong></p>
-            <p>✍️ <strong>1 firma requerida</strong></p>
-            <p>⏰ <strong>Vence en 7 días</strong></p>
-            <p>🔒 <strong>Autenticación: Firma + Email + Selfie</strong></p>
-          </div>
-        </div>
-        <div class="d-nav"><button class="d-btn d-btn-p" onclick="go(2)">Ver documento →</button></div>
-      </div>
-
-      <!-- SCREEN 2: Vista documento -->
-      <div class="screen" id="s2">
-        <div class="dots">
-          <div class="dot done"></div><div class="dot active"></div>
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <p style="font-size:13px;font-weight:600;margin-bottom:10px">📄 Revisá el documento</p>
-        <div style="border:1px solid var(--border);border-radius:10px;padding:16px;background:#FAFAFA;font-size:11px;color:var(--text-medium);line-height:1.8;max-height:210px;overflow-y:auto;margin-bottom:12px">
-          <strong style="display:block;text-align:center;font-size:12px;color:var(--text-dark);margin-bottom:10px">RESERVA DE COMPRA · N° 2026-061</strong>
-          <p>En la ciudad de Córdoba, a los 13 días del mes de junio de 2026, la Sra. <strong>MARIA SILVIA LOPEZ</strong>, DNI 12.345.678, en adelante "EL RESERVANTE", entrega en concepto de reserva la suma de <strong>PESOS OCHOCIENTOS MIL ($800.000)</strong> por la propiedad ubicada en <strong>9 de Julio 1157, Piso 2 PH 33</strong>, Ciudad de Córdoba, Provincia de Córdoba...</p>
-          <br/><p>La presente reserva tiene validez por el término de 10 (diez) días hábiles a partir de la fecha de suscripción. La suma entregada será imputada al precio de venta acordado...</p>
-          <br/>
-          <div style="background:#FFF9E6;border:1px dashed #F0C040;border-radius:6px;padding:10px;text-align:center;margin-top:8px">
-            <p style="color:#856404;font-size:12px;font-weight:600">✍️ Tu firma va aquí</p>
-          </div>
-        </div>
-        <p style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:12px">Scrolleá para leer el documento completo</p>
-        <div class="d-nav">
-          <button class="d-btn d-btn-s" onclick="go(1)">← Atrás</button>
-          <button class="d-btn d-btn-p" onclick="go(3)">Ir a firmar →</button>
-        </div>
-      </div>
-
-      <!-- SCREEN 3: Firma -->
-      <div class="screen" id="s3">
-        <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div>
-          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <p style="font-size:13px;font-weight:600;margin-bottom:4px">✍️ Dibujá tu firma</p>
-        <p style="font-size:12px;color:var(--text-light);margin-bottom:12px">Usá el dedo para firmar en el recuadro de abajo</p>
-        <canvas id="sigCanvas" width="310" height="130"></canvas>
-        <div style="display:flex;justify-content:flex-end;margin-top:8px;margin-bottom:14px">
-          <button onclick="clearSig()" style="padding:6px 14px;background:var(--bg-light);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-medium)">🗑 Limpiar</button>
-        </div>
-        <div class="d-nav">
-          <button class="d-btn d-btn-s" onclick="go(2)">← Atrás</button>
-          <button class="d-btn d-btn-p" onclick="go(4)">Confirmar firma →</button>
-        </div>
-      </div>
-
-      <!-- SCREEN 4: Selfie -->
-      <div class="screen" id="s4">
-        <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div>
-          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
-        </div>
-        <p style="font-size:13px;font-weight:600;margin-bottom:4px;text-align:center">🤳 Confirmá tu identidad</p>
-        <p style="font-size:12px;color:var(--text-medium);margin-bottom:16px;text-align:center">Necesitamos una selfie para validar quién firma</p>
-        <div class="selfie-frame" id="selfieFrame">
-          <div class="selfie-overlay" id="selfieOverlay">
-            <div class="selfie-icon">👤</div>
-            <div class="selfie-label">Posicioná tu cara<br>en el círculo</div>
-          </div>
-        </div>
-        <p style="font-size:11px;color:var(--text-light);text-align:center;margin:12px 0">La foto se marca con timestamp y se adjunta al informe de firmas</p>
-        <div class="d-nav">
-          <button class="d-btn d-btn-s" onclick="go(3)">← Atrás</button>
-          <button class="d-btn d-btn-p" onclick="takeSelfie()">📸 Sacar selfie →</button>
-        </div>
-      </div>
-
-      <!-- SCREEN 5: Código email -->
-      <div class="screen" id="s5">
-        <div class="dots">
-          <div class="dot done"></div><div class="dot done"></div>
-          <div class="dot done"></div><div class="dot done"></div>
-          <div class="dot active"></div>
-        </div>
-        <div style="text-align:center;padding:10px 0">
-          <div style="font-size:44px;margin-bottom:14px">📧</div>
-          <h4 style="font-size:16px;font-weight:600;margin-bottom:8px">Verificá tu email</h4>
-          <p style="font-size:13px;color:var(--text-medium);margin-bottom:22px;line-height:1.6">Enviamos un código de 4 dígitos a<br><strong>mar***@gmail.com</strong></p>
-          <div class="pin-row" style="margin-bottom:16px">
-            <input class="pin-input" id="p1" maxlength="1" oninput="pinNext(this,'p2')">
-            <input class="pin-input" id="p2" maxlength="1" oninput="pinNext(this,'p3')">
-            <input class="pin-input" id="p3" maxlength="1" oninput="pinNext(this,'p4')">
-            <input class="pin-input" id="p4" maxlength="1" oninput="pinLast(this)">
-          </div>
-          <p style="font-size:12px;color:var(--text-light)">¿No llegó? <a href="#" style="color:var(--primary)" onclick="return false">Reenviar código</a></p>
-        </div>
-        <div class="d-nav">
-          <button class="d-btn d-btn-s" onclick="go(4)">← Atrás</button>
-          <button class="d-btn d-btn-p" onclick="go(6)">Verificar →</button>
-        </div>
-      </div>
-
-      <!-- SCREEN 6: Éxito -->
-      <div class="screen" id="s6">
-        <div style="text-align:center;padding:16px 0">
-          <div class="success-circle">✓</div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:var(--success)">¡Firmado!</h3>
-          <p style="font-size:14px;color:var(--text-medium);margin-bottom:24px;line-height:1.7">Tu firma fue registrada con plena validez legal. El documento firmado fue enviado automáticamente a la inmobiliaria.</p>
-          <div class="info-box">
-            <p>✅ Firma manuscrita registrada</p>
-            <p>✅ Selfie con timestamp adjuntada</p>
-            <p>✅ Email verificado</p>
-            <p>✅ IP · GPS · Dispositivo registrados</p>
-            <p>✅ Hash SHA-256 del documento</p>
-            <p>✅ Informe de firmas generado</p>
-          </div>
-          <p style="font-size:11px;color:var(--text-light);margin-top:12px">Token de firma: e0a6cb32-39ab-45a9-ab93</p>
-        </div>
-        <div class="d-nav">
-          <button class="d-btn" style="background:var(--success);color:white" onclick="closeDemo()">Cerrar demo</button>
-        </div>
-      </div>
-
-    </div><!-- /phone-body -->
-  </div><!-- /phone -->
-</div><!-- /overlay -->
-
 <script>
-// ---- BILLING TOGGLE ----
-const prices = {
-  mensual: ['$15.000','$35.000','$70.000'],
-  anual:   ['$12.000','$28.000','$56.000']
-};
-let billing = 'mensual';
-function toggleBilling(){
-  billing = billing === 'mensual' ? 'anual' : 'mensual';
-  const toggle = document.getElementById('billingToggle');
-  const lblM = document.getElementById('lblMensual');
-  const lblA = document.getElementById('lblAnual');
-  toggle.classList.toggle('annual', billing === 'anual');
-  lblM.classList.toggle('active-label', billing === 'mensual');
-  lblA.classList.toggle('active-label', billing === 'anual');
-  document.querySelectorAll('.plan-price').forEach((el, i) => {
-    el.innerHTML = prices[billing][i] + ' <span>ARS</span>';
-  });
-  document.querySelectorAll('.plan-period').forEach(el => {
-    el.textContent = billing === 'anual' ? 'por mes · cobro anual' : 'por mes · cobro mensual';
-  });
-}
-
 // ---- FAQ ----
 function toggleFaq(el){
   const icon = el.querySelector('.faq-icon');
@@ -929,63 +662,6 @@ function toggleFaq(el){
   }
 }
 
-// ---- Canvas signature ----
-const cv = document.getElementById('sigCanvas');
-const ctx = cv ? cv.getContext('2d') : null;
-let drawing = false;
-
-function getPos(e, canvas){
-  const r = canvas.getBoundingClientRect();
-  const scale = canvas.width / r.width;
-  const src = e.touches ? e.touches[0] : e;
-  return {x:(src.clientX-r.left)*scale, y:(src.clientY-r.top)*scale};
-}
-
-if(cv){
-  cv.addEventListener('mousedown', e=>{drawing=true; const p=getPos(e,cv); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
-  cv.addEventListener('mousemove', e=>{ if(!drawing)return; const p=getPos(e,cv); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#1A2B35'; ctx.lineTo(p.x,p.y); ctx.stroke(); });
-  cv.addEventListener('mouseup',()=>drawing=false);
-  cv.addEventListener('touchstart', e=>{e.preventDefault(); drawing=true; const p=getPos(e,cv); ctx.beginPath(); ctx.moveTo(p.x,p.y);},{passive:false});
-  cv.addEventListener('touchmove', e=>{e.preventDefault(); if(!drawing)return; const p=getPos(e,cv); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#1A2B35'; ctx.lineTo(p.x,p.y); ctx.stroke();},{passive:false});
-  cv.addEventListener('touchend',()=>drawing=false);
-}
-
-function clearSig(){ if(ctx) ctx.clearRect(0,0,cv.width,cv.height); }
-
-// ---- Demo navigation ----
-function openDemo(){ document.getElementById('overlay').classList.add('open'); go(1); }
-function closeDemo(){ document.getElementById('overlay').classList.remove('open'); }
-function closeOutside(e){ if(e.target===document.getElementById('overlay')) closeDemo(); }
-
-function go(n){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById('s'+n).classList.add('on');
-  document.querySelector('.phone-body').scrollTop=0;
-}
-
-// ---- Selfie simulation ----
-function takeSelfie(){
-  const frame = document.getElementById('selfieFrame');
-  const overlay = document.getElementById('selfieOverlay');
-  overlay.innerHTML = '<div style="font-size:60px">📸</div><div class="selfie-label">Capturando...</div>';
-  frame.style.border = '3px solid var(--success)';
-  setTimeout(()=>{
-    overlay.innerHTML = '<div style="font-size:60px">✅</div><div class="selfie-label" style="color:#27AE60"><strong>¡Selfie capturada!</strong><br>06/13/2026 20:46:27</div>';
-    setTimeout(()=> go(5), 1200);
-  }, 1500);
-}
-
-// ---- PIN auto-advance ----
-function pinNext(el, nextId){
-  if(el.value) document.getElementById(nextId).focus();
-}
-function pinLast(el){
-  // auto-submit after all filled
-  const all = document.querySelectorAll('.pin-input');
-  let ok = true;
-  all.forEach(i=>{ if(!i.value) ok=false; });
-  if(ok) setTimeout(()=>go(6), 600);
-}
 </script>
 </body>
 </html>
