@@ -584,8 +584,8 @@ function decodeParam(str){
   } catch(e){ try{ return atob(str); } catch(e2){ return str; } }
 }
 
-const DOC_NAME   = decodeParam(DOCRAW)  || 'Documento';
-const FIRMANTE   = decodeParam(FIRMRAW) || '';
+let DOC_NAME   = decodeParam(DOCRAW)  || 'Documento';
+let FIRMANTE   = decodeParam(FIRMRAW) || '';
 
 // Fecha actual
 function fmtDate(d){
@@ -603,13 +603,15 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(init, 600);
 });
 
-function init(){
+async function init(){
   document.getElementById('loadingScreen').style.display = 'none';
 
   if(!TOKEN){
     document.getElementById('errorScreen').style.display = 'flex';
     return;
   }
+
+  await hydrateDocFromBackend();
 
   // Mostrar progress y página 1
   document.getElementById('progressWrap').style.display = 'block';
@@ -628,6 +630,16 @@ function init(){
   initCanvas();
 }
 
+async function hydrateDocFromBackend(){
+  try{
+    const r = await fetch('https://api.londonserviciosinmobiliarios.com.ar/api/doc?token=' + encodeURIComponent(TOKEN));
+    const data = await r.json();
+    if(!data.ok || !data.doc) return;
+    if(!DOCRAW && data.doc.docNombre) DOC_NAME = data.doc.docNombre;
+    if((!FIRMANTE || FIRMANTE === '—') && data.doc.firmante && data.doc.firmante !== '—') FIRMANTE = data.doc.firmante;
+  }catch(e){}
+}
+
 // ==================== ESTADO GLOBAL ====================
 let currentStep   = 1;
 let otpVerified   = false;
@@ -638,6 +650,21 @@ let livenessPrevFrame     = null;
 let dniStream = null;
 let dniData   = null;
 let resendInterval = null;
+
+function getApproxLocation(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation) return resolve({});
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({
+        lat: String(pos.coords.latitude),
+        lng: String(pos.coords.longitude),
+        location: String(pos.coords.latitude) + ', ' + String(pos.coords.longitude)
+      }),
+      () => resolve({}),
+      { enableHighAccuracy:false, timeout:4500, maximumAge:300000 }
+    );
+  });
+}
 
 function setStep(n){
   for(let i=1;i<=4;i++){
@@ -1057,6 +1084,7 @@ async function confirmarFirma(){
   const sigImg    = canvas.toDataURL('image/png');
   const ts        = new Date();
   const tsStr     = fmtDate(ts);
+  const geoData   = await getApproxLocation();
 
   // Datos del evento
   const payload = {
@@ -1068,6 +1096,9 @@ async function confirmarFirma(){
     dni:            window._dni,
     timestamp:      ts.toISOString(),
     fecha_hora:     tsStr,
+    lat:            geoData.lat || '',
+    lng:            geoData.lng || '',
+    ubicacion:      geoData.location || '',
     user_agent:     navigator.userAgent,
     idioma:         navigator.language,
     selfie:         selfieData ? 'sí' : 'no',
@@ -1090,7 +1121,10 @@ async function confirmarFirma(){
         firmante:   window._nombre,
         email:      window._email,
         dni:        window._dni,
-        device:     navigator.userAgent.substring(0,100),
+        lat:        geoData.lat || '',
+        lng:        geoData.lng || '',
+        location:   geoData.location || '',
+        device:     navigator.userAgent,
         otpEmail:   otpVerified       ? 'sí' : 'no',
         selfie:     selfieData        ? 'sí' : 'no',
         dniFoto:    dniData           ? 'sí' : 'no',
