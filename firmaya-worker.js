@@ -52,7 +52,9 @@ function publicDoc(data){
     dni: data.dni || '',
     lat: data.lat || '',
     lng: data.lng || '',
+    location: data.location || '',
     ip: data.ip || '',
+    device: data.device || '',
     otpEmail: data.otpEmail || '',
     selfie: data.selfie || '',
     dniFoto: data.dniFoto || '',
@@ -259,10 +261,16 @@ export default {
     if(url.pathname === '/api/sign' && request.method === 'POST'){
       try{
         const body = await request.json();
-        const { token, firmante, email, dni, lat, lng, ip, device, docNombre } = body;
+        const { token, firmante, email, dni, docNombre } = body;
         if(!token) return json({ok:false, error:'Token requerido'}, 400);
 
         const firmadoEn = new Date().toISOString();
+        const cf = request.cf || {};
+        const lat = body.lat || cf.latitude || '';
+        const lng = body.lng || cf.longitude || '';
+        const ip = body.ip || request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || '';
+        const device = body.device || request.headers.get('User-Agent') || '';
+        const location = body.location || [cf.city, cf.region, cf.country].filter(Boolean).join(', ');
 
         if(env.FIRMAYA_KV){
           const existing = await env.FIRMAYA_KV.get('doc:' + token, 'json');
@@ -274,6 +282,7 @@ export default {
           docData.firmadoEn = firmadoEn;
           docData.lat       = lat;
           docData.lng       = lng;
+          docData.location  = location;
           docData.ip        = ip;
           docData.device    = device;
           // Flags de verificación (sin los datos de foto — esos van en photos:TOKEN)
