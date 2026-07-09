@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>FirmaYa — Firma tu documento</title>
 <!-- OG / WhatsApp preview -->
 <meta property="og:title" content="FirmaYa — Firma tu documento">
@@ -864,14 +864,22 @@ async function loadDocumentPreview(token){
       for(let p = 1; p <= Math.min(pdf.numPages, 10); p++){
         const page = await pdf.getPage(p);
         const vp0  = page.getViewport({scale:1});
-        const scale = Math.min((availW || 320) / vp0.width, 2);
+        const scale = Math.min((availW || 320) / vp0.width, 2.2);
         const vp   = page.getViewport({scale});
+        const outputScale = Math.min(window.devicePixelRatio || 1, 3);
         const cvs  = document.createElement('canvas');
-        cvs.width  = vp.width;
-        cvs.height = vp.height;
-        cvs.style.cssText = 'display:block;margin:0 auto 6px;box-shadow:0 2px 6px rgba(0,0,0,.4);border-radius:2px';
+        cvs.width  = Math.floor(vp.width * outputScale);
+        cvs.height = Math.floor(vp.height * outputScale);
+        cvs.style.width = Math.floor(vp.width) + 'px';
+        cvs.style.height = Math.floor(vp.height) + 'px';
+        cvs.style.cssText += 'display:block;margin:0 auto 10px;box-shadow:0 2px 6px rgba(0,0,0,.4);border-radius:2px;background:white';
         content.appendChild(cvs);
-        await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
+        const ctx = cvs.getContext('2d', {alpha:false});
+        await page.render({
+          canvasContext: ctx,
+          viewport: vp,
+          transform: outputScale !== 1 ? [outputScale,0,0,outputScale,0,0] : null
+        }).promise;
       }
 
     } else if(mime.includes('word') || mime.includes('docx') || mime.includes('officedocument')){
