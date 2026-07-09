@@ -53,6 +53,7 @@ function publicDoc(data){
     lat: data.lat || '',
     lng: data.lng || '',
     location: data.location || '',
+    locationSource: data.locationSource || '',
     ip: data.ip || '',
     device: data.device || '',
     otpEmail: data.otpEmail || '',
@@ -270,7 +271,9 @@ export default {
         const lng = body.lng || cf.longitude || '';
         const ip = body.ip || request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || '';
         const device = body.device || request.headers.get('User-Agent') || '';
+        const hasGps = Boolean(body.lat && body.lng);
         const location = body.location || [cf.city, cf.region, cf.country].filter(Boolean).join(', ');
+        const locationSource = hasGps ? 'gps' : (location ? 'network' : '');
 
         if(env.FIRMAYA_KV){
           const existing = await env.FIRMAYA_KV.get('doc:' + token, 'json');
@@ -283,6 +286,7 @@ export default {
           docData.lat       = lat;
           docData.lng       = lng;
           docData.location  = location;
+          docData.locationSource = locationSource;
           docData.ip        = ip;
           docData.device    = device;
           // Flags de verificación (sin los datos de foto — esos van en photos:TOKEN)
