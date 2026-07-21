@@ -4,10 +4,6 @@
 //   POST /api/upload     → sube archivo del doc a KV para que el cliente lo vea
 //   GET  /api/file       → sirve el archivo del doc desde KV
 //   POST /api/sign       → registra la firma (guarda en KV)
-//   GET  /api/list       → lista documentos guardados en KV
-//   GET  /api/doc        → obtiene metadata de un documento por token
-//   DELETE /api/doc      → elimina metadata, archivo y fotos por token
-//   DELETE /api/delete   → alias compatible para eliminar por token
 //   GET  /api/check      → consulta si un token fue firmado
 //   GET  /api/acms       → obtiene lista de ACMs guardados por agente
 //   POST /api/acms       → guarda un ACM en la nube
@@ -37,35 +33,6 @@ function json(data, status=200){
   });
 }
 
-function publicDoc(data){
-  if(!data) return null;
-  return {
-    token: data.token || '',
-    docNombre: data.docNombre || data.fileNombre || 'Documento',
-    firmante: data.firmante || data.emailFirmante || '—',
-    emailFirmante: data.emailFirmante || data.email || '',
-    estado: data.estado || 'Pendiente',
-    creadoEn: data.creadoEn || null,
-    firmadoEn: data.firmadoEn || null,
-    fileMime: data.fileMime || '',
-    fileNombre: data.fileNombre || '',
-    dni: data.dni || '',
-    lat: data.lat || '',
-    lng: data.lng || '',
-    location: data.location || '',
-    locationSource: data.locationSource || '',
-    ip: data.ip || '',
-    device: data.device || '',
-    otpEmail: data.otpEmail || '',
-    selfie: data.selfie || '',
-    dniFoto: data.dniFoto || '',
-    liveness: data.liveness || '',
-    tieneFotos: data.tieneFotos || '',
-    tieneFirma: data.tieneFirma || '',
-    signPosition: data.signPosition || null
-  };
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -74,80 +41,25 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
-    // ── GET /api/list ────────────────────────────────────────────────────────
-    // Lista documentos reales guardados en KV para el panel admin.
-    if(url.pathname === '/api/list' && request.method === 'GET'){
-      if(!env.FIRMAYA_KV) return json({ ok: false, docs: [], error: 'KV no configurado' }, 500);
-      try{
-        const listed = await env.FIRMAYA_KV.list({ prefix: 'doc:', limit: 1000 });
-        const docs = [];
-        for(const key of listed.keys || []){
-          const data = await env.FIRMAYA_KV.get(key.name, 'json');
-          const doc = publicDoc(data);
-          if(doc && doc.token) docs.push(doc);
-        }
-        docs.sort((a,b) => new Date(b.creadoEn || b.firmadoEn || 0) - new Date(a.creadoEn || a.firmadoEn || 0));
-        return json({ ok: true, docs });
-      }catch(e){
-        return json({ ok: false, docs: [], error: e.message }, 500);
-      }
-    }
-
-    // ── GET /api/doc ─────────────────────────────────────────────────────────
-    if(url.pathname === '/api/doc' && request.method === 'GET'){
-      const token = url.searchParams.get('token');
-      if(!token) return json({ ok: false, error: 'Token requerido' }, 400);
-      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
-      try{
-        const data = await env.FIRMAYA_KV.get('doc:' + token, 'json');
-        if(!data) return json({ ok: false, error: 'Documento no encontrado' }, 404);
-        return json({ ok: true, doc: publicDoc(data) });
-      }catch(e){
-        return json({ ok: false, error: e.message }, 500);
-      }
-    }
-
-    // ── DELETE /api/doc ──────────────────────────────────────────────────────
-    if((url.pathname === '/api/doc' || url.pathname === '/api/delete') && request.method === 'DELETE'){
-      const token = url.searchParams.get('token');
-      if(!token) return json({ ok: false, error: 'Token requerido' }, 400);
-      if(!env.FIRMAYA_KV) return json({ ok: false, error: 'KV no configurado' }, 500);
-      try{
-        await Promise.all([
-          env.FIRMAYA_KV.delete('doc:' + token),
-          env.FIRMAYA_KV.delete('file:' + token),
-          env.FIRMAYA_KV.delete('photos:' + token)
-        ]);
-        return json({ ok: true });
-      }catch(e){
-        return json({ ok: false, error: e.message }, 500);
-      }
-    }
-
     // ── POST /api/send ────────────────────────────────────────────────────────
     // Registra el documento en KV y OPCIONALMENTE envía email
     if(url.pathname === '/api/send' && request.method === 'POST'){
       try{
         const body = await request.json();
-        const { token, docNombre, firmante, emailFirmante, firmarUrl, sendEmail, signPosition } = body;
-        if(!token || !firmarUrl || !docNombre || !firmante) return json({ok:false, error:'Faltan datos'}, 400);
-        if(sendEmail !== false && !emailFirmante) return json({ok:false, error:'Email del firmante requerido'}, 400);
+        const { token, docNombre, firmante, emailFirmante, firmarUrl, sendEmail } = body;
+        if(!token || !firmarUrl) return json({ok:false, error:'Faltan datos'}, 400);
 
         // Siempre guardar en KV (funciona para email Y WhatsApp)
         if(env.FIRMAYA_KV){
-          const existing = (await env.FIRMAYA_KV.get('doc:' + token, 'json')) || {};
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify({
-            ...existing,
             token, docNombre, firmante, emailFirmante, firmarUrl,
-            signPosition: signPosition || existing.signPosition || null,
             estado: 'Pendiente',
-            creadoEn: existing.creadoEn || new Date().toISOString()
+            creadoEn: new Date().toISOString()
           }), { expirationTtl: 60 * 60 * 24 * 90 });
         }
 
         // Solo enviar email si se pide y hay email
-        if(sendEmail !== false){
-          if(!env.RESEND_API_KEY) return json({ ok: false, error: 'RESEND_API_KEY no configurado' }, 500);
+        if(sendEmail !== false && emailFirmante && env.RESEND_API_KEY){
           const emailResp = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -155,7 +67,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
               to: [emailFirmante],
               subject: 'Tenés un documento para firmar: ' + docNombre,
               html: `
@@ -186,11 +98,7 @@ export default {
 </div>`
             })
           });
-          let emailData = {};
-          try{ emailData = await emailResp.json(); }catch(_){}
-          if(!emailResp.ok){
-            return json({ ok: false, emailEnviado: false, error: emailData.message || emailData.error || 'Error al enviar email' }, 502);
-          }
+          const emailData = await emailResp.json();
           return json({ ok: true, emailEnviado: emailResp.ok, emailId: emailData.id });
         }
 
@@ -262,18 +170,10 @@ export default {
     if(url.pathname === '/api/sign' && request.method === 'POST'){
       try{
         const body = await request.json();
-        const { token, firmante, email, dni, docNombre } = body;
+        const { token, firmante, email, dni, lat, lng, ip, device, docNombre } = body;
         if(!token) return json({ok:false, error:'Token requerido'}, 400);
 
         const firmadoEn = new Date().toISOString();
-        const cf = request.cf || {};
-        const lat = body.lat || cf.latitude || '';
-        const lng = body.lng || cf.longitude || '';
-        const ip = body.ip || request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || '';
-        const device = body.device || request.headers.get('User-Agent') || '';
-        const hasGps = Boolean(body.lat && body.lng);
-        const location = body.location || [cf.city, cf.region, cf.country].filter(Boolean).join(', ');
-        const locationSource = hasGps ? 'gps' : (location ? 'network' : '');
 
         if(env.FIRMAYA_KV){
           const existing = await env.FIRMAYA_KV.get('doc:' + token, 'json');
@@ -285,8 +185,6 @@ export default {
           docData.firmadoEn = firmadoEn;
           docData.lat       = lat;
           docData.lng       = lng;
-          docData.location  = location;
-          docData.locationSource = locationSource;
           docData.ip        = ip;
           docData.device    = device;
           // Flags de verificación (sin los datos de foto — esos van en photos:TOKEN)
@@ -295,15 +193,13 @@ export default {
           docData.dniFoto   = body.dniFoto   || 'no';
           docData.liveness  = body.liveness  || 'no';
           docData.tieneFotos = (body.selfieImg || body.dniFotoImg) ? 'sí' : 'no';
-          docData.tieneFirma = body.firmaImg ? 'sí' : 'no';
           await env.FIRMAYA_KV.put('doc:' + token, JSON.stringify(docData), { expirationTtl: 60 * 60 * 24 * 365 });
 
           // Guardar fotos en clave separada para no inflar el registro principal
-          if(body.selfieImg || body.dniFotoImg || body.firmaImg){
+          if(body.selfieImg || body.dniFotoImg){
             const photos = {
               selfie:     body.selfieImg  || null,
               dniFoto:    body.dniFotoImg || null,
-              firma:      body.firmaImg    || null,
               firmante,
               token,
               guardadoEn: firmadoEn
@@ -323,7 +219,7 @@ export default {
             : '<span style="color:#aaa">—</span>';
 
           const emailPayload = {
-            from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
+            from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
             to:   ['londonserviciosinmobiliarios@gmail.com'],
             subject: '✅ ' + firmante + ' firmó: ' + docNombreFinal,
             html: `
@@ -559,7 +455,7 @@ export default {
       try{
         const data = await env.FIRMAYA_KV.get('photos:' + token, 'json');
         if(!data) return json({ ok: false, error: 'Fotos no encontradas para este token' }, 404);
-        return json({ ok: true, selfie: data.selfie, dniFoto: data.dniFoto, firma: data.firma, firmante: data.firmante, guardadoEn: data.guardadoEn });
+        return json({ ok: true, selfie: data.selfie, dniFoto: data.dniFoto, firmante: data.firmante, guardadoEn: data.guardadoEn });
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
@@ -589,7 +485,7 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'FirmaYa <noreply@londonserviciosinmobiliarios.com.ar>',
+              from: 'FirmaYa <noreply@firmaya.londonserviciosinmobiliarios.com.ar>',
               to: [email],
               subject: 'Tu código de verificación es: ' + otp,
               html: `
@@ -622,15 +518,7 @@ export default {
 </div>`
             })
           });
-          let resendData = {};
-          try{ resendData = await r.json(); }catch(_){}
-          if(!r.ok){
-            return json({
-              ok: false,
-              error: resendData.message || resendData.error || 'Error al enviar email de verificación',
-              resendStatus: r.status
-            }, 500);
-          }
+          if(!r.ok){ return json({ ok: false, error: 'Error al enviar email de verificación' }, 500); }
         }
 
         return json({ ok: true });
@@ -658,16 +546,21 @@ export default {
       }catch(e){ return json({ ok: false, error: e.message }, 500); }
     }
 
-
-    // ── GET /api/visitas-tasacion ─────────────────────────────────────────────
-    // Proxy server-side para evitar bloqueo CORS de counterapi.dev en panel admin
-    if(url.pathname === '/api/visitas-tasacion' && request.method === 'GET'){
+    // ── GET/POST /api/visitas-tasacion ───────────────────────────────────────
+    // Proxy server-side para leer y sumar visitas sin depender de CORS del navegador.
+    // Lectura:      GET /api/visitas-tasacion
+    // Sumar visita: GET /api/visitas-tasacion?action=up  o POST /api/visitas-tasacion
+    if(url.pathname === '/api/visitas-tasacion' && (request.method === 'GET' || request.method === 'POST')){
       try {
-        const r = await fetch('https://api.counterapi.dev/v1/london-tasacion/visitas');
+        const shouldIncrement = request.method === 'POST' || url.searchParams.get('action') === 'up';
+        const endpoint = shouldIncrement
+          ? 'https://api.counterapi.dev/v1/london-tasacion/visitas/up'
+          : 'https://api.counterapi.dev/v1/london-tasacion/visitas';
+        const r = await fetch(endpoint, { cf: { cacheTtl: 0, cacheEverything: false } });
         const data = await r.json();
-        return json({ count: data.count ?? 0 });
+        return json({ ok: true, incremented: shouldIncrement, count: data.count ?? 0 });
       } catch(e) {
-        return json({ count: 0, error: e.message }, 200);
+        return json({ ok: false, count: 0, error: e.message }, 200);
       }
     }
 
